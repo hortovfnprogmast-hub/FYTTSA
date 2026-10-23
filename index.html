@@ -1,1 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio de Sesión - LORETO</title>
 
+    <!-- PWA & Web Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#058EA6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://i.ibb.co/Q7gpgrtS/chiquita.png">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- SDKs de Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #152B71;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 21px 12px 12px 12px; 
+            box-sizing: border-box;
+        }
+
+        .login-box {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 12px 25px 15px 25px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            width: 100%; 
+            max-width: 550px; 
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .main-logo {
+            width: 100px; 
+            height: auto;
+            margin-top: 0px; 
+            margin-bottom: 15px; 
+        }
+
+        .company-name {
+            font-size: 13pt; 
+            color: #152B71;
+            font-weight: bold;
+            margin-bottom: 20px; 
+            line-height: 1.4;
+        }
+
+        .no-wrap {
+            white-space: nowrap;
+        }
+
+        .welcome-text {
+            font-size: 16px; 
+            color: #333333;
+            margin-bottom: 25px; 
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 20px; 
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 13px; 
+            color: #555;
+            margin-bottom: 8px; 
+            font-weight: 600;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 18px 16px 18px 45px; 
+            border: 1px solid #cccccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 15px; 
+            background-color: #f9f9f9;
+        }
+
+        .input-group .field-icon {
+            position: absolute;
+            left: 14px; 
+            top: 50%;
+            transform: translateY(-50%);
+            color: #888;
+            font-size: 16px; 
+        }
+
+        .input-group .toggle-password {
+            position: absolute;
+            right: 14px; 
+            top: 50%;
+            transform: translateY(-50%);
+            color: #888;
+            cursor: pointer;
+            font-size: 16px; 
+        }
+
+        .login-button {
+            background-color: #152B71;
+            color: #ffffff;
+            border: none;
+            padding: 18px; 
+            border-radius: 6px;
+            font-size: 17px; 
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 5px;
+            margin-bottom: 5px; 
+            transition: background-color 0.3s;
+        }
+        
+        .login-button:hover {
+            background-color: #0d1a4a;
+        }
+        
+        .login-button:disabled {
+            background-color: #5a6fb0;
+            cursor: not-allowed;
+        }
+
+        #mensaje {
+            margin-bottom: 5px;
+            font-size: 13px; 
+            font-weight: bold;
+            min-height: 18px; 
+        }
+
+        .bottom-logo {
+            width: 212px; 
+            height: auto;
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+
+        .copyright {
+            font-size: 10px; 
+            color: #ffffff;
+            margin-top: 15px; 
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-box">
+        <img src="https://i.ibb.co/jv9mNxYr/LOGO1.png" alt="Logo LORETO" class="main-logo">
+        
+        <div class="company-name">
+            <span class="no-wrap">LORETO</span>
+        </div>
+        
+        <div class="welcome-text">Bienvenido</div>
+
+        <div class="input-group">
+            <label for="username">Usuario</label>
+            <div class="input-wrapper">
+                <i class="fas fa-id-badge field-icon"></i>
+                <input type="text" id="username" placeholder="ID de Usuario">
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label for="password">Contraseña</label>
+            <div class="input-wrapper">
+                <i class="fas fa-lock field-icon"></i>
+                <input type="password" id="password" placeholder="••••••••">
+                <i class="fas fa-eye toggle-password" id="togglePasswordIcon"></i>
+            </div>
+        </div>
+
+        <button type="button" class="login-button" id="btn-login" onclick="iniciarSesion()">Iniciar sesión</button>
+        
+        <div id="mensaje"></div>
+
+        <img src="https://i.ibb.co/fdMsnKTg/LOGO2.png" alt="Maquinaria" class="bottom-logo">
+    </div>
+
+    <div class="copyright">
+        © 2026 LORETO. TODOS LOS DERECHOS RESERVADOS.
+    </div>
+
+    <script>
+        // REGISTRO DEL SERVICE WORKER PARA PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('Service Worker registrado correctamente:', reg.scope))
+                    .catch(err => console.error('Error al registrar Service Worker:', err));
+            });
+        }
+
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyD9Ihkh0NaP5vVbKntobmVTb53T0yDAZjU",
+            authDomain: "fyttsa-ae508.firebaseapp.com",
+            projectId: "fyttsa-ae508",
+            storageBucket: "fyttsa-ae508.firebasestorage.app",
+            messagingSenderId: "860564632264",
+            appId: "1:860564632264:web:30edf5a8f837e284ab2bfd",
+            measurementId: "G-7PQ1R77YJ3"
+        };
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const db = firebase.firestore();
+
+        const togglePasswordIcon = document.getElementById('togglePasswordIcon');
+        const passwordField = document.getElementById('password');
+
+        togglePasswordIcon.addEventListener('click', function () {
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
+            
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+
+        function iniciarSesion() {
+            var user = document.getElementById("username").value;
+            var pass = document.getElementById("password").value;
+            var btnLogin = document.getElementById("btn-login");
+            var mensajeDiv = document.getElementById("mensaje");
+            
+            if (!user || !pass) {
+                mensajeDiv.innerText = "Ingresa tus credenciales";
+                mensajeDiv.style.color = "#d93025";
+                return;
+            }
+
+            btnLogin.innerText = "Validando...";
+            btnLogin.disabled = true;
+            mensajeDiv.innerText = "";
+            
+            var scriptURL = "https://script.google.com/macros/s/AKfycbzXU8zmHurIHSmo4-eZNHxjGM9_XM2qcXyWX1ijILY2s10ZbJBrVe2OQvVxLcNdk40/exec";
+
+            fetch(scriptURL, {
+                method: 'POST',
+                body: JSON.stringify({ usuario: user, contrasena: pass }),
+                headers: {
+                    'Content-Type': 'text/plain;charset=utf-8'
+                }
+            })
+            .then(response => response.json())
+            .then(respuesta => {
+                btnLogin.innerText = "Iniciar sesión";
+                btnLogin.disabled = false;
+                
+                if(respuesta.success) {
+                    mensajeDiv.style.color = "#188038";
+                    mensajeDiv.innerText = "¡Bienvenido! Redirigiendo...";
+                    
+                    localStorage.setItem('usuario', user); 
+                    localStorage.setItem('privilegio', respuesta.privilegio);
+                    localStorage.setItem('nombre', respuesta.nombre); 
+                    
+                    db.collection("usuarios").doc(user).set({
+                        nombre: respuesta.nombre, 
+                        usuario: user
+                    }, { merge: true })
+                    .then(() => {
+                        console.log("Usuario registrado/actualizado en Firebase");
+                    })
+                    .catch((error) => {
+                        console.error("Error al registrar en Firebase: ", error);
+                    });
+                    
+                    setTimeout(() => {
+                        window.location.href = "inicio.html";
+                    }, 1000);
+                } else {
+                    mensajeDiv.style.color = "#d93025";
+                    mensajeDiv.innerText = respuesta.mensaje;
+                }
+            })
+            .catch(error => {
+                btnLogin.innerText = "Iniciar sesión";
+                btnLogin.disabled = false;
+                mensajeDiv.style.color = "#d93025";
+                mensajeDiv.innerText = "Error de red. Reintenta.";
+                console.error('Error:', error);
+            });
+        }
+    </script>
+
+</body>
+</html>
