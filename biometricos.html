@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Biométricos | Loreto Ingeniería</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        :root {
+            --primary-blue: #152B71; --light-blue: #eef2ff; --bg-color: #f8fafc;
+            --text-main: #1e293b; --text-muted: #64748b; --border-color: #e2e8f0;
+            --success-bg: #f0fdf4; --success-text: #166534; --danger: #dc2626;
+        }
+
+        body { margin: 0; font-family: 'Inter', sans-serif; background-color: var(--bg-color); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: white; border-bottom: 1px solid var(--border-color); z-index: 50; }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .menu-btn { background: none; border: none; cursor: pointer; color: var(--text-main); }
+        .header-title { margin: 0; font-size: 15px; font-weight: 700; color: var(--primary-blue); }
+        .header-right { display: flex; align-items: center; gap: 12px; }
+        .user-initial { width: 35px; height: 35px; border-radius: 50%; background-color: var(--primary-blue); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+
+        .main-layout { display: flex; flex: 1; overflow: hidden; }
+        .sidebar { width: 260px; background: white; border-right: 1px solid var(--border-color); overflow-y: auto; transition: transform 0.3s ease; display: flex; flex-direction: column; }
+        @media (max-width: 768px) { .sidebar { position: fixed; height: calc(100vh - 60px); transform: translateX(-100%); z-index: 40; } .sidebar.open { transform: translateX(0); } .header-title { display: none; } }
+
+        .sidebar-nav { padding: 15px 10px; }
+        .sidebar-section { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
+        .sidebar-section:last-child { border-bottom: none; }
+        .sidebar .section-title { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin: 10px 15px; padding-bottom: 0; border-bottom: none; display: block; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 15px; color: var(--text-main); text-decoration: none; font-size: 14px; font-weight: 500; border-radius: 8px; margin-bottom: 2px; transition: all 0.2s; }
+        .nav-item:hover { background-color: var(--bg-color); }
+        .nav-item.active { background-color: var(--light-blue); color: var(--primary-blue); font-weight: 700; border-left: 4px solid var(--primary-blue); }
+        .nav-item.active i { color: var(--primary-blue); }
+
+        .content { flex: 1; padding: 20px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        .biometricos-container { max-width: 1100px; margin: 0 auto; padding-bottom: 80px; }
+        
+        .page-header { margin-bottom: 30px; border-bottom: 2px solid var(--border-color); padding-bottom: 15px; }
+        .page-header h1 { font-size: 24px; color: var(--primary-blue); margin: 0 0 5px 0; font-weight: 800; }
+        .page-header p { color: var(--text-muted); margin: 0; font-size: 14px; }
+
+        .data-card { background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.04); border: 1px solid var(--border-color); margin-bottom: 25px; }
+        .section-title { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 700; color: var(--primary-blue); margin: 0 0 20px 0; padding-bottom: 12px; border-bottom: 1px solid var(--bg-color); }
+        
+        .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 10px; border: 1px solid var(--border-color); }
+        .data-table { width: 100%; border-collapse: collapse; min-width: 850px; }
+        .data-table th { background-color: var(--light-blue); color: var(--primary-blue); font-size: 12px; font-weight: 800; text-transform: uppercase; padding: 14px 12px; text-align: center; border-bottom: 2px solid var(--border-color); white-space: nowrap; }
+        .data-table td { padding: 12px; font-size: 13px; color: var(--text-main); border-bottom: 1px solid var(--border-color); text-align: center; font-weight: 500; }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tbody tr:hover { background-color: #f8fafc; }
+        
+        .row-active { background-color: var(--success-bg) !important; }
+        .row-active td { color: var(--success-text); }
+        
+        .cell-dia { font-weight: 800 !important; color: var(--primary-blue) !important; font-size: 14px; }
+        .cell-fecha { text-transform: capitalize; color: var(--text-muted); font-size: 12px; }
+        .cell-empty { color: #cbd5e1 !important; font-weight: 400 !important; }
+        
+        .cell-horas-jor { font-weight: 700; color: var(--primary-blue); background-color: var(--light-blue); border-radius: 4px; padding: 4px 8px; display: inline-block;}
+        .cell-horas-te { font-weight: 700; color: #0f766e; background-color: #d1fae5; border-radius: 4px; padding: 4px 8px; display: inline-block;}
+
+        .loader-container { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; color: var(--primary-blue); font-weight: 600; }
+
+        .fab-download { position: fixed; bottom: 30px; right: 30px; background-color: var(--danger); color: white; border: none; border-radius: 50px; padding: 16px 24px; font-size: 15px; font-weight: 700; cursor: pointer; box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4); display: none; align-items: center; gap: 10px; z-index: 1000; transition: transform 0.2s, background-color 0.2s; }
+        .fab-download:hover { transform: translateY(-5px); background-color: #b91c1c; }
+        @media (max-width: 768px) { .fab-download { bottom: 20px; right: 20px; padding: 14px 20px; font-size: 14px; } }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-left">
+            <button class="menu-btn" id="toggle-menu"><i data-lucide="menu"></i></button>
+            <img src="https://i.ibb.co/fdMsnKTg/LOGO2.png" alt="Logo" style="height: 35px; object-fit: contain;">
+            <h1 class="header-title">Biométricos</h1>
+        </div>
+        <div class="header-right">
+            <div class="user-initial" id="user-initial">U</div>
+            <img src="https://i.ibb.co/jv9mNxYr/LOGO1.png" alt="User" height="35" style="border-radius:4px;">
+        </div>
+    </header>
+
+    <div class="main-layout">
+        <aside class="sidebar" id="sidebar"></aside>
+
+        <main class="content">
+            <div class="biometricos-container">
+                <div class="page-header">
+                    <h1>Biométricos y Asistencias</h1>
+                    <p>Visualiza el registro detallado de tus horas laboradas, desglosado por día y ubicación.</p>
+                </div>
+
+                <div id="loader" class="loader-container">
+                    <i data-lucide="loader-2" class="animate-spin" style="width:40px; height:40px; margin-bottom: 15px;"></i>
+                    <p>Sincronizando registros con la base de datos...</p>
+                </div>
+
+                <div id="tablas-container" style="display: none;">
+                    <div class="data-card">
+                        <h3 class="section-title"><i data-lucide="calendar-days"></i> <span id="title-mes-actual">Mes Actual</span></h3>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 40px;">#</th>
+                                        <th>Día / Fecha</th>
+                                        <th>Sitio / Obra</th>
+                                        <th>Entrada</th>
+                                        <th>Salida</th>
+                                        <th>HORAS JOR</th>
+                                        <th>Entrada T.E.</th>
+                                        <th>Salida T.E.</th>
+                                        <th>HORAS T.E.</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-mes-actual"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="data-card">
+                        <h3 class="section-title"><i data-lucide="history"></i> <span id="title-mes-anterior">Mes Anterior</span></h3>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 40px;">#</th>
+                                        <th>Día / Fecha</th>
+                                        <th>Sitio / Obra</th>
+                                        <th>Entrada</th>
+                                        <th>Salida</th>
+                                        <th>HORAS JOR</th>
+                                        <th>Entrada T.E.</th>
+                                        <th>Salida T.E.</th>
+                                        <th>HORAS T.E.</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-mes-anterior"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <button id="btn-descargar-pdf" class="fab-download" onclick="generarPDF()"><i data-lucide="file-down"></i> Descargar Biométrico</button>
+
+    <script>
+        // Configuración de Firebase actualizada
+        const firebaseConfig = {
+            apiKey: "AIzaSyD9Ihkh0NaP5vVbKntobmVTb53T0yDAZjU",
+            authDomain: "fyttsa-ae508.firebaseapp.com",
+            projectId: "fyttsa-ae508",
+            storageBucket: "fyttsa-ae508.firebasestorage.app",
+            messagingSenderId: "860564632264",
+            appId: "1:860564632264:web:30edf5a8f837e284ab2bfd",
+            measurementId: "G-7PQ1R77YJ3"
+        };
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const db = firebase.firestore();
+
+        fetch('menu.html').then(res => res.text()).then(html => {
+            document.getElementById('sidebar').innerHTML = html; lucide.createIcons();
+            const linkInicio = document.getElementById('link-inicio'); if(linkInicio) linkInicio.classList.remove('active');
+            const linkBiometricos = document.getElementById('link-biometricos'); if(linkBiometricos) linkBiometricos.classList.add('active');
+        });
+
+        document.getElementById('toggle-menu').addEventListener('click', () => { document.getElementById('sidebar').classList.toggle('open'); });
+
+        const idUsuario = localStorage.getItem('usuario');
+        const nombreUsuario = localStorage.getItem('nombre') || 'Usuario Desconocido';
+        document.getElementById('user-initial').innerText = nombreUsuario.charAt(0).toUpperCase();
+
+        function calcularDiferenciaHoras(entrada, salida) {
+            if (entrada === '-' || salida === '-') return '-';
+            function parseTime(timeStr) {
+                const match = timeStr.match(/(\d+):(\d+)(?::(\d+))?\s*(a\.?m\.?|p\.?m\.?|am|pm)?/i);
+                if (!match) return null;
+                let hours = parseInt(match[1], 10); const mins = parseInt(match[2], 10);
+                const modifier = match[4] ? match[4].toLowerCase().replace(/\./g, '') : '';
+                if (modifier === 'pm' && hours < 12) hours += 12;
+                if (modifier === 'am' && hours === 12) hours = 0;
+                const date = new Date(); date.setHours(hours, mins, 0, 0); return date;
+            }
+
+            const t1 = parseTime(entrada); const t2 = parseTime(salida);
+            if (!t1 || !t2) return '-';
+            let diffMs = t2 - t1;
+            if (diffMs < 0) diffMs += 24 * 60 * 60 * 1000;
+            const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
+            const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+            return `${diffHrs}h ${diffMins.toString().padStart(2, '0')}m`;
+        }
+
+        const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        const hoy = new Date(); const diaActual = hoy.getDate(); const mesActual = hoy.getMonth(); const añoActual = hoy.getFullYear();
+        let mesAnterior = mesActual - 1; let añoAnterior = añoActual;
+        if (mesAnterior < 0) { mesAnterior = 11; añoAnterior--; }
+
+        document.getElementById('title-mes-actual').innerText = `Mes Actual: ${meses[mesActual]} ${añoActual}`;
+        document.getElementById('title-mes-anterior').innerText = `Mes Anterior: ${meses[mesAnterior]} ${añoAnterior}`;
+
+        function diasEnElMes(mes, año) { return new Date(año, mes + 1, 0).getDate(); }
+        const maxDiasActual = diasEnElMes(mesActual, añoActual);
+        const maxDiasAnterior = diasEnElMes(mesAnterior, añoAnterior);
+
+        let datosActual = Array.from({length: maxDiasActual + 1}, () => ({sitio: '', entrada: '-', salida: '-', entradaExt: '-', salidaExt: '-', fechaStr: ''}));
+        let datosAnterior = Array.from({length: maxDiasAnterior + 1}, () => ({sitio: '', entrada: '-', salida: '-', entradaExt: '-', salidaExt: '-', fechaStr: ''}));
+
+        for(let i = 1; i <= maxDiasActual; i++) {
+            let d = new Date(añoActual, mesActual, i);
+            datosActual[i].fechaStr = d.toLocaleDateString('es-MX', { weekday: 'short', day: '2-digit' }).replace('.', '');
+        }
+        for(let i = 1; i <= maxDiasAnterior; i++) {
+            let d = new Date(añoAnterior, mesAnterior, i);
+            datosAnterior[i].fechaStr = d.toLocaleDateString('es-MX', { weekday: 'short', day: '2-digit' }).replace('.', '');
+        }
+
+        async function cargarAsistencias() {
+            if(!idUsuario) {
+                document.getElementById('loader').innerHTML = '<p style="color:var(--danger);">No se识别ó al usuario. Inicia sesión.</p>';
+                return;
+            }
+            try {
+                const snapshot = await db.collection("registro_asistencia").where("usuario_id", "==", idUsuario).get();
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (!data.fecha) return;
+
+                    const regex = /(\d+)\s+de\s+([a-z]+)\s+de\s+(\d+)/i;
+                    const match = data.fecha.match(regex);
+
+                    if (match) {
+                        const d = parseInt(match[1], 10);
+                        const m = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"].indexOf(match[2].toLowerCase());
+                        const y = parseInt(match[3], 10);
+
+                        let targetData = null;
+                        if(m === mesActual && y === añoActual) targetData = datosActual;
+                        else if(m === mesAnterior && y === añoAnterior) targetData = datosAnterior;
+
+                        if(targetData) {
+                            if(!targetData[d].sitio) targetData[d].sitio = data.sitio_obra;
+
+                            const tipo = data.tipo_registro;
+                            const hora = data.hora;
+
+                            if(tipo === 'Entrada') targetData[d].entrada = hora;
+                            else if(tipo === 'Salida') targetData[d].salida = hora;
+                            else if(tipo.includes('Entrada Tiempo Extra') || tipo.includes('Entrada Extra')) targetData[d].entradaExt = hora;
+                            else if(tipo.includes('Salida Tiempo Extra') || tipo.includes('Salida Extra')) targetData[d].salidaExt = hora;
+                        }
+                    }
+                });
+                pintarTablas();
+            } catch(error) {
+                console.error("Error al cargar biométricos:", error);
+                document.getElementById('loader').innerHTML = `<i data-lucide="alert-triangle" style="color: var(--danger); width:40px; height:40px; margin-bottom: 15px;"></i><p style="color:var(--danger); font-weight:600;">Error de permisos al cargar.</p><p style="font-size:12px; color:var(--text-muted);">Revisa que las reglas de Firestore estén configuradas como "allow read, write: if true;".</p>`;
+                lucide.createIcons();
+            }
+        }
+
+        function pintarTablas() {
+            const generarHTML = (arrayDatos, esMesActual) => {
+                let html = '';
+                for(let i = 1; i < arrayDatos.length; i++) {
+                    const fila = arrayDatos[i];
+                    const esHoy = (esMesActual && i === diaActual);
+                    const claseFila = esHoy ? 'row-active' : '';
+                    
+                    const getCelda = (valor) => valor === '-' ? `<span class="cell-empty">-</span>` : valor;
+                    const getSitio = (valor) => valor === '' ? `<span class="cell-empty">Sin registro</span>` : `<span style="font-weight:600;">${valor}</span>`;
+                    
+                    const horasJor = calcularDiferenciaHoras(fila.entrada, fila.salida);
+                    const htmlHorasJor = horasJor === '-' ? `<span class="cell-empty">-</span>` : `<span class="cell-horas-jor">${horasJor}</span>`;
+
+                    const horasTE = calcularDiferenciaHoras(fila.entradaExt, fila.salidaExt);
+                    const htmlHorasTE = horasTE === '-' ? `<span class="cell-empty">-</span>` : `<span class="cell-horas-te">${horasTE}</span>`;
+
+                    html += `<tr class="${claseFila}"><td class="cell-dia">${i}</td><td class="cell-fecha">${fila.fechaStr}</td><td>${getSitio(fila.sitio)}</td><td>${getCelda(fila.entrada)}</td><td>${getCelda(fila.salida)}</td><td>${htmlHorasJor}</td><td>${getCelda(fila.entradaExt)}</td><td>${getCelda(fila.salidaExt)}</td><td>${htmlHorasTE}</td></tr>`;
+                }
+                return html;
+            };
+
+            document.getElementById('tbody-mes-actual').innerHTML = generarHTML(datosActual, true);
+            document.getElementById('tbody-mes-anterior').innerHTML = generarHTML(datosAnterior, false);
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('tablas-container').style.display = 'block';
+            document.getElementById('btn-descargar-pdf').style.display = 'flex';
+            lucide.createIcons();
+        }
+
+        document.addEventListener('DOMContentLoaded', cargarAsistencias);
+
+        function generarPDF() {
+            const btn = document.getElementById('btn-descargar-pdf');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i data-lucide="loader-2" class="animate-spin"></i> Generando PDF...'; btn.disabled = true; lucide.createIcons();
+
+            const fechaHoraDescarga = new Date().toLocaleString('es-MX', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            const pdfWrap = document.createElement('div');
+            pdfWrap.style.width = '750px'; pdfWrap.style.backgroundColor = 'white'; pdfWrap.style.color = '#1e293b';
+
+            const crearHoja = (titulo, tbodyId) => `
+                <div style="padding: 20px 30px; background: white; font-family: 'Inter', sans-serif;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #152B71; padding-bottom: 10px; margin-bottom: 15px;">
+                        <img src="https://i.ibb.co/fdMsnKTg/LOGO2.png" style="height: 40px;">
+                        <div style="text-align: center; color: #152B71;">
+                            <h2 style="margin: 0; font-size: 18px; font-weight: 800; text-transform: uppercase;">BIOMÉTRICO</h2>
+                            <h3 style="margin: 3px 0 0 0; font-size: 14px; color: #1e293b; font-weight: 700;">${nombreUsuario}</h3>
+                        </div>
+                        <img src="https://i.ibb.co/jv9mNxYr/LOGO1.png" style="height: 40px; border-radius: 4px;">
+                    </div>
+                    <h3 style="color: #152B71; font-size: 14px; margin-bottom: 10px; font-weight: bold;">${titulo}</h3>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 9px; margin-bottom: 10px;">
+                        <thead>
+                            <tr style="background-color: #eef2ff; color: #152B71; text-transform: uppercase;">
+                                <th style="padding: 7px 4px; border: 1px solid #e2e8f0; text-align: center;">#</th>
+                                <th style="padding: 7px 4px; border: 1px solid #e2e8f0; text-align: center;">Día / Fecha</th>
+                                <th style="padding: 7px 4px; border: 1px solid #e2e8f0; text-align: center;">Sitio / Obra</th>
+                                <th style="padding: 7px 4px; border: 1px solid #e2e8f0; text-align: center;">Entrada</th>
+                                <th style="padding: 7px 4px; border: 1px solid #e2e8f0; text-align: center;">Salida</th>
+                                <th style="padding: 7px 4px; border: 1px solid #e2e8f0; text-align: center;">HORAS JOR</th>
+                                <th style="padding: 7px 4px; border: 1px solid #e2e8f0; text-align: center;">Ent. Extra</th>
+                                <th style="padding: 7px 4px; border: 1px solid #e2e8f0; text-align: center;">Sal. Extra</th>
+                                <th style="padding: 7px 4px; border: 1px solid #e2e8f0; text-align: center;">HORAS T.E.</th>
+                            </tr>
+                        </thead>
+                        <tbody>${document.getElementById(tbodyId).innerHTML}</tbody>
+                    </table>
+                    <div style="text-align: center; font-size: 9px; color: #64748b; margin-top: 15px; border-top: 1px solid #e2e8f0; padding-top: 10px; font-weight: 600;">
+                        Documento generado el: ${fechaHoraDescarga}
+                    </div>
+                </div>
+            `;
+
+            pdfWrap.innerHTML = `${crearHoja(document.getElementById('title-mes-actual').innerText, 'tbody-mes-actual')} <div class="html2pdf__page-break"></div> ${crearHoja(document.getElementById('title-mes-anterior').innerText, 'tbody-mes-anterior')}`;
+
+            const celdas = pdfWrap.querySelectorAll('td');
+            celdas.forEach(td => { td.style.padding = '5px 4px'; td.style.border = '1px solid #e2e8f0'; td.style.textAlign = 'center'; td.style.fontSize = '9px'; if(td.querySelector('.cell-empty')) { td.style.color = '#cbd5e1'; } });
+            pdfWrap.querySelectorAll('.cell-fecha').forEach(td => { td.style.color = '#64748b'; td.style.setProperty('font-size', '9px', 'important'); });
+            pdfWrap.querySelectorAll('.cell-dia').forEach(td => { td.style.fontWeight = 'bold'; td.style.color = '#152B71'; td.style.setProperty('font-size', '9px', 'important'); });
+            pdfWrap.querySelectorAll('.cell-horas-jor').forEach(span => { span.style.color = '#152B71'; span.style.fontWeight = 'bold'; });
+            pdfWrap.querySelectorAll('.cell-horas-te').forEach(span => { span.style.color = '#0f766e'; span.style.fontWeight = 'bold'; });
+            pdfWrap.querySelectorAll('.row-active').forEach(tr => { tr.style.backgroundColor = '#f0fdf4'; tr.querySelectorAll('td').forEach(td => { if(!td.querySelector('.cell-empty')) td.style.color = '#166534'; }); });
+
+            const opt = { margin: [15, 15, 15, 15], filename: `Biometrico_${nombreUsuario.replace(/ /g, '_')}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'pt', format: 'letter', orientation: 'portrait' } };
+            html2pdf().set(opt).from(pdfWrap).save().then(() => { btn.innerHTML = originalText; btn.disabled = false; lucide.createIcons(); }).catch(err => { alert("Hubo un error al generar tu PDF."); btn.innerHTML = originalText; btn.disabled = false; lucide.createIcons(); });
+        }
+    </script>
+</body>
+</html>
