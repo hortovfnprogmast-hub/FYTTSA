@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asistencia | Loreto Ingeniería</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <style>
+        :root {
+            --primary-blue: #152B71;
+            --light-blue: #eef2ff;
+            --bg-color: #f8fafc;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success-green: #10b981;
+        }
+
+        body {
+            margin: 0; font-family: 'Inter', sans-serif; background-color: var(--bg-color);
+            display: flex; flex-direction: column; height: 100vh; overflow: hidden;
+        }
+
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: white; border-bottom: 1px solid var(--border-color); z-index: 50; }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .menu-btn { background: none; border: none; cursor: pointer; color: var(--text-main); }
+        .header-title { margin: 0; font-size: 15px; font-weight: 700; color: var(--primary-blue); }
+        .header-right { display: flex; align-items: center; gap: 12px; }
+        .user-initial { width: 35px; height: 35px; border-radius: 50%; background-color: var(--primary-blue); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+
+        .main-layout { display: flex; flex: 1; overflow: hidden; }
+        .sidebar { width: 260px; background: white; border-right: 1px solid var(--border-color); overflow-y: auto; transition: transform 0.3s ease; display: flex; flex-direction: column; }
+        
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; height: calc(100vh - 60px); transform: translateX(-100%); z-index: 40; }
+            .sidebar.open { transform: translateX(0); }
+            .header-title { display: none; }
+        }
+
+        .sidebar-nav { padding: 15px 10px; }
+        .sidebar-section { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
+        .sidebar-section:last-child { border-bottom: none; }
+        .section-title { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin: 10px 15px; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 15px; color: var(--text-main); text-decoration: none; font-size: 14px; font-weight: 500; border-radius: 8px; margin-bottom: 2px; transition: all 0.2s; }
+        .nav-item:hover { background-color: var(--bg-color); }
+        .nav-item.active { background-color: var(--light-blue); color: var(--primary-blue); font-weight: 700; border-left: 4px solid var(--primary-blue); }
+        .nav-item.active i { color: var(--primary-blue); }
+
+        .content { flex: 1; padding: 20px; overflow-y: auto; display: flex; justify-content: center; }
+        
+        .asistencia-card {
+            background: white; width: 100%; max-width: 500px; border-radius: 16px; padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 1px solid var(--border-color); height: fit-content;
+        }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+        
+        .form-control {
+            width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);
+            background-color: var(--bg-color); font-size: 15px; box-sizing: border-box; outline: none;
+        }
+
+        .grid-botones { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 25px; }
+        .btn-wrapper { display: flex; flex-direction: column; gap: 6px; }
+
+        .btn-check {
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+            padding: 20px 10px; border-radius: 12px; border: none; background-color: var(--primary-blue);
+            color: white; font-weight: 700; font-size: 12px; text-align: center; cursor: pointer;
+            transition: all 0.3s; width: 100%;
+        }
+
+        .btn-check:hover { background-color: #0d1a4a; transform: translateY(-2px); }
+        .btn-check:disabled { background-color: var(--border-color); color: var(--text-muted); cursor: not-allowed; transform: none; }
+
+        .time-display { font-size: 11px; font-weight: 700; color: var(--primary-blue); text-align: center; min-height: 15px; line-height: 1.4; }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center; }
+        .modal-content { background: white; padding: 25px; border-radius: 12px; width: 90%; max-width: 320px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        .modal-content p { margin: 0 0 20px 0; font-size: 15px; color: var(--text-main); font-weight: 600; }
+        .btn-modal { background: var(--primary-blue); color: white; border: none; padding: 10px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.2s; }
+        .btn-modal:hover { background: #0d1a4a; }
+        .nota-advertencia { margin-top: 25px; font-size: 12px; color: #b91c1c; font-weight: 600; text-align: center; line-height: 1.5; }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-left">
+            <button class="menu-btn" id="toggle-menu"><i data-lucide="menu"></i></button>
+            <img src="https://i.ibb.co/fdMsnKTg/LOGO2.png" alt="Logo" style="height: 35px; width: auto; object-fit: contain;">
+            <h1 class="header-title">Módulo de Asistencia</h1>
+        </div>
+        <div class="header-right">
+            <div class="user-initial" id="user-initial">U</div>
+            <img src="https://i.ibb.co/jv9mNxYr/LOGO1.png" alt="User" height="35" style="border-radius:4px;">
+        </div>
+    </header>
+
+    <div class="main-layout">
+        <aside class="sidebar" id="sidebar"></aside>
+
+        <main class="content">
+            <div class="asistencia-card">
+                <h2 style="margin-top:0; color: var(--primary-blue); text-align:center;">Registro de Asistencia</h2>
+                
+                <div class="form-group">
+                    <label>Sitio / Obra</label>
+                    <select class="form-control" id="sitio">
+                        <option value="">Selecciona ubicación...</option>
+                        <option value="Oficina Central">Oficina Central</option>
+                        <option value="Obra Reforma">Obra Reforma</option>
+                        <option value="Obra Santa Fe">Obra Santa Fe</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Fecha de la Jornada Activa</label>
+                    <input type="text" class="form-control" id="fecha-hoy" readonly value="Cargando jornada...">
+                </div>
+
+                <div class="grid-botones">
+                    <div class="btn-wrapper">
+                        <button id="btn-Entrada" class="btn-check" onclick="marcar('Entrada', this)"><i data-lucide="log-in"></i> Entrada</button>
+                        <div id="time-Entrada" class="time-display"></div>
+                    </div>
+                    
+                    <div class="btn-wrapper">
+                        <button id="btn-Salida" class="btn-check" onclick="marcar('Salida', this)"><i data-lucide="log-out"></i> Salida</button>
+                        <div id="time-Salida" class="time-display"></div>
+                    </div>
+                    
+                    <div class="btn-wrapper">
+                        <button id="btn-Entrada-Tiempo-Extra" class="btn-check" onclick="marcar('Entrada Tiempo Extra', this)"><i data-lucide="clock-9"></i> Entrada Tiempo Extra</button>
+                        <div id="time-Entrada-Tiempo-Extra" class="time-display"></div>
+                    </div>
+                    
+                    <div class="btn-wrapper">
+                        <button id="btn-Salida-Tiempo-Extra" class="btn-check" onclick="marcar('Salida Tiempo Extra', this)"><i data-lucide="clock-12"></i> Salida Tiempo Extra</button>
+                        <div id="time-Salida-Tiempo-Extra" class="time-display"></div>
+                    </div>
+                </div>
+
+                <div class="nota-advertencia">
+                    ⚠️ Tienes 15 minutos de tolerancia en tu entrada, evita sanciones y recuerda que la asistencia está geolocalizada.
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="customAlert" class="modal-overlay">
+        <div class="modal-content"><i data-lucide="alert-circle" style="color: #ef4444; width: 48px; height: 48px; margin-bottom: 15px;"></i><p id="customAlertMessage">Mensaje</p><button class="btn-modal" onclick="cerrarAlerta()">Aceptar</button></div>
+    </div>
+    <div id="successAlert" class="modal-overlay">
+        <div class="modal-content"><i data-lucide="check-circle" style="color: #10b981; width: 48px; height: 48px; margin-bottom: 15px;"></i><p id="successAlertMessage">Éxito</p><button class="btn-modal" style="background:#10b981;" onclick="cerrarSuccess()">Aceptar</button></div>
+    </div>
+
+    <script>
+        function mostrarAlerta(m) { document.getElementById('customAlertMessage').innerText = m; document.getElementById('customAlert').style.display = 'flex'; }
+        function cerrarAlerta() { document.getElementById('customAlert').style.display = 'none'; }
+        function mostrarExito(m) { document.getElementById('successAlertMessage').innerText = m; document.getElementById('successAlert').style.display = 'flex'; }
+        function cerrarSuccess() { document.getElementById('successAlert').style.display = 'none'; }
+
+        // CONFIGURACIÓN FIREBASE ACTUALIZADA
+        const firebaseConfig = {
+            apiKey: "AIzaSyD9Ihkh0NaP5vVbKntobmVTb53T0yDAZjU",
+            authDomain: "fyttsa-ae508.firebaseapp.com",
+            projectId: "fyttsa-ae508",
+            storageBucket: "fyttsa-ae508.firebasestorage.app",
+            messagingSenderId: "860564632264",
+            appId: "1:860564632264:web:30edf5a8f837e284ab2bfd",
+            measurementId: "G-7PQ1R77YJ3"
+        };
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const db = firebase.firestore();
+
+        fetch('menu.html').then(res => res.text()).then(html => {
+            document.getElementById('sidebar').innerHTML = html; lucide.createIcons();
+            const linkInicio = document.getElementById('link-inicio'); if(linkInicio) linkInicio.classList.remove('active');
+            const linkAsistencia = document.getElementById('link-asistencia'); if(linkAsistencia) linkAsistencia.classList.add('active');
+        });
+
+        const idUsuario = localStorage.getItem('usuario');
+        const nombreUsuario = localStorage.getItem('nombre') || 'Usuario Desconocido';
+        if (nombreUsuario !== 'Usuario Desconocido') document.getElementById('user-initial').innerText = nombreUsuario.charAt(0).toUpperCase();
+
+        // LÓGICA INTELIGENTE DE JORNADA (OPTIMIZADA)
+        window.jornadaActualFecha = "";
+
+        if (idUsuario) {
+            const hoy = new Date();
+            const ayer = new Date(hoy); ayer.setDate(ayer.getDate() - 1);
+            const opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const strHoy = hoy.toLocaleDateString('es-MX', opts);
+            const strAyer = ayer.toLocaleDateString('es-MX', opts);
+
+            // Consulta única para evitar problemas de índices compuestos en Firebase
+            db.collection("registro_asistencia").where("usuario_id", "==", idUsuario).get().then(snapshot => {
+                let recordsHoy = [];
+                let recordsAyer = [];
+
+                // Filtramos en memoria
+                snapshot.forEach(doc => {
+                    const r = doc.data();
+                    if(r.fecha === strHoy) recordsHoy.push(r);
+                    if(r.fecha === strAyer) recordsAyer.push(r);
+                });
+
+                let targetJornada = strHoy;
+                let targetRecords = recordsHoy;
+
+                // Si hoy no hay registros, revisamos si ayer se quedó un turno incompleto
+                if (recordsHoy.length === 0) {
+                    const hasEntradaAyer = recordsAyer.some(r => r.tipo_registro === 'Entrada');
+                    const hasSalidaAyer = recordsAyer.some(r => r.tipo_registro === 'Salida');
+                    const hasEntradaTEAyer = recordsAyer.some(r => r.tipo_registro.includes('Entrada Tiempo Extra'));
+                    const hasSalidaTEAyer = recordsAyer.some(r => r.tipo_registro.includes('Salida Tiempo Extra'));
+
+                    const pendingNormal = hasEntradaAyer && !hasSalidaAyer;
+                    const pendingTE = hasEntradaTEAyer && !hasSalidaTEAyer;
+
+                    // Si dejó abierto algo ayer, mantenemos la jornada de ayer
+                    if (pendingNormal || pendingTE) {
+                        targetJornada = strAyer;
+                        targetRecords = recordsAyer;
+                    }
+                }
+
+                window.jornadaActualFecha = targetJornada;
+                document.getElementById('fecha-hoy').value = targetJornada;
+
+                // SECUENCIA OBLIGATORIA
+                const hasEntrada = targetRecords.some(r => r.tipo_registro === 'Entrada');
+                const hasSalida = targetRecords.some(r => r.tipo_registro === 'Salida');
+                const hasEntradaTE = targetRecords.some(r => r.tipo_registro.includes('Entrada Tiempo Extra'));
+                const hasSalidaTE = targetRecords.some(r => r.tipo_registro.includes('Salida Tiempo Extra'));
+
+                const btnEntrada = document.getElementById('btn-Entrada');
+                const btnSalida = document.getElementById('btn-Salida');
+                const btnEntradaTE = document.getElementById('btn-Entrada-Tiempo-Extra');
+                const btnSalidaTE = document.getElementById('btn-Salida-Tiempo-Extra');
+
+                btnEntrada.disabled = hasEntrada;
+                btnSalida.disabled = !hasEntrada || hasSalida;
+                btnEntradaTE.disabled = !hasSalida || hasEntradaTE;
+                btnSalidaTE.disabled = !hasEntradaTE || hasSalidaTE;
+
+                const paintChecked = (btn, tipoObj) => {
+                    const rec = targetRecords.find(r => r.tipo_registro === tipoObj);
+                    if (rec) {
+                        btn.innerHTML = `<i data-lucide="check-circle"></i> Registrado`;
+                        const locHTML = rec.coordenadas ? `<br><span style="font-size:9px; font-weight:normal; color:#64748b;">📍 ${rec.coordenadas}</span>` : '';
+                        document.getElementById("time-" + tipoObj.replace(/ /g, "-")).innerHTML = `Checada: ${rec.hora}${locHTML}`;
+                        
+                        // Autocompletar el sitio para que no lo tenga que volver a elegir
+                        const sitioSelect = document.getElementById('sitio');
+                        if (sitioSelect.value === "") sitioSelect.value = rec.sitio_obra;
+                    }
+                };
+
+                if (hasEntrada) paintChecked(btnEntrada, 'Entrada');
+                if (hasSalida) paintChecked(btnSalida, 'Salida');
+                if (hasEntradaTE) paintChecked(btnEntradaTE, 'Entrada Tiempo Extra');
+                if (hasSalidaTE) paintChecked(btnSalidaTE, 'Salida Tiempo Extra');
+
+                lucide.createIcons();
+            }).catch(error => {
+                console.error("Error al cargar la jornada:", error);
+                document.getElementById('fecha-hoy').value = "Error al cargar fecha";
+            });
+        }
+
+        // REGISTRO
+        function marcar(tipo, boton) {
+            const sitio = document.getElementById('sitio').value;
+            if(!sitio) { mostrarAlerta("Por favor, selecciona primero el Sitio/Obra."); return; }
+
+            boton.disabled = true;
+            const textoOriginal = boton.innerHTML;
+            boton.innerHTML = "Guardando...";
+
+            const ahora = new Date();
+            const horaString = ahora.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: true });
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(async (pos) => {
+                    const lat = pos.coords.latitude.toFixed(6);
+                    const lon = pos.coords.longitude.toFixed(6);
+                    const coordsTexto = `${lat}, ${lon}`;
+
+                    try {
+                        const docId = `ASISTENCIA_${idUsuario}_${Date.now()}`;
+                        await db.collection("registro_asistencia").doc(docId).set({
+                            id_registro: docId,
+                            usuario_id: idUsuario,
+                            nombre: nombreUsuario,
+                            sitio_obra: sitio,
+                            tipo_registro: tipo,
+                            fecha: window.jornadaActualFecha, // Usa la jornada inteligente
+                            hora: horaString,
+                            coordenadas: coordsTexto,
+                            latitud: lat,
+                            longitud: lon,
+                            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+
+                        const idTime = "time-" + tipo.replace(/ /g, "-");
+                        document.getElementById(idTime).innerHTML = `Checada: ${horaString}<br><span style="font-size:9px; font-weight:normal; color:#64748b;">📍 ${coordsTexto}</span>`;
+
+                        mostrarExito(`Has registrado tu ${tipo} con éxito a las ${horaString}`);
+                        boton.innerHTML = `<i data-lucide="check-circle"></i> Registrado`;
+                        
+                        // Recargar la página después de 2 segundos para aplicar la secuencia obligatoria al siguiente botón
+                        setTimeout(() => { window.location.reload(); }, 2000);
+
+                    } catch (error) {
+                        mostrarAlerta("Error al guardar. Revisa tu conexión a internet.");
+                        boton.disabled = false; boton.innerHTML = textoOriginal;
+                    }
+                }, (err) => {
+                    mostrarAlerta("Es obligatorio permitir el GPS para registrar la asistencia.");
+                    boton.disabled = false; boton.innerHTML = textoOriginal;
+                });
+            } else {
+                mostrarAlerta("GPS no soportado."); boton.disabled = false; boton.innerHTML = textoOriginal;
+            }
+        }
+
+        document.getElementById('toggle-menu').addEventListener('click', () => { document.getElementById('sidebar').classList.toggle('open'); });
+        lucide.createIcons();
+    </script>
+</body>
+</html>
