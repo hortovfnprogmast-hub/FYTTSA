@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gasolina | FYTTSA</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+
+    <style>
+        :root {
+            --primary-blue: #152B71;
+            --light-blue: #eef2ff;
+            --bg-color: #f8fafc;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --danger: #dc2626;
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+
+        body { margin: 0; font-family: 'Inter', sans-serif; background-color: var(--bg-color); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+        /* HEADER */
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: white; border-bottom: 1px solid var(--border-color); z-index: 50; }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .menu-btn { background: none; border: none; cursor: pointer; color: var(--text-main); }
+        .header-title { margin: 0; font-size: 15px; font-weight: 700; color: var(--primary-blue); }
+        .header-right { display: flex; align-items: center; gap: 12px; }
+        .user-initial { width: 35px; height: 35px; border-radius: 50%; background-color: var(--primary-blue); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+
+        /* LAYOUT */
+        .main-layout { display: flex; flex: 1; overflow: hidden; }
+        .sidebar { width: 260px; background: white; border-right: 1px solid var(--border-color); overflow-y: auto; transition: transform 0.3s ease; display: flex; flex-direction: column; }
+        @media (max-width: 768px) { .sidebar { position: fixed; height: calc(100vh - 60px); transform: translateX(-100%); z-index: 40; } .sidebar.open { transform: translateX(0); } .header-title { display: none; } }
+
+        .sidebar-nav { padding: 15px 10px; }
+        .sidebar-section { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
+        .sidebar-section:last-child { border-bottom: none; }
+        .sidebar .section-title { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin: 10px 15px; padding-bottom: 0; display: block; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 15px; color: var(--text-main); text-decoration: none; font-size: 14px; font-weight: 500; border-radius: 10px; margin-bottom: 2px; transition: all 0.2s; }
+        .nav-item:hover { background-color: var(--bg-color); }
+        .nav-item.active { background-color: var(--light-blue); color: var(--primary-blue); font-weight: 700; border-left: 4px solid var(--primary-blue); }
+        .nav-item.active i { color: var(--primary-blue); }
+
+        .content { flex: 1; padding: 20px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        .container { max-width: 1050px; margin: 0 auto; padding-bottom: 50px; }
+
+        .page-header { margin-bottom: 30px; border-bottom: 2px solid var(--border-color); padding-bottom: 15px; }
+        .page-header h1 { font-size: 24px; color: var(--primary-blue); margin: 0 0 5px 0; font-weight: 800; }
+        .page-header p { color: var(--text-muted); margin: 0; font-size: 14px; }
+
+        /* FORMS */
+        .form-card { background: white; border-radius: 20px; padding: 28px; box-shadow: 0 4px 12px rgba(0,0,0,0.04); border: 1px solid var(--border-color); margin-bottom: 25px; }
+        .section-title { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 700; color: var(--primary-blue); margin: 0 0 20px 0; padding-bottom: 12px; border-bottom: 1px solid var(--bg-color); }
+
+        .form-group { margin-bottom: 15px; }
+        .form-label { display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; }
+        .form-input, .form-select { width: 100%; padding: 12px 15px; background-color: var(--bg-color); border: 1px solid transparent; border-radius: 12px; font-size: 14px; color: var(--text-main); box-sizing: border-box; outline: none; transition: all 0.2s; font-family: inherit; }
+        .form-input:focus, .form-select:focus { background-color: white; border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(21,43,113,0.1); }
+        .form-input[readonly] { background-color: #e2e8f0; color: var(--text-muted); cursor: not-allowed; font-weight: bold; }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
+        @media (max-width: 640px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+        /* FOTOS */
+        .photo-controls { display: flex; gap: 10px; margin-bottom: 15px; }
+        .btn-photo { background: var(--primary-blue); color: white; border: none; padding: 10px 12px; border-radius: 10px; font-weight: 600; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; flex: 1; justify-content: center; transition: 0.2s; }
+        .btn-photo:hover { background: #0d1a4a; }
+        .btn-photo-sec { background: white; color: var(--text-main); border: 1px solid var(--border-color); padding: 10px 12px; border-radius: 10px; font-weight: 600; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; flex: 1; justify-content: center; transition: 0.2s; }
+        .btn-photo-sec:hover { background: var(--bg-color); }
+
+        .docs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+        .doc-item { text-align: center; border: 1px solid var(--border-color); padding: 18px; border-radius: 16px; background: var(--bg-color); }
+        .doc-item label { font-size: 12px; font-weight: 700; color: var(--primary-blue); display: block; margin-bottom: 12px; }
+        .photo-slot { aspect-ratio: 4/3; border: 2px dashed #cbd5e1; border-radius: 14px; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; width: 100%; margin: 0 auto 12px auto; }
+        .photo-slot img { width: 100%; height: 100%; object-fit: cover; cursor: zoom-in; }
+        .remove-photo { position: absolute; top: 8px; right: 8px; background: rgba(220,38,38,0.9); color: white; border-radius: 50%; width: 26px; height: 26px; text-align: center; line-height: 26px; cursor: pointer; font-weight: bold; font-size: 14px; border: 2px solid white; }
+
+        /* TABLA */
+        .table-responsive { width: 100%; overflow-x: auto; border-radius: 16px; border: 1px solid var(--border-color); background: white; }
+        .data-table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        .data-table th { background-color: var(--light-blue); color: var(--primary-blue); font-size: 11px; font-weight: 800; text-transform: uppercase; padding: 14px 10px; text-align: center; border-bottom: 2px solid var(--border-color); white-space: nowrap; }
+        .data-table td { padding: 12px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--text-main); text-align: center; vertical-align: middle; }
+        .data-table tbody tr:hover { background-color: #f8fafc; }
+
+        .status-badge { display: inline-flex; align-items: center; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; gap: 4px; }
+        .status-badge.pendiente { background: #fef3c7; color: #d97706; }
+        .status-badge.aprobado { background: #dcfce7; color: #166534; }
+        .status-badge.rechazado { background: #fee2e2; color: #b91c1c; }
+
+        .obs-box { display: block; font-size: 10px; color: var(--danger); background: #fee2e2; padding: 5px; border-radius: 6px; margin-top: 5px; text-align: center; font-weight: bold; }
+        .btn-action-red { background: var(--danger); color: white; border: none; height: 32px; padding: 0 14px; border-radius: 8px; font-weight: 700; font-size: 11px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; }
+        .btn-action-red:hover { background: #b91c1c; }
+
+        /* BOTONES ACCIÓN */
+        .action-buttons { display: flex; gap: 15px; margin-top: 25px; }
+        .btn-guardar { background: var(--primary-blue); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer; flex: 2; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
+        .btn-guardar:hover { background: #0d1a4a; transform: translateY(-2px); }
+        .btn-cancelar { background: white; color: var(--text-main); border: 1px solid var(--border-color); padding: 16px; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer; flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
+        .btn-cancelar:hover { background: var(--bg-color); }
+
+        /* MODALES */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
+        .modal-small { background: white; padding: 30px; border-radius: 20px; width: 100%; max-width: 380px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .modal-small p { font-size: 15px; color: var(--text-main); margin-bottom: 20px; font-weight: 600; line-height: 1.5; }
+        .btn-modal { width: 100%; padding: 12px; border-radius: 10px; font-weight: bold; border: none; cursor: pointer; transition: 0.2s; }
+
+        #image-viewer-img { max-width: 90%; max-height: 90%; border-radius: 12px; }
+        #camera-stream { width: 100%; max-width: 500px; aspect-ratio: 3/4; background: black; border-radius: 16px; overflow: hidden; margin: 0 auto; position: relative; }
+        #camera-video { width: 100%; height: 100%; object-fit: cover; }
+        .camera-controls { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-left">
+            <button class="menu-btn" id="toggle-menu"><i data-lucide="menu"></i></button>
+            <img src="https://i.ibb.co/fdMsnKTg/LOGO2.png" alt="Logo" style="height: 35px; object-fit: contain; border-radius: 6px;">
+            <h1 class="header-title">Gasolina</h1>
+        </div>
+        <div class="header-right">
+            <div class="user-initial" id="user-initial">U</div>
+            <img src="https://i.ibb.co/jv9mNxYr/LOGO1.png" alt="User" height="35" style="border-radius: 8px;">
+        </div>
+    </header>
+
+    <div class="main-layout">
+        <aside class="sidebar" id="sidebar"></aside>
+
+        <main class="content">
+            <div class="container">
+                <div class="page-header">
+                    <h1>Registro de Gasolina</h1>
+                    <p>Registra la carga de combustible de tu vehículo. Adjunta la foto del tacómetro y del ticket.</p>
+                </div>
+
+                <form id="form-gasolina" class="form-card">
+                    <input type="hidden" id="edit-log-id">
+
+                    <h3 class="section-title"><i data-lucide="car"></i> Datos del Vehículo</h3>
+                    <div class="form-group">
+                        <label class="form-label">Selecciona el Vehículo</label>
+                        <select class="form-select" id="vehiculo" required>
+                            <option value="">Cargando vehículos...</option>
+                        </select>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="form-group"><label class="form-label">Fecha</label><input type="date" class="form-input" id="fecha" required></div>
+                        <div class="form-group"><label class="form-label">Número de Ticket</label><input type="text" class="form-input" id="ticket" required></div>
+                    </div>
+
+                    <h3 class="section-title" style="margin-top: 25px;"><i data-lucide="gauge"></i> Kilometraje y Consumo</h3>
+                    <div class="grid-3">
+                        <div class="form-group"><label class="form-label">Kilometraje Actual</label><input type="number" class="form-input" id="km_actual" required></div>
+                        <div class="form-group"><label class="form-label">Carga (Litros)</label><input type="number" step="0.01" class="form-input" id="litros" required></div>
+                        <div class="form-group"><label class="form-label">Importe Total ($)</label><input type="number" step="0.01" class="form-input" id="importe" required></div>
+                    </div>
+
+                    <h3 class="section-title" style="margin-top: 25px;"><i data-lucide="camera"></i> Evidencia Fotográfica</h3>
+                    <p style="font-size: 12px; color: var(--text-muted); margin: 0 0 18px 0;">Sube dos fotografías claras: el tacómetro del vehículo y el ticket de la carga.</p>
+                    <div class="docs-grid">
+                        <div class="doc-item">
+                            <label><i data-lucide="gauge" style="width:14px; vertical-align:middle;"></i> Foto del Tacómetro</label>
+                            <div id="slot-tacometro-0" class="photo-slot"><i data-lucide="image" style="color:#cbd5e1; width:36px; height:36px;"></i></div>
+                            <div class="photo-controls">
+                                <button type="button" class="btn-photo" onclick="triggerCamera('tacometro')"><i data-lucide="camera"></i> Cámara</button>
+                                <button type="button" class="btn-photo-sec" onclick="triggerFile('tacometro')"><i data-lucide="upload"></i> Subir</button>
+                            </div>
+                        </div>
+                        <div class="doc-item">
+                            <label><i data-lucide="receipt" style="width:14px; vertical-align:middle;"></i> Foto del Ticket</label>
+                            <div id="slot-ticket-0" class="photo-slot"><i data-lucide="image" style="color:#cbd5e1; width:36px; height:36px;"></i></div>
+                            <div class="photo-controls">
+                                <button type="button" class="btn-photo" onclick="triggerCamera('ticket')"><i data-lucide="camera"></i> Cámara</button>
+                                <button type="button" class="btn-photo-sec" onclick="triggerFile('ticket')"><i data-lucide="upload"></i> Subir</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button type="button" class="btn-cancelar" onclick="limpiarFormulario()"><i data-lucide="x"></i> Cancelar</button>
+                        <button type="submit" class="btn-guardar" id="btn-guardar"><i data-lucide="save"></i> Guardar Registro</button>
+                    </div>
+                </form>
+
+                <div class="page-header" style="margin-top: 40px;">
+                    <h1>Mis Últimos Registros</h1>
+                    <p>Historial de las últimas 5 cargas de gasolina realizadas.</p>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha y Hora</th>
+                                <th>Vehículo</th>
+                                <th>Km</th>
+                                <th>Litros</th>
+                                <th>Importe</th>
+                                <th>Ubicación</th>
+                                <th>Estatus</th>
+                                <th>Evidencias</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-body">
+                            <tr><td colspan="9" style="color:var(--text-muted); padding:30px; text-align:center;">Cargando registros...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <input type="file" id="fileInputGlobal" accept="image/*" style="display:none" onchange="processFile(this)">
+    <canvas id="tempCanvas" style="display:none"></canvas>
+
+    <div id="image-viewer-overlay" onclick="closeImageViewer()" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:10000; align-items:center; justify-content:center; cursor:zoom-out;">
+        <img id="image-viewer-img" src="" alt="Vista previa">
+    </div>
+
+    <div id="camera-overlay" class="modal-overlay" style="flex-direction: column;">
+        <div id="camera-stream"><video id="camera-video" autoplay playsinline></video></div>
+        <div class="camera-controls">
+            <button class="btn-photo-sec" onclick="closeCamera()">Cancelar</button>
+            <button class="btn-photo-sec" onclick="switchCamera()"><i data-lucide="refresh-cw"></i> Girar</button>
+            <button class="btn-photo" onclick="captureFoto()">Tomar Foto</button>
+        </div>
+    </div>
+
+    <div id="modal-success" class="modal-overlay">
+        <div class="modal-small">
+            <i data-lucide="check-circle" style="color: var(--success); width: 56px; height: 56px; margin-bottom: 15px;"></i>
+            <p id="modal-success-msg">Registro guardado exitosamente.</p>
+            <button class="btn-modal" style="background:var(--success); color:white;" onclick="document.getElementById('modal-success').style.display='none'">Aceptar</button>
+        </div>
+    </div>
+    <div id="modal-error" class="modal-overlay">
+        <div class="modal-small">
+            <i data-lucide="alert-triangle" style="color: var(--danger); width: 56px; height: 56px; margin-bottom: 15px;"></i>
+            <p id="modal-error-msg">Error.</p>
+            <button class="btn-modal" style="background:var(--danger); color:white;" onclick="document.getElementById('modal-error').style.display='none'">Aceptar</button>
+        </div>
+    </div>
+
+    <script>
+        // Configuración de Firebase (FYTTSA)
+        const firebaseConfig = {
+            apiKey: "AIzaSyD9Ihkh0NaP5vVbKntobmVTb53T0yDAZjU",
+            authDomain: "fyttsa-ae508.firebaseapp.com",
+            projectId: "fyttsa-ae508",
+            storageBucket: "fyttsa-ae508.firebasestorage.app",
+            messagingSenderId: "860564632264",
+            appId: "1:860564632264:web:30edf5a8f837e284ab2bfd",
+            measurementId: "G-7PQ1R77YJ3"
+        };
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        const idUsuario = localStorage.getItem('usuario') || 'SinID';
+        const nombreUsuario = localStorage.getItem('nombre') || 'Trabajador';
+        document.getElementById('user-initial').innerText = nombreUsuario.charAt(0).toUpperCase();
+
+        // Fecha por defecto = hoy
+        document.getElementById('fecha').valueAsDate = new Date();
+
+        let fotos = { tacometro: [null], ticket: [null] };
+        let activeTarget = ''; let currentFacingMode = 'environment'; let currentStream;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('menu.html').then(res => res.text()).then(html => {
+                document.getElementById('sidebar').innerHTML = html; lucide.createIcons();
+                const linkInicio = document.getElementById('link-inicio'); if(linkInicio) linkInicio.classList.remove('active');
+                const linkGas = document.getElementById('link-gasolina'); if(linkGas) linkGas.classList.add('active');
+            });
+            document.getElementById('toggle-menu').addEventListener('click', () => { document.getElementById('sidebar').classList.toggle('open'); });
+
+            cargarVehiculos();
+            cargarMisRegistros();
+        });
+
+        function mostrarAlerta(msg) { document.getElementById('modal-error-msg').innerText = msg; document.getElementById('modal-error').style.display = 'flex'; lucide.createIcons(); }
+        function mostrarExito(msg) { document.getElementById('modal-success-msg').innerText = msg; document.getElementById('modal-success').style.display = 'flex'; lucide.createIcons(); }
+
+        // FOTOS
+        function triggerFile(target) { activeTarget = target; document.getElementById('fileInputGlobal').click(); }
+        function processFile(input) {
+            if (!input.files || input.files.length === 0) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas'); let w = img.width, h = img.height; const maxDim = 800;
+                    if(w > maxDim || h > maxDim) { if(w > h) { h = (h/w)*maxDim; w = maxDim; } else { w = (w/h)*maxDim; h = maxDim; } }
+                    canvas.width = w; canvas.height = h; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, w, h);
+                    fotos[activeTarget][0] = canvas.toDataURL('image/jpeg', 0.8); renderSlots(activeTarget); input.value = '';
+                }; img.src = e.target.result;
+            }; reader.readAsDataURL(input.files[0]);
+        }
+
+        async function triggerCamera(target) { activeTarget = target; currentFacingMode = 'environment'; await startCamera(); }
+        async function startCamera() {
+            if (currentStream) currentStream.getTracks().forEach(t => t.stop());
+            try { currentStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: currentFacingMode } }); document.getElementById('camera-video').srcObject = currentStream; document.getElementById('camera-overlay').style.display = 'flex'; } catch (err) { alert("Permiso denegado o cámara no disponible."); }
+        }
+
+        function switchCamera() { currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment'; startCamera(); }
+        function closeCamera() { if (currentStream) currentStream.getTracks().forEach(t => t.stop()); document.getElementById('camera-overlay').style.display = 'none'; }
+
+        function captureFoto() {
+            const canvasT = document.getElementById('tempCanvas'); const video = document.getElementById('camera-video');
+            canvasT.width = video.videoWidth; canvasT.height = video.videoHeight; const ctx = canvasT.getContext('2d');
+            if (currentFacingMode === 'user') { ctx.translate(canvasT.width, 0); ctx.scale(-1, 1); }
+            ctx.drawImage(video, 0, 0, canvasT.width, canvasT.height); ctx.setTransform(1, 0, 0, 1, 0, 0);
+            fotos[activeTarget][0] = canvasT.toDataURL('image/jpeg', 0.8); renderSlots(activeTarget); closeCamera();
+        }
+
+        function removeFoto(target) { fotos[target][0] = null; renderSlots(target); }
+        function openImageViewer(src) { document.getElementById('image-viewer-img').src = src; document.getElementById('image-viewer-overlay').style.display = 'flex'; }
+        function closeImageViewer() { document.getElementById('image-viewer-overlay').style.display = 'none'; document.getElementById('image-viewer-img').src = ''; }
+
+        function renderSlots(target) {
+            const slot = document.getElementById(`slot-${target}-0`); if(!slot) return;
+            if (fotos[target][0]) {
+                slot.innerHTML = `<img src="${fotos[target][0]}" onclick="openImageViewer(this.src)"><span class="remove-photo" onclick="event.stopPropagation(); removeFoto('${target}')">&times;</span>`;
+                slot.style.border = "1px solid var(--border-color)";
+            } else {
+                slot.innerHTML = `<i data-lucide="image" style="width:36px; height:36px; color:#cbd5e1;"></i>`; slot.style.border = "2px dashed #cbd5e1";
+            }
+            lucide.createIcons();
+        }
+
+        function dataURItoBlob(dataURI) {
+            if(!dataURI) return null;
+            if(dataURI.startsWith('http')) return dataURI;
+            const byteString = atob(dataURI.split(',')[1]); const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+            const ab = new ArrayBuffer(byteString.length); const ia = new Uint8Array(ab); for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i); return new Blob([ab], {type: mimeString});
+        }
+
+        // LÓGICA
+        async function cargarVehiculos() {
+            try {
+                const snap = await db.collection("vehiculos").get();
+                const select = document.getElementById('vehiculo');
+                select.innerHTML = '<option value="">Selecciona un vehículo...</option>';
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    select.innerHTML += `<option value="${doc.id}" data-nombre="${d.vehiculo} ${d.modelo} (${d.placas})">${d.vehiculo} ${d.modelo} [${d.placas}]</option>`;
+                });
+            } catch(e) { console.error("Error al cargar vehículos", e); }
+        }
+
+        function limpiarFormulario() {
+            document.getElementById('form-gasolina').reset();
+            document.getElementById('edit-log-id').value = "";
+            document.getElementById('fecha').valueAsDate = new Date();
+            fotos = { tacometro: [null], ticket: [null] };
+            renderSlots('tacometro'); renderSlots('ticket');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        document.getElementById('form-gasolina').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-guardar');
+            const oldTxt = btn.innerHTML;
+
+            const vSelect = document.getElementById('vehiculo');
+            const vId = vSelect.value;
+            const vNombre = vSelect.options[vSelect.selectedIndex].getAttribute('data-nombre');
+
+            if(!fotos.tacometro[0] || !fotos.ticket[0]) {
+                mostrarAlerta("Debes adjuntar las 2 fotografías requeridas (Tacómetro y Ticket)."); return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<i data-lucide="loader-2" class="animate-spin"></i> Obteniendo GPS...';
+            lucide.createIcons();
+
+            let lat = null, lng = null;
+            if ("geolocation" in navigator) {
+                try {
+                    const pos = await new Promise((resolve, reject) => {
+                        navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 8000 });
+                    });
+                    lat = pos.coords.latitude;
+                    lng = pos.coords.longitude;
+                } catch(err) { console.warn("No se pudo obtener el GPS:", err); }
+            }
+
+            btn.innerHTML = '<i data-lucide="loader-2" class="animate-spin"></i> Subiendo evidencias...';
+
+            try {
+                let urlsFotos = {};
+                for (let target of ['tacometro', 'ticket']) {
+                    const fotoData = fotos[target][0];
+                    if(fotoData && fotoData.startsWith('http')) {
+                        urlsFotos[target] = fotoData;
+                    } else if (fotoData) {
+                        const ref = storage.ref(`gasolina_logs/${idUsuario}/${target}_${Date.now()}.jpg`);
+                        await ref.put(dataURItoBlob(fotoData));
+                        urlsFotos[target] = await ref.getDownloadURL();
+                    }
+                }
+
+                const docData = {
+                    uid_trabajador: idUsuario,
+                    nombre_trabajador: nombreUsuario,
+                    id_vehiculo: vId,
+                    vehiculo_nombre: vNombre,
+                    fecha: document.getElementById('fecha').value,
+                    km_actual: parseFloat(document.getElementById('km_actual').value),
+                    litros: parseFloat(document.getElementById('litros').value),
+                    importe: parseFloat(document.getElementById('importe').value),
+                    ticket: document.getElementById('ticket').value,
+                    foto_tacometro: urlsFotos.tacometro,
+                    foto_ticket: urlsFotos.ticket,
+                    latitud: lat,
+                    longitud: lng,
+                    estado: 'pendiente',
+                    observacion: '',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                const logId = document.getElementById('edit-log-id').value;
+                if(logId) {
+                    await db.collection("gasolina_logs").doc(logId).set(docData, {merge: true});
+                } else {
+                    await db.collection("gasolina_logs").add(docData);
+                }
+
+                mostrarExito("Registro guardado y enviado a revisión exitosamente.");
+                limpiarFormulario();
+                cargarMisRegistros();
+
+            } catch (error) {
+                console.error(error);
+                mostrarAlerta("Error al subir el registro. Revisa tu conexión a internet.");
+            } finally {
+                btn.disabled = false; btn.innerHTML = oldTxt; lucide.createIcons();
+            }
+        });
+
+        function formatearFechaHoraCompleta(timestampObj) {
+            if (!timestampObj) return '';
+            let date = timestampObj.toDate ? timestampObj.toDate() : new Date(timestampObj);
+            return date.toLocaleString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
+        }
+
+        async function cargarMisRegistros() {
+            try {
+                const tbody = document.getElementById('tabla-body');
+                tbody.innerHTML = '<tr><td colspan="9" style="color:var(--text-muted); padding:30px; text-align:center;">Buscando registros...</td></tr>';
+
+                const snap = await db.collection("gasolina_logs")
+                    .where("uid_trabajador", "==", idUsuario)
+                    .orderBy("timestamp", "desc")
+                    .limit(5)
+                    .get();
+
+                if(snap.empty) {
+                    tbody.innerHTML = '<tr><td colspan="9" style="color:var(--text-muted); padding:30px; text-align:center;">No has realizado ningún registro de gasolina.</td></tr>';
+                    return;
+                }
+
+                let html = '';
+                snap.forEach(doc => {
+                    const d = doc.data();
+
+                    let estatusHtml = '';
+                    if(d.estado === 'pendiente') estatusHtml = `<div class="status-badge pendiente">Pendiente</div>`;
+                    else if(d.estado === 'aprobado') { estatusHtml = `<div class="status-badge aprobado">Aprobado</div>`; }
+                    else if(d.estado === 'rechazado') { estatusHtml = `<div class="status-badge rechazado">Rechazado</div><div class="obs-box">Ver obs. en Editar</div>`; }
+
+                    let btnAction = '';
+                    if(d.estado === 'rechazado') {
+                        btnAction = `<button type="button" class="btn-action-red" onclick="editarRegistro('${doc.id}')"><i data-lucide="edit-2"></i> Editar</button>`;
+                    } else {
+                        btnAction = `<span style="font-size:10px; color:var(--text-muted);">Sin acción</span>`;
+                    }
+
+                    let geoHtml = (d.latitud && d.longitud)
+                        ? `<a href="https://maps.google.com/?q=${d.latitud},${d.longitud}" target="_blank" style="color:var(--primary-blue); font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:4px; justify-content:center;"><i data-lucide="map-pin" style="width:14px;"></i> Mapa</a>`
+                        : '<span style="color:var(--text-muted); font-size:10px;">Sin GPS</span>';
+
+                    let registroFechaHora = d.timestamp ? formatearFechaHoraCompleta(d.timestamp).replace(', ', '<br>') : '-';
+
+                    html += `
+                        <tr>
+                            <td style="font-size:11px; font-weight:600; color:var(--text-muted);">${registroFechaHora}</td>
+                            <td style="font-weight:800; color:var(--primary-blue); font-size:12px;">${d.vehiculo_nombre}</td>
+                            <td>${d.km_actual || '-'}</td>
+                            <td style="font-weight:700;">${d.litros} L</td>
+                            <td style="color:var(--success); font-weight:800;">$${d.importe}</td>
+                            <td>${geoHtml}</td>
+                            <td>${estatusHtml}</td>
+                            <td>
+                                <div style="display:flex; gap:5px; justify-content:center;">
+                                    <img src="${d.foto_tacometro}" style="width:30px; height:30px; border-radius:6px; object-fit:cover; cursor:zoom-in; border:1px solid #ccc;" onclick="openImageViewer(this.src)" title="Tacómetro">
+                                    <img src="${d.foto_ticket}" style="width:30px; height:30px; border-radius:6px; object-fit:cover; cursor:zoom-in; border:1px solid #ccc;" onclick="openImageViewer(this.src)" title="Ticket">
+                                </div>
+                            </td>
+                            <td>${btnAction}</td>
+                        </tr>
+                    `;
+                });
+                tbody.innerHTML = html;
+                lucide.createIcons();
+
+            } catch(e) { console.error("Error cargando tabla", e); }
+        }
+
+        async function editarRegistro(docId) {
+            try {
+                const doc = await db.collection("gasolina_logs").doc(docId).get();
+                if(doc.exists) {
+                    const d = doc.data();
+                    document.getElementById('edit-log-id').value = docId;
+                    document.getElementById('vehiculo').value = d.id_vehiculo;
+                    document.getElementById('fecha').value = d.fecha;
+                    document.getElementById('km_actual').value = d.km_actual;
+                    document.getElementById('litros').value = d.litros;
+                    document.getElementById('importe').value = d.importe;
+                    document.getElementById('ticket').value = d.ticket;
+
+                    fotos.tacometro[0] = d.foto_tacometro;
+                    fotos.ticket[0] = d.foto_ticket;
+
+                    renderSlots('tacometro'); renderSlots('ticket');
+
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    mostrarAlerta(`Motivo del rechazo: ${d.observacion}\n\nPor favor corrige los datos y vuelve a Guardar.`);
+                }
+            } catch(e) { console.error(e); }
+        }
+    </script>
+</body>
+</html>
