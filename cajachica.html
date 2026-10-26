@@ -63,7 +63,17 @@
         @media (max-width: 768px) {
             .sidebar { position: fixed; height: calc(100vh - 60px); transform: translateX(-100%); z-index: 40; }
             .sidebar.open { transform: translateX(0); }
+            .header-title { display: none; }
         }
+        /* Estilos del menu lateral (mismos que gasolina.html) */
+        .sidebar-nav { padding: 15px 10px; }
+        .sidebar-section { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
+        .sidebar-section:last-child { border-bottom: none; }
+        .sidebar .section-title { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin: 10px 15px; padding-bottom: 0; display: block; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 15px; color: var(--text-main); text-decoration: none; font-size: 14px; font-weight: 500; border-radius: 10px; margin-bottom: 2px; transition: all 0.2s; }
+        .nav-item:hover { background-color: var(--bg-color); }
+        .nav-item.active { background-color: var(--light-blue); color: var(--primary-blue); font-weight: 700; border-left: 4px solid var(--primary-blue); }
+        .nav-item.active i { color: var(--primary-blue); }
         .content {
             flex: 1; padding: 30px; overflow-y: auto;
         }
@@ -354,6 +364,26 @@
             text-align: right;
             padding-right: 12px;
             font-family: 'Courier New', monospace;
+        }
+        /* Subtotal de NO Facturado: franja gris clara */
+        .subtotal-row.subtotal-no-facturado td {
+            background: #f1f5f9 !important;
+            color: var(--text-main) !important;
+            border-top: 2px solid #cbd5e1 !important;
+        }
+        .subtotal-row.subtotal-no-facturado .subtotal-label,
+        .subtotal-row.subtotal-no-facturado .subtotal-amount {
+            color: var(--text-main) !important;
+        }
+        /* Fila TOTAL GASTADO: estilo azul fuerte como el header */
+        .subtotal-row.subtotal-total td {
+            background: var(--primary-blue) !important;
+            color: white !important;
+            border-top: 2px solid var(--primary-blue) !important;
+        }
+        .subtotal-row.subtotal-total .subtotal-label,
+        .subtotal-row.subtotal-total .subtotal-amount {
+            color: white !important;
         }
 
         /* Remove button */
@@ -707,17 +737,9 @@
                                 <option value="Imper C100">
                             </datalist>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">Razón Social</label>
-                            <input type="text" class="form-control" id="input-razon" placeholder="Ej. Soluciones Constructivas" list="razones-list">
-                            <datalist id="razones-list">
-                                <option value="Soluciones Constructivas">
-                                <option value="Proveedora de Materiales Especializados GSJ">
-                            </datalist>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">No. Caja</label>
-                            <input type="number" class="form-control" id="input-caja" placeholder="Ej. 1" min="1">
+                        <div class="form-group full">
+                            <label class="form-label">Folio</label>
+                            <input type="text" class="form-control" id="input-folio" readonly style="background:#e2e8f0; color:var(--text-muted); font-weight:bold; cursor:not-allowed;">
                         </div>
                     </div>
                 </div>
@@ -1069,7 +1091,7 @@
                     tbody.appendChild(subTotalFact);
 
                     const subTotalNota = document.createElement('tr');
-                    subTotalNota.className = 'subtotal-row';
+                    subTotalNota.className = 'subtotal-row subtotal-no-facturado';
                     subTotalNota.innerHTML = `
                         <td colspan="6" class="subtotal-label">SUBTOTAL NO FACTURADO (${items.filter(i => i.tipo === 'Nota').length})</td>
                         <td class="subtotal-amount">${formatCurrency(noFacturado)}</td>
@@ -1078,9 +1100,7 @@
                     tbody.appendChild(subTotalNota);
 
                     const totalRow = document.createElement('tr');
-                    totalRow.className = 'subtotal-row';
-                    totalRow.style.background = 'var(--primary-blue) !important';
-                    totalRow.style.color = 'white';
+                    totalRow.className = 'subtotal-row subtotal-total';
                     totalRow.innerHTML = `
                         <td colspan="6" class="subtotal-label" style="color: white;">IMPORTE TOTAL GASTADO</td>
                         <td class="subtotal-amount" style="color: white;">${formatCurrency(total)}</td>
@@ -1288,26 +1308,35 @@
             const count = historial.length + 1;
             return 'CC-' + year + '-' + String(count).padStart(4, '0');
         }
+        function updateFolioInput() {
+            const folioInput = document.getElementById('input-folio');
+            if (folioInput) {
+                folioInput.value = generateFolio();
+            }
+        }
         function renderHistorial() {
             const tbody = document.getElementById('recent-tbody');
             if (historial.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="5" class="empty-row">No hay comprobaciones registradas todavía.</td></tr>';
-                return;
+            } else {
+                const ultimas5 = historial.slice(-5).reverse();
+                tbody.innerHTML = ultimas5.map(h => `
+                    <tr>
+                        <td class="folio-cell">${escapeHtml(h.folio)}</td>
+                        <td>${escapeHtml(h.obra)}</td>
+                        <td>${escapeHtml(h.periodo)}</td>
+                        <td class="amount-cell">${formatCurrency(h.total)}</td>
+                        <td style="text-align: center;"><span class="badge ok"><i data-lucide="check" style="width:11px;height:11px;"></i>Firmada</span></td>
+                    </tr>
+                `).join('');
             }
-            const ultimas5 = historial.slice(-5).reverse();
-            tbody.innerHTML = ultimas5.map(h => `
-                <tr>
-                    <td class="folio-cell">${escapeHtml(h.folio)}</td>
-                    <td>${escapeHtml(h.obra)}</td>
-                    <td>${escapeHtml(h.periodo)}</td>
-                    <td class="amount-cell">${formatCurrency(h.total)}</td>
-                    <td style="text-align: center;"><span class="badge ok"><i data-lucide="check" style="width:11px;height:11px;"></i>Firmada</span></td>
-                </tr>
-            `).join('');
             lucide.createIcons();
+            // Actualizar el folio automatico del input
+            updateFolioInput();
         }
         loadHistorial();
         renderHistorial();
+        updateFolioInput();
 
         // =====================================================
         // 7. FIRMA (CANVAS)
@@ -1463,14 +1492,12 @@
                 showToast('Faltan datos: ' + errors[0], 'error');
                 return;
             }
-            const folio = generateFolio();
+            const folio = document.getElementById('input-folio').value || generateFolio();
             const total = items.reduce((acc, i) => acc + (parseFloat(i.importe) || 0), 0);
             const recibido = parseFloat(document.getElementById('input-monto-recibido').value) || 0;
             const registro = {
                 folio,
                 obra: document.getElementById('input-obra').value.trim(),
-                razon: document.getElementById('input-razon').value.trim(),
-                caja: document.getElementById('input-caja').value.trim(),
                 fechaInicio: document.getElementById('input-fecha-inicio').value,
                 fechaFin: document.getElementById('input-fecha-fin').value,
                 periodo: document.getElementById('input-periodo').value,
@@ -1522,8 +1549,6 @@
         function resetForm() {
             items = [];
             document.getElementById('input-obra').value = '';
-            document.getElementById('input-razon').value = '';
-            document.getElementById('input-caja').value = '';
             document.getElementById('input-fecha-inicio').value = '';
             document.getElementById('input-fecha-fin').value = '';
             document.getElementById('input-periodo').value = '';
@@ -1532,6 +1557,7 @@
             clearSignature();
             addItem();
             updateSummary();
+            updateFolioInput();
         }
 
         lucide.createIcons();
