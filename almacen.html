@@ -174,8 +174,8 @@
         .btn-filter { background: var(--primary-blue); color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; font-family: 'Inter', sans-serif; height: 40px; }
         .btn-filter:hover { background: #1e40af; }
         .btn-filter i { width: 14px; height: 14px; }
-        .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
-        @media (max-width: 900px) { .chart-grid { grid-template-columns: 1fr; } }
+        .chart-grid { display: grid; grid-template-columns: 1fr; gap: 20px; margin-bottom: 20px; }
+        .chart-container-wide { position: relative; height: 360px; width: 100%; }
         .chart-container { position: relative; height: 280px; width: 100%; }
         .autocomplete-list { position: absolute; z-index: 100; background: white; border: 1px solid var(--border-color); border-radius: 8px; max-height: 200px; overflow-y: auto; box-shadow: 0 8px 20px rgba(0,0,0,0.1); display: none; }
         .autocomplete-list.show { display: block; }
@@ -184,9 +184,29 @@
         .autocomplete-item:hover { background: var(--light-blue); }
         .autocomplete-item .item-desc { font-weight: 600; color: var(--text-main); }
         .autocomplete-item .item-meta { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
-        .inv-badge { display: inline-flex; align-items: center; gap: 3px; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 800; text-transform: uppercase; }
+        .inv-badge { display: inline-flex; align-items: center; gap: 3px; padding: 3px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.3px; }
+        .inv-badge.disponible { background: #dcfce7; color: #166534; }
+        .inv-badge.bajo { background: #fef3c7; color: #92400e; }
+        .inv-badge.agotado { background: #fee2e2; color: #991b1b; }
         .inv-badge.in { background: #dcfce7; color: #166534; }
         .inv-badge.out { background: #fee2e2; color: #991b1b; }
+        /* Botones de accion en tabla */
+        .btn-table-action { border: none; cursor: pointer; width: 28px; height: 28px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; transition: all 0.15s; margin: 0 2px; }
+        .btn-table-action i { width: 14px; height: 14px; }
+        .btn-table-edit { background: #dbeafe; color: var(--info); }
+        .btn-table-edit:hover { background: var(--info); color: white; }
+        .btn-table-delete { background: #fee2e2; color: var(--danger); }
+        .btn-table-delete:hover { background: var(--danger); color: white; }
+        /* Modal para agregar/editar */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.82); backdrop-filter: blur(6px); z-index: 2000; align-items: center; justify-content: center; padding: 16px; }
+        .modal-overlay.show { display: flex; }
+        .modal-box { background: white; border-radius: 20px; width: 100%; max-width: 560px; padding: 24px; box-shadow: 0 30px 70px rgba(0,0,0,0.4); animation: slideIn 0.3s cubic-bezier(.2,.8,.3,1); max-height: 90vh; overflow-y: auto; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .modal-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 2px solid var(--light-blue); }
+        .modal-icon { width: 44px; height: 44px; border-radius: 12px; background: var(--light-blue); color: var(--primary-blue); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .modal-icon i { width: 24px; height: 24px; }
+        .modal-title { font-size: 16px; font-weight: 800; color: var(--text-main); }
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -244,6 +264,15 @@
                             </select>
                         </div>
                         <div class="filter-group">
+                            <label class="filter-label">Estatus</label>
+                            <select class="filter-select" id="filter-estatus">
+                                <option value="">Todos</option>
+                                <option value="disponible">Disponible</option>
+                                <option value="bajo">Bajo</option>
+                                <option value="agotado">Agotado</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
                             <label class="filter-label">Ubicación</label>
                             <select class="filter-select" id="filter-ubicacion">
                                 <option value="">Todas</option>
@@ -257,12 +286,19 @@
                         </div>
                     </div>
 
+                    <div class="actions-bar" style="margin-top: 0; margin-bottom: 14px;">
+                        <button class="btn btn-primary left" id="btn-add-item">
+                            <i data-lucide="plus"></i> Agregar Material
+                        </button>
+                    </div>
+
                     <div class="table-wrap">
                         <table class="expense-table" id="table-inventario">
                             <thead>
                                 <tr>
                                     <th class="center" style="width:40px;">N°</th>
                                     <th>Familia</th>
+                                    <th class="center" style="width:100px;">Estatus</th>
                                     <th>Ubicación</th>
                                     <th>Codificación</th>
                                     <th>Descripción</th>
@@ -271,10 +307,11 @@
                                     <th class="right">Precio Unit.</th>
                                     <th class="right">Total</th>
                                     <th>Observaciones</th>
+                                    <th class="center" style="width:70px;">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="tbody-inventario">
-                                <tr><td colspan="10" class="empty-row">No hay inventario cargado. Carga un archivo CSV más abajo para comenzar.</td></tr>
+                                <tr><td colspan="12" class="empty-row">No hay inventario cargado. Carga un archivo CSV más abajo para comenzar.</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -337,19 +374,7 @@
                 <!-- KPIs -->
                 <div class="summary-grid" id="kpi-grid"></div>
 
-                <!-- Gráficas -->
-                <div class="chart-grid">
-                    <div class="card">
-                        <h3 class="card-title"><i data-lucide="bar-chart-2"></i> Cantidad por Familia</h3>
-                        <div class="chart-container"><canvas id="chart-cantidad-familia"></canvas></div>
-                    </div>
-                    <div class="card">
-                        <h3 class="card-title"><i data-lucide="pie-chart"></i> Distribución por Valor</h3>
-                        <div class="chart-container"><canvas id="chart-valor-familia"></canvas></div>
-                    </div>
-                </div>
-
-                <!-- Tabla resumen por familia -->
+                <!-- Tabla resumen por familia (ARRIBA) -->
                 <div class="card">
                     <h3 class="card-title">
                         <i data-lucide="layers"></i>
@@ -370,6 +395,67 @@
                                 <tr><td colspan="5" class="empty-row">No hay datos para mostrar.</td></tr>
                             </tbody>
                         </table>
+                    </div>
+                </div>
+
+                <!-- Gráfica Cantidad por Familia (ancho completo, valores en barras) -->
+                <div class="card">
+                    <h3 class="card-title"><i data-lucide="bar-chart-2"></i> Cantidad por Familia</h3>
+                    <div class="chart-container-wide"><canvas id="chart-cantidad-familia"></canvas></div>
+                </div>
+            </div>
+
+            <!-- Modal para agregar/editar material -->
+            <div class="modal-overlay" id="modal-item">
+                <div class="modal-box">
+                    <div class="modal-header">
+                        <div class="modal-icon"><i data-lucide="package-plus"></i></div>
+                        <div class="modal-title" id="modal-item-title">Agregar Material</div>
+                    </div>
+                    <input type="hidden" id="edit-item-index" value="-1">
+                    <div class="form-grid">
+                        <div class="form-group full">
+                            <label class="form-label">Familia</label>
+                            <input type="text" class="form-control" id="modal-familia" placeholder="Ej. MATERIAL ELÉCTRICO" list="familias-list">
+                            <datalist id="familias-list"></datalist>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Ubicación</label>
+                            <input type="text" class="form-control" id="modal-ubicacion" placeholder="Ej. DENTRO DE BODEGA" list="ubicaciones-list">
+                            <datalist id="ubicaciones-list"></datalist>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Codificación</label>
+                            <input type="text" class="form-control" id="modal-codificacion" placeholder="Ej. O5XLDS">
+                        </div>
+                        <div class="form-group full">
+                            <label class="form-label">Descripción</label>
+                            <input type="text" class="form-control" id="modal-descripcion" placeholder="Ej. Base para bocina timbre">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Unidad</label>
+                            <input type="text" class="form-control" id="modal-unidad" placeholder="PZA" value="PZA">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Cantidad</label>
+                            <input type="number" class="form-control" id="modal-cantidad" placeholder="0" min="0" step="1">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Precio Unitario</label>
+                            <input type="number" class="form-control" id="modal-precio" placeholder="0.00" min="0" step="0.01">
+                        </div>
+                        <div class="form-group full">
+                            <label class="form-label">Observaciones</label>
+                            <input type="text" class="form-control" id="modal-observaciones" placeholder="Notas adicionales (opcional)">
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-danger" id="modal-item-cancel">
+                            <i data-lucide="x"></i> Cancelar
+                        </button>
+                        <button class="btn btn-success" id="modal-item-save">
+                            <i data-lucide="check"></i> Guardar
+                        </button>
                     </div>
                 </div>
             </div>
@@ -630,11 +716,23 @@
         // =====================================================
         // RENDER INVENTARIO
         // =====================================================
+        function getEstatus(cantidad) {
+            if (cantidad <= 0) return 'agotado';
+            if (cantidad <= 5) return 'bajo';
+            return 'disponible';
+        }
+        function getEstatusBadge(cantidad) {
+            const est = getEstatus(cantidad);
+            const labels = { disponible: 'Disponible', bajo: 'Bajo', agotado: 'Agotado' };
+            return '<span class="inv-badge ' + est + '">' + labels[est] + '</span>';
+        }
+
         function renderInventario() {
             const tbody = document.getElementById('tbody-inventario');
             const buscar = document.getElementById('filter-buscar').value.toLowerCase().trim();
             const familiaF = document.getElementById('filter-familia').value;
             const ubicacionF = document.getElementById('filter-ubicacion').value;
+            const estatusF = document.getElementById('filter-estatus').value;
 
             // Actualizar filtros de familia y ubicacion
             const familias = [...new Set(inventario.map(i => i.familia))].sort();
@@ -648,6 +746,12 @@
             selFam.value = famVal;
             selUb.value = ubVal;
 
+            // Actualizar datalists del modal
+            const dlFam = document.getElementById('familias-list');
+            const dlUb = document.getElementById('ubicaciones-list');
+            if (dlFam) dlFam.innerHTML = familias.map(f => `<option value="${escapeHtml(f)}">`).join('');
+            if (dlUb) dlUb.innerHTML = ubicaciones.map(u => `<option value="${escapeHtml(u)}">`).join('');
+
             // Filtrar
             let filtered = inventario;
             if (buscar) {
@@ -659,29 +763,36 @@
             }
             if (familiaF) filtered = filtered.filter(i => i.familia === familiaF);
             if (ubicacionF) filtered = filtered.filter(i => i.ubicacion === ubicacionF);
+            if (estatusF) filtered = filtered.filter(i => getEstatus(i.cantidad) === estatusF);
 
             // Render
             if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="10" class="empty-row">No hay materiales que coincidan con los filtros.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="12" class="empty-row">No hay materiales que coincidan con los filtros.</td></tr>';
             } else {
                 tbody.innerHTML = filtered.map(i => {
-                    const agotado = i.cantidad <= 0;
-                    const bajoStock = i.cantidad > 0 && i.cantidad <= 5;
-                    let stockBadge = '';
-                    if (agotado) stockBadge = ' <span class="inv-badge out">Agotado</span>';
-                    else if (bajoStock) stockBadge = ' <span class="inv-badge out">Bajo</span>';
+                    const realIndex = inventario.indexOf(i);
+                    const estatusBadge = getEstatusBadge(i.cantidad);
                     return `
                         <tr>
                             <td class="row-num">${i.numero}</td>
                             <td style="font-size:11px; font-weight:600; color:var(--text-muted);">${escapeHtml(i.familia)}</td>
+                            <td style="text-align:center;">${estatusBadge}</td>
                             <td style="font-size:11px;">${escapeHtml(i.ubicacion)}</td>
                             <td style="font-family:'Courier New',monospace; font-weight:700; color:var(--primary-blue); font-size:11px;">${escapeHtml(i.codificacion)}</td>
-                            <td style="font-weight:600;">${escapeHtml(i.descripcion)}${stockBadge}</td>
+                            <td style="font-weight:600;">${escapeHtml(i.descripcion)}</td>
                             <td style="text-align:center; font-size:11px;">${escapeHtml(i.unidad)}</td>
-                            <td class="amount-cell" style="${agotado ? 'color:var(--danger);' : (bajoStock ? 'color:var(--warning);' : '')}">${formatNumber(i.cantidad)}</td>
+                            <td class="amount-cell">${formatNumber(i.cantidad)}</td>
                             <td class="amount-cell" style="color:var(--text-muted);">${formatCurrency(i.precioUnitario)}</td>
                             <td class="amount-cell">${formatCurrency(i.total)}</td>
                             <td style="font-size:10px; color:var(--text-muted);">${escapeHtml(i.observaciones)}</td>
+                            <td style="text-align:center;">
+                                <button class="btn-table-action btn-table-edit" onclick="editItem(${realIndex})" title="Editar">
+                                    <i data-lucide="edit-3"></i>
+                                </button>
+                                <button class="btn-table-action btn-table-delete" onclick="deleteItem(${realIndex})" title="Eliminar">
+                                    <i data-lucide="trash-2"></i>
+                                </button>
+                            </td>
                         </tr>
                     `;
                 }).join('');
@@ -690,24 +801,120 @@
             // Contador y badge
             document.getElementById('count-inventario').textContent = filtered.length;
             document.getElementById('badge-inventario').textContent = inventario.length;
+            lucide.createIcons();
         }
 
         // Filtros
         document.getElementById('filter-buscar').addEventListener('input', renderInventario);
         document.getElementById('filter-familia').addEventListener('change', renderInventario);
         document.getElementById('filter-ubicacion').addEventListener('change', renderInventario);
+        document.getElementById('filter-estatus').addEventListener('change', renderInventario);
         document.getElementById('btn-limpiar-filtros').addEventListener('click', () => {
             document.getElementById('filter-buscar').value = '';
             document.getElementById('filter-familia').value = '';
             document.getElementById('filter-ubicacion').value = '';
+            document.getElementById('filter-estatus').value = '';
             renderInventario();
+        });
+
+        // =====================================================
+        // CRUD: Agregar / Editar / Eliminar
+        // =====================================================
+        function openModalItem(editIndex) {
+            const modal = document.getElementById('modal-item');
+            const title = document.getElementById('modal-item-title');
+            const idxInput = document.getElementById('edit-item-index');
+            if (editIndex >= 0) {
+                const item = inventario[editIndex];
+                title.textContent = 'Editar Material';
+                idxInput.value = editIndex;
+                document.getElementById('modal-familia').value = item.familia || '';
+                document.getElementById('modal-ubicacion').value = item.ubicacion || '';
+                document.getElementById('modal-codificacion').value = item.codificacion || '';
+                document.getElementById('modal-descripcion').value = item.descripcion || '';
+                document.getElementById('modal-unidad').value = item.unidad || 'PZA';
+                document.getElementById('modal-cantidad').value = item.cantidad || 0;
+                document.getElementById('modal-precio').value = item.precioUnitario || 0;
+                document.getElementById('modal-observaciones').value = item.observaciones || '';
+            } else {
+                title.textContent = 'Agregar Material';
+                idxInput.value = -1;
+                document.getElementById('modal-familia').value = '';
+                document.getElementById('modal-ubicacion').value = 'DENTRO DE BODEGA';
+                document.getElementById('modal-codificacion').value = '';
+                document.getElementById('modal-descripcion').value = '';
+                document.getElementById('modal-unidad').value = 'PZA';
+                document.getElementById('modal-cantidad').value = '';
+                document.getElementById('modal-precio').value = '';
+                document.getElementById('modal-observaciones').value = '';
+            }
+            modal.classList.add('show');
+            lucide.createIcons();
+        }
+        function closeModalItem() {
+            document.getElementById('modal-item').classList.remove('show');
+        }
+        document.getElementById('btn-add-item').addEventListener('click', () => openModalItem(-1));
+        document.getElementById('modal-item-cancel').addEventListener('click', closeModalItem);
+
+        function editItem(index) {
+            openModalItem(index);
+        }
+        function deleteItem(index) {
+            const item = inventario[index];
+            if (confirm('¿Eliminar "' + (item.descripcion || 'este material') + '"?')) {
+                inventario.splice(index, 1);
+                inventario.forEach((it, i) => { it.numero = i + 1; });
+                saveInventario();
+                renderInventario();
+                renderReportes();
+                updateUploadState();
+                showToast('Material eliminado.', 'success');
+            }
+        }
+
+        document.getElementById('modal-item-save').addEventListener('click', () => {
+            const familia = document.getElementById('modal-familia').value.trim();
+            const descripcion = document.getElementById('modal-descripcion').value.trim();
+            if (!familia || !descripcion) {
+                showToast('Familia y descripción son obligatorios.', 'error');
+                return;
+            }
+            const cantidad = parseFloat(document.getElementById('modal-cantidad').value) || 0;
+            const precioUnit = parseFloat(document.getElementById('modal-precio').value) || 0;
+            const total = cantidad * precioUnit;
+            const editIndex = parseInt(document.getElementById('edit-item-index').value);
+            const itemData = {
+                familia: familia,
+                ubicacion: document.getElementById('modal-ubicacion').value.trim() || 'DENTRO DE BODEGA',
+                codificacion: document.getElementById('modal-codificacion').value.trim(),
+                descripcion: descripcion,
+                unidad: document.getElementById('modal-unidad').value.trim() || 'PZA',
+                cantidad: cantidad,
+                precioUnitario: precioUnit,
+                total: total,
+                observaciones: document.getElementById('modal-observaciones').value.trim()
+            };
+            if (editIndex >= 0) {
+                itemData.numero = inventario[editIndex].numero;
+                inventario[editIndex] = itemData;
+                showToast('Material actualizado.', 'success');
+            } else {
+                itemData.numero = inventario.length + 1;
+                inventario.push(itemData);
+                showToast('Material agregado.', 'success');
+            }
+            saveInventario();
+            closeModalItem();
+            renderInventario();
+            renderReportes();
+            updateUploadState();
         });
 
         // =====================================================
         // REPORTES
         // =====================================================
         let chartCantidad = null;
-        let chartValor = null;
 
         function renderReportes() {
             const totalItems = inventario.length;
@@ -716,6 +923,7 @@
             const totalFamilias = new Set(inventario.map(i => i.familia)).size;
             const agotados = inventario.filter(i => i.cantidad <= 0).length;
             const bajoStock = inventario.filter(i => i.cantidad > 0 && i.cantidad <= 5).length;
+            const disponibles = totalItems - agotados - bajoStock;
 
             // KPIs
             const kpiGrid = document.getElementById('kpi-grid');
@@ -748,11 +956,11 @@
                         <span class="summary-label">Familias</span>
                     </div>
                 </div>
-                <div class="summary-card danger">
-                    <div class="summary-icon"><i data-lucide="alert-octagon"></i></div>
+                <div class="summary-card success">
+                    <div class="summary-icon"><i data-lucide="check-circle"></i></div>
                     <div class="summary-info">
-                        <span class="summary-value">${agotados}</span>
-                        <span class="summary-label">Agotados</span>
+                        <span class="summary-value">${disponibles}</span>
+                        <span class="summary-label">Disponibles</span>
                     </div>
                 </div>
                 <div class="summary-card warning">
@@ -760,6 +968,13 @@
                     <div class="summary-info">
                         <span class="summary-value">${bajoStock}</span>
                         <span class="summary-label">Bajo Stock (≤5)</span>
+                    </div>
+                </div>
+                <div class="summary-card danger">
+                    <div class="summary-icon"><i data-lucide="alert-octagon"></i></div>
+                    <div class="summary-info">
+                        <span class="summary-value">${agotados}</span>
+                        <span class="summary-label">Agotados</span>
                     </div>
                 </div>
             `;
@@ -775,7 +990,7 @@
                 porFamilia[i.familia].cantidad += i.cantidad || 0;
                 porFamilia[i.familia].valor += i.total || 0;
             });
-            const familias = Object.keys(porFamilia).sort((a, b) => porFamilia[b].valor - porFamilia[a].valor);
+            const familias = Object.keys(porFamilia).sort((a, b) => porFamilia[b].cantidad - porFamilia[a].cantidad);
 
             // Tabla resumen
             const tbody = document.getElementById('tbody-resumen-familias');
@@ -805,14 +1020,12 @@
                 `;
             }
 
-            // Charts
+            // Chart: Cantidad por familia (barras con valores visibles)
             const colors = ['#152B71', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#06b6d4'];
 
-            // Destruir charts existentes
+            // Destruir chart existente
             if (chartCantidad) chartCantidad.destroy();
-            if (chartValor) chartValor.destroy();
 
-            // Chart 1: Cantidad por familia (barras)
             const ctx1 = document.getElementById('chart-cantidad-familia').getContext('2d');
             chartCantidad = new Chart(ctx1, {
                 type: 'bar',
@@ -821,32 +1034,44 @@
                     datasets: [{
                         label: 'Cantidad',
                         data: familias.map(f => porFamilia[f].cantidad),
-                        backgroundColor: colores => familias.map((_, i) => colors[i % colors.length]),
-                        borderRadius: 8
+                        backgroundColor: familias.map((_, i) => colors[i % colors.length]),
+                        borderRadius: 8,
+                        barThickness: 'flex',
+                        maxBarThickness: 80
                     }]
                 },
                 options: {
                     responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true } }
-                }
-            });
-
-            // Chart 2: Valor por familia (doughnut)
-            const ctx2 = document.getElementById('chart-valor-familia').getContext('2d');
-            chartValor = new Chart(ctx2, {
-                type: 'doughnut',
-                data: {
-                    labels: familias,
-                    datasets: [{
-                        data: familias.map(f => porFamilia[f].valor),
-                        backgroundColor: familias.map((_, i) => colors[i % colors.length]),
-                        borderWidth: 2, borderColor: '#ffffff'
-                    }]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false, cutout: '60%',
-                    plugins: { legend: { position: 'right', labels: { font: { size: 10 }, boxWidth: 12, padding: 8 } } }
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: { label: ctx => 'Cantidad: ' + formatNumber(ctx.parsed.y) }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { callback: v => formatNumber(v) } }
+                    },
+                    // Mostrar valores dentro de las barras
+                    animation: {
+                        onComplete: function() {
+                            const chart = this;
+                            const ctx = chart.ctx;
+                            ctx.font = 'bold 12px Inter, sans-serif';
+                            ctx.fillStyle = '#ffffff';
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            chart.data.datasets.forEach(function(dataset, i) {
+                                const meta = chart.getDatasetMeta(i);
+                                meta.data.forEach(function(bar, index) {
+                                    const value = dataset.data[index];
+                                    if (value > 0) {
+                                        const y = bar.y + 14;
+                                        ctx.fillText(formatNumber(value), bar.x, y);
+                                    }
+                                });
+                            });
+                        }
+                    }
                 }
             });
         }
