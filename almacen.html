@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Almacén | FYTTSA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --primary-blue: #152B71;
+            --light-blue: #eef2ff;
+            --bg-color: #f8fafc;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --purple: #8b5cf6;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: white; border-bottom: 1px solid var(--border-color); z-index: 50; flex-shrink: 0; }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .menu-btn { background: none; border: none; cursor: pointer; color: var(--text-main); padding: 5px; }
+        .header-title { margin: 0; font-size: 15px; font-weight: 700; color: var(--primary-blue); display: none; }
+        @media (min-width: 768px) { .header-title { display: block; } }
+        .header-right { display: flex; align-items: center; gap: 12px; }
+        .user-initial { width: 35px; height: 35px; border-radius: 50%; background-color: var(--primary-blue); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; }
+        .main-layout { display: flex; flex: 1; overflow: hidden; }
+        .sidebar { width: 260px; background: white; border-right: 1px solid var(--border-color); overflow-y: auto; transition: transform 0.3s ease; display: flex; flex-direction: column; flex-shrink: 0; }
+        @media (max-width: 768px) { .sidebar { position: fixed; height: calc(100vh - 60px); transform: translateX(-100%); z-index: 40; } .sidebar.open { transform: translateX(0); } .header-title { display: none; } }
+        .sidebar-nav { padding: 15px 10px; }
+        .sidebar-section { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
+        .sidebar-section:last-child { border-bottom: none; }
+        .sidebar .section-title { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin: 10px 15px; padding-bottom: 0; display: block; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 15px; color: var(--text-main); text-decoration: none; font-size: 14px; font-weight: 500; border-radius: 10px; margin-bottom: 2px; transition: all 0.2s; }
+        .nav-item:hover { background-color: var(--bg-color); }
+        .nav-item.active { background-color: var(--light-blue); color: var(--primary-blue); font-weight: 700; border-left: 4px solid var(--primary-blue); }
+        .nav-item.active i { color: var(--primary-blue); }
+        .content { flex: 1; padding: 30px; overflow-y: auto; }
+        @media (max-width: 768px) { .content { padding: 20px; } }
+        .page-title { display: flex; align-items: center; gap: 12px; font-size: 22px; font-weight: 800; color: var(--primary-blue); margin-bottom: 8px; }
+        .page-title i { width: 28px; height: 28px; }
+        .page-subtitle { color: var(--text-muted); font-size: 13px; margin-bottom: 25px; }
+        .tabs-bar { display: flex; gap: 8px; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 2px solid var(--border-color); flex-wrap: wrap; }
+        .tab-btn { background: var(--bg-color); border: 1.5px solid var(--border-color); color: var(--text-muted); padding: 10px 20px; font-size: 13px; font-weight: 700; cursor: pointer; border-radius: 10px; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; font-family: 'Inter', sans-serif; }
+        .tab-btn:hover { background: white; color: var(--text-main); border-color: var(--primary-blue); }
+        .tab-btn.active { background: var(--primary-blue); color: white; border-color: var(--primary-blue); box-shadow: 0 4px 12px rgba(21, 43, 113, 0.25); }
+        .tab-btn i { width: 16px; height: 16px; }
+        .tab-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 11px; font-size: 11px; font-weight: 800; background: white; color: var(--text-muted); border: 1px solid var(--border-color); }
+        .tab-btn.active .tab-badge { background: white; color: var(--primary-blue); border-color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.25s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .card { background: white; border-radius: 20px; padding: 24px; border: 1px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.04); margin-bottom: 20px; }
+        .card-title { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 18px; padding-bottom: 12px; border-bottom: 2px solid var(--light-blue); }
+        .card-title i { color: var(--primary-blue); width: 20px; height: 20px; }
+        .card-title .badge-count { margin-left: auto; background: var(--light-blue); color: var(--primary-blue); font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group.full { grid-column: 1 / -1; }
+        .form-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 6px; }
+        .form-label .req { color: var(--danger); }
+        .form-control { padding: 10px 12px; border: 1.5px solid var(--border-color); border-radius: 10px; font-size: 13.5px; font-family: 'Inter', sans-serif; color: var(--text-main); background: white; transition: all 0.2s; width: 100%; }
+        .form-control:focus { outline: none; border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(21, 43, 113, 0.1); }
+        .form-control[readonly] { background: #e2e8f0; color: var(--text-muted); cursor: not-allowed; font-weight: bold; }
+        .top-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        @media (max-width: 900px) { .top-grid { grid-template-columns: 1fr; } }
+        .table-wrap { overflow-x: auto; border: 1.5px solid var(--border-color); border-radius: 14px; margin-bottom: 14px; background: white; }
+        .expense-table { width: 100%; border-collapse: collapse; font-size: 12.5px; min-width: 1100px; }
+        .expense-table thead th { background: var(--primary-blue); color: white; text-transform: uppercase; font-size: 10.5px; font-weight: 800; padding: 12px 8px; text-align: left; border-right: 1px solid rgba(255,255,255,0.15); letter-spacing: 0.4px; position: sticky; top: 0; z-index: 2; }
+        .expense-table thead th:last-child { border-right: none; }
+        .expense-table thead th.center { text-align: center; }
+        .expense-table thead th.right { text-align: right; }
+        .expense-table tbody td { padding: 10px 8px; border-bottom: 1px solid var(--bg-color); border-right: 1px solid var(--bg-color); color: var(--text-main); vertical-align: middle; }
+        .expense-table tbody td:last-child { border-right: none; }
+        .expense-table tbody tr:last-child td { border-bottom: none; }
+        .expense-table tbody tr:hover { background: var(--bg-color); }
+        .row-num { text-align: center; font-weight: 700; color: var(--text-muted); width: 40px; background: var(--bg-color); }
+        .table-input, .table-select { width: 100%; padding: 6px 8px; border: 1px solid transparent; border-radius: 6px; font-size: 12px; font-family: 'Inter', sans-serif; background: transparent; color: var(--text-main); transition: all 0.15s; }
+        .table-input:hover, .table-select:hover { background: var(--bg-color); }
+        .table-input:focus, .table-select:focus { outline: none; background: white; border-color: var(--primary-blue); box-shadow: 0 0 0 2px rgba(21, 43, 113, 0.1); }
+        .table-input.right { text-align: right; font-weight: 700; color: var(--primary-blue); }
+        .btn { padding: 11px 18px; border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; border: none; font-family: 'Inter', sans-serif; }
+        .btn i { width: 16px; height: 16px; }
+        .btn-primary { background: var(--primary-blue); color: white; }
+        .btn-primary:hover { background: #1e40af; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(21, 43, 113, 0.25); }
+        .btn-secondary { background: white; color: var(--primary-blue); border: 1.5px solid var(--border-color); }
+        .btn-secondary:hover { background: var(--light-blue); border-color: var(--primary-blue); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #059669; transform: translateY(-1px); }
+        .btn-danger { background: white; color: var(--danger); border: 1.5px solid #fecaca; }
+        .btn-danger:hover { background: var(--danger); color: white; }
+        .actions-bar { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; flex-wrap: wrap; }
+        .actions-bar .left { margin-right: auto; }
+        .btn-remove-row { background: #fee2e2; color: var(--danger); border: none; cursor: pointer; width: 26px; height: 26px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; transition: all 0.15s; }
+        .btn-remove-row:hover { background: var(--danger); color: white; }
+        .btn-remove-row i { width: 13px; height: 13px; }
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 20px; }
+        .summary-card { background: white; border-radius: 16px; padding: 16px 18px; border: 1px solid var(--border-color); border-left: 5px solid var(--primary-blue); display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+        .summary-card.success { border-left-color: var(--success); }
+        .summary-card.warning { border-left-color: var(--warning); }
+        .summary-card.danger { border-left-color: var(--danger); }
+        .summary-card.info { border-left-color: var(--info); }
+        .summary-card.purple { border-left-color: var(--purple); }
+        .summary-icon { width: 40px; height: 40px; border-radius: 12px; background: var(--light-blue); color: var(--primary-blue); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .summary-card.success .summary-icon { background: #dcfce7; color: var(--success); }
+        .summary-card.warning .summary-icon { background: #fef3c7; color: var(--warning); }
+        .summary-card.danger .summary-icon { background: #fee2e2; color: var(--danger); }
+        .summary-card.info .summary-icon { background: #dbeafe; color: var(--info); }
+        .summary-card.purple .summary-icon { background: #ede9fe; color: var(--purple); }
+        .summary-icon i { width: 22px; height: 22px; }
+        .summary-info { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+        .summary-value { font-size: 18px; font-weight: 800; color: var(--text-main); line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .summary-label { font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; margin-top: 2px; }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+        .data-table thead th { background: var(--bg-color); color: var(--text-muted); text-transform: uppercase; font-size: 10.5px; font-weight: 800; padding: 11px 12px; text-align: left; border-bottom: 2px solid var(--border-color); letter-spacing: 0.4px; }
+        .data-table tbody td { padding: 11px 12px; border-bottom: 1px solid var(--bg-color); color: var(--text-main); font-weight: 500; }
+        .data-table tbody tr:last-child td { border-bottom: none; }
+        .data-table tbody tr:hover { background: var(--bg-color); }
+        .amount-cell { font-weight: 800; text-align: right; color: var(--primary-blue); }
+        .empty-row { text-align: center; color: var(--text-muted); font-style: italic; padding: 24px !important; }
+        .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+        .badge.ok { background: #dcfce7; color: #166534; }
+        .badge.warn { background: #fef3c7; color: #92400e; }
+        .badge.bad { background: #fee2e2; color: #991b1b; }
+        .badge.info { background: #dbeafe; color: #1e40af; }
+        .signature-section { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center; padding: 24px; background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 100%); border-radius: 16px; border: 1px solid #c7d2fe; }
+        @media (max-width: 768px) { .signature-section { grid-template-columns: 1fr; } }
+        .signature-user-info { display: flex; align-items: center; gap: 14px; }
+        .signature-avatar { width: 56px; height: 56px; border-radius: 50%; background: var(--primary-blue); color: white; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800; flex-shrink: 0; }
+        .signature-user-detail { display: flex; flex-direction: column; }
+        .signature-user-label { font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; }
+        .signature-user-name { font-size: 16px; color: var(--primary-blue); font-weight: 800; margin-top: 2px; }
+        .signature-user-role { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+        .signature-box { position: relative; background: white; border: 2px dashed var(--border-color); border-radius: 12px; padding: 12px; min-height: 100px; display: flex; align-items: center; justify-content: center; }
+        .signature-box.signed { border-color: var(--primary-blue); border-style: solid; }
+        #signature-canvas { display: block; width: 100%; height: 100px; cursor: crosshair; touch-action: none; }
+        .signature-hint { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #cbd5e1; font-size: 13px; font-style: italic; pointer-events: none; text-align: center; }
+        .signature-hint i { width: 16px; height: 16px; vertical-align: -3px; margin-right: 4px; }
+        .signature-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
+        .btn-mini { padding: 6px 12px; font-size: 11px; border-radius: 8px; border: none; cursor: pointer; font-weight: 700; font-family: 'Inter', sans-serif; display: inline-flex; align-items: center; gap: 4px; }
+        .btn-mini i { width: 12px; height: 12px; }
+        .btn-mini-clear { background: #fee2e2; color: var(--danger); }
+        .btn-mini-clear:hover { background: var(--danger); color: white; }
+        .btn-mini-clear:disabled { background: #f1f5f9; color: #cbd5e1; cursor: not-allowed; }
+        .btn-action-red { background: var(--danger); color: white; border: none; padding: 8px 14px; border-radius: 8px; font-weight: 700; font-size: 11px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 5px; transition: all 0.2s; font-family: 'Inter', sans-serif; text-transform: uppercase; letter-spacing: 0.3px; }
+        .btn-action-red:hover { background: #b91c1c; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3); }
+        .btn-action-red i { width: 13px; height: 13px; }
+        .toast { position: fixed; top: 20px; right: 20px; background: var(--text-main); color: white; padding: 14px 20px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 9999; display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; transform: translateX(120%); transition: transform 0.3s ease; }
+        .toast.show { transform: translateX(0); }
+        .toast.success { background: var(--success); }
+        .toast.error { background: var(--danger); }
+        .toast.info { background: var(--info); }
+        .toast i { width: 18px; height: 18px; }
+        .file-upload-zone { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; border: 2px dashed var(--border-color); border-radius: 16px; background: var(--bg-color); cursor: pointer; transition: all 0.2s; text-align: center; min-height: 180px; }
+        .file-upload-zone:hover { border-color: var(--primary-blue); background: var(--light-blue); }
+        .file-upload-zone.dragover { border-color: var(--primary-blue); background: var(--light-blue); transform: scale(1.01); }
+        .file-upload-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+        .file-upload-icon { color: var(--primary-blue); margin-bottom: 12px; }
+        .file-upload-icon i { width: 48px; height: 48px; }
+        .file-upload-text { font-size: 14px; color: var(--text-main); font-weight: 700; margin-bottom: 4px; }
+        .file-upload-text strong { color: var(--primary-blue); }
+        .file-upload-hint { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+        .filters-bar { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 18px; padding: 16px; background: var(--bg-color); border-radius: 12px; border: 1px solid var(--border-color); }
+        .filter-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 160px; }
+        .filter-label { font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
+        .filter-input, .filter-select { padding: 9px 12px; border: 1.5px solid var(--border-color); border-radius: 8px; font-size: 13px; font-family: 'Inter', sans-serif; color: var(--text-main); background: white; transition: all 0.2s; width: 100%; }
+        .filter-input:focus, .filter-select:focus { outline: none; border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(21, 43, 113, 0.1); }
+        .btn-filter { background: var(--primary-blue); color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; font-family: 'Inter', sans-serif; height: 40px; }
+        .btn-filter:hover { background: #1e40af; }
+        .btn-filter i { width: 14px; height: 14px; }
+        .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        @media (max-width: 900px) { .chart-grid { grid-template-columns: 1fr; } }
+        .chart-container { position: relative; height: 280px; width: 100%; }
+        .autocomplete-list { position: absolute; z-index: 100; background: white; border: 1px solid var(--border-color); border-radius: 8px; max-height: 200px; overflow-y: auto; box-shadow: 0 8px 20px rgba(0,0,0,0.1); display: none; }
+        .autocomplete-list.show { display: block; }
+        .autocomplete-item { padding: 8px 12px; cursor: pointer; font-size: 12px; border-bottom: 1px solid var(--bg-color); }
+        .autocomplete-item:last-child { border-bottom: none; }
+        .autocomplete-item:hover { background: var(--light-blue); }
+        .autocomplete-item .item-desc { font-weight: 600; color: var(--text-main); }
+        .autocomplete-item .item-meta { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+        .inv-badge { display: inline-flex; align-items: center; gap: 3px; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 800; text-transform: uppercase; }
+        .inv-badge.in { background: #dcfce7; color: #166534; }
+        .inv-badge.out { background: #fee2e2; color: #991b1b; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <button class="menu-btn" id="toggle-menu"><i data-lucide="menu"></i></button>
+            <img src="https://i.ibb.co/fdMsnKTg/LOGO2.png" alt="Logo" height="35">
+            <h1 class="header-title">FYTTSA - Almacén e Inventario</h1>
+        </div>
+        <div class="header-right">
+            <div class="user-initial" id="user-initial">U</div>
+            <img src="https://i.ibb.co/jv9mNxYr/LOGO1.png" alt="Logo" height="35" style="border-radius: 8px;">
+        </div>
+    </header>
+
+    <div class="main-layout">
+        <aside class="sidebar" id="sidebar"></aside>
+
+        <main class="content">
+            <h1 class="page-title">
+                <i data-lucide="package"></i>
+                Almacén / Inventario
+            </h1>
+            <p class="page-subtitle">Carga y gestiona el inventario de materiales de la bodega.</p>
+
+            <div class="tabs-bar">
+                <button class="tab-btn active" data-tab="inventario">
+                    <i data-lucide="package"></i> Inventario
+                    <span class="tab-badge" id="badge-inventario">0</span>
+                </button>
+                <button class="tab-btn" data-tab="reportes">
+                    <i data-lucide="bar-chart-3"></i> Reportes
+                </button>
+            </div>
+
+            <!-- TAB INVENTARIO -->
+            <div class="tab-content active" id="content-inventario">
+                <!-- Buscar / Filtrar -->
+                <div class="card">
+                    <h3 class="card-title">
+                        <i data-lucide="search"></i>
+                        Inventario Actual
+                        <span class="badge-count" id="count-inventario">0</span>
+                    </h3>
+
+                    <div class="filters-bar">
+                        <div class="filter-group">
+                            <label class="filter-label">Buscar</label>
+                            <input type="text" class="filter-input" id="filter-buscar" placeholder="Descripción, código, familia...">
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Familia</label>
+                            <select class="filter-select" id="filter-familia">
+                                <option value="">Todas</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Ubicación</label>
+                            <select class="filter-select" id="filter-ubicacion">
+                                <option value="">Todas</option>
+                            </select>
+                        </div>
+                        <div class="filter-group" style="flex: 0 0 auto;">
+                            <label class="filter-label">&nbsp;</label>
+                            <button class="btn-filter" id="btn-limpiar-filtros">
+                                <i data-lucide="refresh-cw"></i> Limpiar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-wrap">
+                        <table class="expense-table" id="table-inventario">
+                            <thead>
+                                <tr>
+                                    <th class="center" style="width:40px;">N°</th>
+                                    <th>Familia</th>
+                                    <th>Ubicación</th>
+                                    <th>Codificación</th>
+                                    <th>Descripción</th>
+                                    <th class="center">Unidad</th>
+                                    <th class="right">Cantidad</th>
+                                    <th class="right">Precio Unit.</th>
+                                    <th class="right">Total</th>
+                                    <th>Observaciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-inventario">
+                                <tr><td colspan="10" class="empty-row">No hay inventario cargado. Carga un archivo CSV más abajo para comenzar.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Cargar CSV (al final, ya que se hace una sola vez) -->
+                <div class="card" id="card-upload">
+                    <h3 class="card-title">
+                        <i data-lucide="upload-cloud"></i>
+                        Cargar Inventario desde Excel/CSV
+                    </h3>
+                    <p style="color:var(--text-muted); font-size:12px; margin-bottom:16px;">
+                        Esta acción se realiza <strong>una sola vez</strong>. Guarda tu archivo Excel como <strong>.csv (UTF-8, delimitado por comas)</strong> y súbelo aquí.
+                        Las columnas reconocidas son: N°, FAMILIA, UBICACIÓN, CODIFICACIÓN, DESCRIPCIÓN, UNIDAD, CANTIDAD, PRECIO UNITARIO, TOTAL, OBSERVACIONES.
+                    </p>
+
+                    <!-- Estado: sin inventario cargado -->
+                    <div id="upload-empty">
+                        <div class="file-upload-zone" id="upload-zone">
+                            <input type="file" id="csv-input" accept=".csv,text/csv">
+                            <div class="file-upload-icon"><i data-lucide="file-spreadsheet"></i></div>
+                            <div class="file-upload-text">
+                                <strong>Haz clic</strong> o arrastra tu archivo CSV aquí
+                            </div>
+                            <div class="file-upload-hint">Formato: .csv (UTF-8) · Tamaño máx: 10 MB</div>
+                        </div>
+                        <div id="upload-preview" style="margin-top: 16px; display:none;">
+                            <div style="display:flex; gap:12px; align-items:center; margin-bottom:12px;">
+                                <span id="upload-info" style="font-size:13px; color:var(--text-main); font-weight:600;"></span>
+                            </div>
+                            <div class="actions-bar" style="margin-top: 0;">
+                                <button class="btn btn-danger" id="btn-cancel-upload">
+                                    <i data-lucide="x"></i> Cancelar
+                                </button>
+                                <button class="btn btn-success" id="btn-confirm-upload">
+                                    <i data-lucide="check"></i> Cargar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Estado: inventario ya cargado (botón para recargar) -->
+                    <div id="upload-loaded" style="display:none;">
+                        <div style="display:flex; align-items:center; gap:14px; padding:18px; background:#dcfce7; border:1px solid #86efac; border-radius:12px; margin-bottom:14px;">
+                            <i data-lucide="check-circle" style="width:36px; height:36px; color:var(--success); flex-shrink:0;"></i>
+                            <div style="flex:1;">
+                                <div style="font-weight:800; color:#166534; font-size:14px;">Inventario cargado correctamente</div>
+                                <div style="font-size:12px; color:#166534; margin-top:2px;" id="loaded-info">— materiales en inventario</div>
+                            </div>
+                            <button class="btn btn-secondary" id="btn-reload" style="background:white; color:var(--primary-blue); border-color:var(--primary-blue);">
+                                <i data-lucide="refresh-cw"></i> Cargar nuevo CSV
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB REPORTES -->
+            <div class="tab-content" id="content-reportes">
+                <!-- KPIs -->
+                <div class="summary-grid" id="kpi-grid"></div>
+
+                <!-- Gráficas -->
+                <div class="chart-grid">
+                    <div class="card">
+                        <h3 class="card-title"><i data-lucide="bar-chart-2"></i> Cantidad por Familia</h3>
+                        <div class="chart-container"><canvas id="chart-cantidad-familia"></canvas></div>
+                    </div>
+                    <div class="card">
+                        <h3 class="card-title"><i data-lucide="pie-chart"></i> Distribución por Valor</h3>
+                        <div class="chart-container"><canvas id="chart-valor-familia"></canvas></div>
+                    </div>
+                </div>
+
+                <!-- Tabla resumen por familia -->
+                <div class="card">
+                    <h3 class="card-title">
+                        <i data-lucide="layers"></i>
+                        Resumen por Familia
+                    </h3>
+                    <div style="overflow-x: auto;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Familia</th>
+                                    <th style="text-align:center;">Items</th>
+                                    <th style="text-align:right;">Cantidad Total</th>
+                                    <th style="text-align:right;">Valor Total</th>
+                                    <th style="text-align:right;">% Valor</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-resumen-familias">
+                                <tr><td colspan="5" class="empty-row">No hay datos para mostrar.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="toast" id="toast">
+        <i data-lucide="check-circle"></i>
+        <span id="toast-msg">Mensaje</span>
+    </div>
+
+    <script>
+        // =====================================================
+        // MENU DINAMICO
+        // =====================================================
+        fetch('menu.html')
+            .then(r => r.text())
+            .then(html => {
+                document.getElementById('sidebar').innerHTML = html;
+                lucide.createIcons();
+                const link = document.getElementById('link-almacen');
+                if (link) link.classList.add('active');
+            })
+            .catch(err => console.error('Error cargando el menú:', err));
+        document.getElementById('toggle-menu').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('open');
+        });
+        function getUserName() { return localStorage.getItem('nombre') || ''; }
+        (function applyUserName() {
+            const nombre = getUserName();
+            if (nombre) {
+                document.getElementById('user-initial').textContent = nombre.charAt(0).toUpperCase();
+            } else { setTimeout(applyUserName, 1500); }
+        })();
+
+        // =====================================================
+        // HELPERS
+        // =====================================================
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+        }
+        function formatCurrency(num) {
+            return '$' + (num || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+        function formatNumber(num) {
+            return (num || 0).toLocaleString('es-MX');
+        }
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('toast');
+            const iconName = type === 'success' ? 'check-circle' : (type === 'error' ? 'alert-circle' : 'info');
+            toast.innerHTML = `<i data-lucide="${iconName}"></i><span>${escapeHtml(msg)}</span>`;
+            toast.className = 'toast ' + type;
+            lucide.createIcons();
+            toast.classList.add('show');
+            clearTimeout(window._toastTimer);
+            window._toastTimer = setTimeout(() => toast.classList.remove('show'), 3500);
+        }
+
+        // =====================================================
+        // CSV PARSER (robusto: detecta , o ; como separador)
+        // =====================================================
+        function parseCSV(text) {
+            // Remover BOM si existe
+            if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+            // Normalizar saltos de linea
+            text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+            const lines = text.split('\n').filter(l => l.trim() !== '');
+            if (lines.length === 0) return { headers: [], rows: [] };
+
+            // Detectar separador (, o ;)
+            const firstLine = lines[0];
+            const commaCount = (firstLine.match(/,/g) || []).length;
+            const semicolonCount = (firstLine.match(/;/g) || []).length;
+            const sep = semicolonCount > commaCount ? ';' : ',';
+
+            function parseLine(line) {
+                const result = [];
+                let current = '';
+                let inQuotes = false;
+                for (let i = 0; i < line.length; i++) {
+                    const c = line[i];
+                    if (c === '"') {
+                        if (inQuotes && line[i+1] === '"') { current += '"'; i++; }
+                        else inQuotes = !inQuotes;
+                    } else if (c === sep && !inQuotes) {
+                        result.push(current.trim()); current = '';
+                    } else { current += c; }
+                }
+                result.push(current.trim());
+                return result;
+            }
+
+            const headers = parseLine(lines[0]).map(h => h.toUpperCase().trim());
+            const rows = [];
+            for (let i = 1; i < lines.length; i++) {
+                const values = parseLine(lines[i]);
+                if (values.length === 1 && values[0] === '') continue;
+                const obj = {};
+                headers.forEach((h, idx) => {
+                    obj[h] = values[idx] || '';
+                });
+                rows.push(obj);
+            }
+            return { headers, rows };
+        }
+
+        // Mapeo de columnas del CSV a nuestro formato
+        function normalizeInventoryRow(row, idx) {
+            // Buscar el valor en posibles nombres de columna
+            function getField(...names) {
+                for (const n of names) {
+                    if (row[n] !== undefined && row[n] !== '') return row[n];
+                }
+                return '';
+            }
+            const cantidad = parseFloat(String(getField('CANTIDAD', 'CANTID', 'CANT')).replace(/[^0-9.-]/g, '')) || 0;
+            const precioUnit = parseFloat(String(getField('PRECIO UNITARIO', 'PRECIO UNIT', 'TO UNI', 'PRECIO', 'P.U.')).replace(/[^0-9.-]/g, '')) || 0;
+            const total = parseFloat(String(getField('TOTAL').replace(/[^0-9.-]/g, ''))) || (cantidad * precioUnit);
+            return {
+                numero: idx + 1,
+                familia: getField('FAMILIA') || 'SIN FAMILIA',
+                ubicacion: getField('UBICACION', 'UBICACIÓN') || 'DENTRO DE BODEGA',
+                codificacion: getField('CODIFICACION', 'CODIFICACIÓN', 'CODIGO', 'CÓDIGO') || '',
+                descripcion: getField('DESCRIPCION', 'DESCRIPCIÓN') || '',
+                unidad: getField('UNIDAD') || 'PZA',
+                cantidad: cantidad,
+                precioUnitario: precioUnit,
+                total: total,
+                observaciones: getField('OBSERVACIONES', 'OBSERVACIONES', 'OBS') || ''
+            };
+        }
+
+        // =====================================================
+        // INVENTARIO (localStorage)
+        // =====================================================
+        const INV_KEY = 'fyttsa_almacen_inventario';
+        let inventario = [];
+
+        function loadInventario() {
+            try {
+                const data = localStorage.getItem(INV_KEY);
+                inventario = data ? JSON.parse(data) : [];
+            } catch (e) { inventario = []; }
+        }
+        function saveInventario() {
+            localStorage.setItem(INV_KEY, JSON.stringify(inventario));
+        }
+
+        let pendingImport = null;
+
+        function handleFile(file) {
+            if (!file) return;
+            if (!file.name.toLowerCase().endsWith('.csv')) {
+                showToast('El archivo debe ser .csv', 'error');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const text = e.target.result;
+                    const parsed = parseCSV(text);
+                    if (parsed.rows.length === 0) {
+                        showToast('El archivo CSV no contiene datos.', 'error');
+                        return;
+                    }
+                    pendingImport = parsed.rows.map((r, i) => normalizeInventoryRow(r, i));
+                    // Mostrar preview
+                    document.getElementById('upload-info').innerHTML =
+                        `<i data-lucide="file-check" style="width:18px;height:18px;color:var(--success);vertical-align:-3px;"></i> ` +
+                        `<strong>${file.name}</strong> · ${pendingImport.length} materiales detectados`;
+                    document.getElementById('upload-preview').style.display = 'block';
+                    lucide.createIcons();
+                    showToast(`${pendingImport.length} materiales listos para importar.`, 'info');
+                } catch (err) {
+                    console.error(err);
+                    showToast('Error al leer el archivo: ' + err.message, 'error');
+                }
+            };
+            reader.readAsText(file, 'UTF-8');
+        }
+
+        document.getElementById('csv-input').addEventListener('change', (e) => {
+            handleFile(e.target.files[0]);
+        });
+
+        // Drag & drop
+        const uploadZone = document.getElementById('upload-zone');
+        uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+        uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
+        });
+
+        document.getElementById('btn-confirm-upload').addEventListener('click', () => {
+            if (!pendingImport || pendingImport.length === 0) {
+                showToast('No hay datos para importar.', 'error');
+                return;
+            }
+            if (inventario.length > 0) {
+                if (!confirm(`Ya tienes ${inventario.length} materiales en el inventario. ¿Reemplazar todo o agregar?\n\nOK = Reemplazar todo\nCancelar = Agregar al final`)) {
+                    inventario = inventario.concat(pendingImport.map((r, i) => ({...r, numero: inventario.length + i + 1})));
+                } else {
+                    inventario = pendingImport;
+                }
+            } else {
+                inventario = pendingImport;
+            }
+            saveInventario();
+            pendingImport = null;
+            document.getElementById('upload-preview').style.display = 'none';
+            document.getElementById('csv-input').value = '';
+            renderInventario();
+            renderReportes();
+            updateUploadState();
+            showToast(`Inventario cargado: ${inventario.length} materiales.`, 'success');
+        });
+
+        document.getElementById('btn-cancel-upload').addEventListener('click', () => {
+            pendingImport = null;
+            document.getElementById('upload-preview').style.display = 'none';
+            document.getElementById('csv-input').value = '';
+            showToast('Carga cancelada.', 'info');
+        });
+
+        // Boton "Cargar nuevo CSV" - recarga
+        document.getElementById('btn-reload').addEventListener('click', () => {
+            if (inventario.length > 0) {
+                if (!confirm(`¿Cargar un nuevo CSV? Se reemplazarán los ${inventario.length} materiales actuales.`)) {
+                    return;
+                }
+            }
+            // Mostrar zona de carga
+            document.getElementById('upload-loaded').style.display = 'none';
+            document.getElementById('upload-empty').style.display = 'block';
+            document.getElementById('upload-preview').style.display = 'none';
+            document.getElementById('csv-input').value = '';
+            pendingImport = null;
+        });
+
+        // Actualizar estado de la seccion de carga (empty vs loaded)
+        function updateUploadState() {
+            const emptyDiv = document.getElementById('upload-empty');
+            const loadedDiv = document.getElementById('upload-loaded');
+            const loadedInfo = document.getElementById('loaded-info');
+            if (inventario.length > 0) {
+                emptyDiv.style.display = 'none';
+                loadedDiv.style.display = 'block';
+                loadedInfo.textContent = `${inventario.length} materiales en inventario`;
+            } else {
+                emptyDiv.style.display = 'block';
+                loadedDiv.style.display = 'none';
+            }
+        }
+
+        // =====================================================
+        // RENDER INVENTARIO
+        // =====================================================
+        function renderInventario() {
+            const tbody = document.getElementById('tbody-inventario');
+            const buscar = document.getElementById('filter-buscar').value.toLowerCase().trim();
+            const familiaF = document.getElementById('filter-familia').value;
+            const ubicacionF = document.getElementById('filter-ubicacion').value;
+
+            // Actualizar filtros de familia y ubicacion
+            const familias = [...new Set(inventario.map(i => i.familia))].sort();
+            const ubicaciones = [...new Set(inventario.map(i => i.ubicacion))].sort();
+            const selFam = document.getElementById('filter-familia');
+            const selUb = document.getElementById('filter-ubicacion');
+            const famVal = selFam.value;
+            const ubVal = selUb.value;
+            selFam.innerHTML = '<option value="">Todas</option>' + familias.map(f => `<option value="${escapeHtml(f)}">${escapeHtml(f)}</option>`).join('');
+            selUb.innerHTML = '<option value="">Todas</option>' + ubicaciones.map(u => `<option value="${escapeHtml(u)}">${escapeHtml(u)}</option>`).join('');
+            selFam.value = famVal;
+            selUb.value = ubVal;
+
+            // Filtrar
+            let filtered = inventario;
+            if (buscar) {
+                filtered = filtered.filter(i =>
+                    (i.descripcion || '').toLowerCase().includes(buscar) ||
+                    (i.codificacion || '').toLowerCase().includes(buscar) ||
+                    (i.familia || '').toLowerCase().includes(buscar)
+                );
+            }
+            if (familiaF) filtered = filtered.filter(i => i.familia === familiaF);
+            if (ubicacionF) filtered = filtered.filter(i => i.ubicacion === ubicacionF);
+
+            // Render
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" class="empty-row">No hay materiales que coincidan con los filtros.</td></tr>';
+            } else {
+                tbody.innerHTML = filtered.map(i => {
+                    const agotado = i.cantidad <= 0;
+                    const bajoStock = i.cantidad > 0 && i.cantidad <= 5;
+                    let stockBadge = '';
+                    if (agotado) stockBadge = ' <span class="inv-badge out">Agotado</span>';
+                    else if (bajoStock) stockBadge = ' <span class="inv-badge out">Bajo</span>';
+                    return `
+                        <tr>
+                            <td class="row-num">${i.numero}</td>
+                            <td style="font-size:11px; font-weight:600; color:var(--text-muted);">${escapeHtml(i.familia)}</td>
+                            <td style="font-size:11px;">${escapeHtml(i.ubicacion)}</td>
+                            <td style="font-family:'Courier New',monospace; font-weight:700; color:var(--primary-blue); font-size:11px;">${escapeHtml(i.codificacion)}</td>
+                            <td style="font-weight:600;">${escapeHtml(i.descripcion)}${stockBadge}</td>
+                            <td style="text-align:center; font-size:11px;">${escapeHtml(i.unidad)}</td>
+                            <td class="amount-cell" style="${agotado ? 'color:var(--danger);' : (bajoStock ? 'color:var(--warning);' : '')}">${formatNumber(i.cantidad)}</td>
+                            <td class="amount-cell" style="color:var(--text-muted);">${formatCurrency(i.precioUnitario)}</td>
+                            <td class="amount-cell">${formatCurrency(i.total)}</td>
+                            <td style="font-size:10px; color:var(--text-muted);">${escapeHtml(i.observaciones)}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            // Contador y badge
+            document.getElementById('count-inventario').textContent = filtered.length;
+            document.getElementById('badge-inventario').textContent = inventario.length;
+        }
+
+        // Filtros
+        document.getElementById('filter-buscar').addEventListener('input', renderInventario);
+        document.getElementById('filter-familia').addEventListener('change', renderInventario);
+        document.getElementById('filter-ubicacion').addEventListener('change', renderInventario);
+        document.getElementById('btn-limpiar-filtros').addEventListener('click', () => {
+            document.getElementById('filter-buscar').value = '';
+            document.getElementById('filter-familia').value = '';
+            document.getElementById('filter-ubicacion').value = '';
+            renderInventario();
+        });
+
+        // =====================================================
+        // REPORTES
+        // =====================================================
+        let chartCantidad = null;
+        let chartValor = null;
+
+        function renderReportes() {
+            const totalItems = inventario.length;
+            const totalCantidad = inventario.reduce((a, i) => a + (i.cantidad || 0), 0);
+            const totalValor = inventario.reduce((a, i) => a + (i.total || 0), 0);
+            const totalFamilias = new Set(inventario.map(i => i.familia)).size;
+            const agotados = inventario.filter(i => i.cantidad <= 0).length;
+            const bajoStock = inventario.filter(i => i.cantidad > 0 && i.cantidad <= 5).length;
+
+            // KPIs
+            const kpiGrid = document.getElementById('kpi-grid');
+            kpiGrid.innerHTML = `
+                <div class="summary-card">
+                    <div class="summary-icon"><i data-lucide="package"></i></div>
+                    <div class="summary-info">
+                        <span class="summary-value">${formatNumber(totalItems)}</span>
+                        <span class="summary-label">Items en Inventario</span>
+                    </div>
+                </div>
+                <div class="summary-card success">
+                    <div class="summary-icon"><i data-lucide="layers"></i></div>
+                    <div class="summary-info">
+                        <span class="summary-value">${formatNumber(totalCantidad)}</span>
+                        <span class="summary-label">Cantidad Total</span>
+                    </div>
+                </div>
+                <div class="summary-card info">
+                    <div class="summary-icon"><i data-lucide="dollar-sign"></i></div>
+                    <div class="summary-info">
+                        <span class="summary-value">${formatCurrency(totalValor)}</span>
+                        <span class="summary-label">Valor Total</span>
+                    </div>
+                </div>
+                <div class="summary-card purple">
+                    <div class="summary-icon"><i data-lucide="tags"></i></div>
+                    <div class="summary-info">
+                        <span class="summary-value">${totalFamilias}</span>
+                        <span class="summary-label">Familias</span>
+                    </div>
+                </div>
+                <div class="summary-card danger">
+                    <div class="summary-icon"><i data-lucide="alert-octagon"></i></div>
+                    <div class="summary-info">
+                        <span class="summary-value">${agotados}</span>
+                        <span class="summary-label">Agotados</span>
+                    </div>
+                </div>
+                <div class="summary-card warning">
+                    <div class="summary-icon"><i data-lucide="alert-triangle"></i></div>
+                    <div class="summary-info">
+                        <span class="summary-value">${bajoStock}</span>
+                        <span class="summary-label">Bajo Stock (≤5)</span>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+
+            // Agrupar por familia
+            const porFamilia = {};
+            inventario.forEach(i => {
+                if (!porFamilia[i.familia]) {
+                    porFamilia[i.familia] = { items: 0, cantidad: 0, valor: 0 };
+                }
+                porFamilia[i.familia].items += 1;
+                porFamilia[i.familia].cantidad += i.cantidad || 0;
+                porFamilia[i.familia].valor += i.total || 0;
+            });
+            const familias = Object.keys(porFamilia).sort((a, b) => porFamilia[b].valor - porFamilia[a].valor);
+
+            // Tabla resumen
+            const tbody = document.getElementById('tbody-resumen-familias');
+            if (familias.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-row">No hay datos para mostrar.</td></tr>';
+            } else {
+                tbody.innerHTML = familias.map(f => {
+                    const p = porFamilia[f];
+                    const pct = totalValor > 0 ? (p.valor / totalValor * 100).toFixed(1) : '0.0';
+                    return `
+                        <tr>
+                            <td style="font-weight:700; color:var(--primary-blue);">${escapeHtml(f)}</td>
+                            <td style="text-align:center;">${p.items}</td>
+                            <td class="amount-cell">${formatNumber(p.cantidad)}</td>
+                            <td class="amount-cell">${formatCurrency(p.valor)}</td>
+                            <td style="text-align:right; font-weight:800;">${pct}%</td>
+                        </tr>
+                    `;
+                }).join('') + `
+                    <tr style="background:var(--light-blue); font-weight:800;">
+                        <td style="color:var(--primary-blue); padding:14px 12px;">TOTAL (${familias.length} familias)</td>
+                        <td style="text-align:center; color:var(--primary-blue);">${totalItems}</td>
+                        <td class="amount-cell" style="color:var(--primary-blue);">${formatNumber(totalCantidad)}</td>
+                        <td class="amount-cell" style="color:var(--primary-blue);">${formatCurrency(totalValor)}</td>
+                        <td style="text-align:right; color:var(--primary-blue);">100.0%</td>
+                    </tr>
+                `;
+            }
+
+            // Charts
+            const colors = ['#152B71', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#06b6d4'];
+
+            // Destruir charts existentes
+            if (chartCantidad) chartCantidad.destroy();
+            if (chartValor) chartValor.destroy();
+
+            // Chart 1: Cantidad por familia (barras)
+            const ctx1 = document.getElementById('chart-cantidad-familia').getContext('2d');
+            chartCantidad = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: familias,
+                    datasets: [{
+                        label: 'Cantidad',
+                        data: familias.map(f => porFamilia[f].cantidad),
+                        backgroundColor: colores => familias.map((_, i) => colors[i % colors.length]),
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+
+            // Chart 2: Valor por familia (doughnut)
+            const ctx2 = document.getElementById('chart-valor-familia').getContext('2d');
+            chartValor = new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: familias,
+                    datasets: [{
+                        data: familias.map(f => porFamilia[f].valor),
+                        backgroundColor: familias.map((_, i) => colors[i % colors.length]),
+                        borderWidth: 2, borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, cutout: '60%',
+                    plugins: { legend: { position: 'right', labels: { font: { size: 10 }, boxWidth: 12, padding: 8 } } }
+                }
+            });
+        }
+
+        // =====================================================
+        // TABS
+        // =====================================================
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            const btn = document.querySelector('.tab-btn[data-tab="' + tabName + '"]');
+            const content = document.getElementById('content-' + tabName);
+            if (btn) btn.classList.add('active');
+            if (content) content.classList.add('active');
+            if (tabName === 'reportes') renderReportes();
+        }
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+        });
+
+        // =====================================================
+        // INICIALIZAR
+        // =====================================================
+        loadInventario();
+        renderInventario();
+        renderReportes();
+        updateUploadState();
+        lucide.createIcons();
+    </script>
+</body>
+</html>
