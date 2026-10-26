@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caja Chica | FYTTSA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        :root {
+            --primary-blue: #152B71;
+            --light-blue: #eef2ff;
+            --bg-color: #f8fafc;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --purple: #8b5cf6;
+            --green-soft: #d1fae5;
+            --green-dark: #065f46;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 50;
+            flex-shrink: 0;
+        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .menu-btn { background: none; border: none; cursor: pointer; color: var(--text-main); padding: 5px; }
+        .header-title { margin: 0; font-size: 15px; font-weight: 700; color: var(--primary-blue); display: none; }
+        @media (min-width: 768px) { .header-title { display: block; } }
+        .header-right { display: flex; align-items: center; gap: 12px; }
+        .user-initial {
+            width: 35px; height: 35px; border-radius: 50%;
+            background-color: var(--primary-blue); color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 16px;
+        }
+        .main-layout { display: flex; flex: 1; overflow: hidden; }
+        .sidebar {
+            width: 260px; background: white;
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto; transition: transform 0.3s ease;
+            display: flex; flex-direction: column;
+            flex-shrink: 0;
+        }
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; height: calc(100vh - 60px); transform: translateX(-100%); z-index: 40; }
+            .sidebar.open { transform: translateX(0); }
+        }
+        .content {
+            flex: 1; padding: 30px; overflow-y: auto;
+        }
+        @media (max-width: 768px) { .content { padding: 20px; } }
+
+        /* Page Title */
+        .page-title {
+            display: flex; align-items: center; gap: 12px;
+            font-size: 22px; font-weight: 800; color: var(--primary-blue);
+            margin-bottom: 8px;
+        }
+        .page-title i { width: 28px; height: 28px; }
+        .page-subtitle {
+            color: var(--text-muted); font-size: 13px;
+            margin-bottom: 25px;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            margin-bottom: 20px;
+        }
+        .card-title {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 15px; font-weight: 700; color: var(--text-main);
+            margin-bottom: 18px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--light-blue);
+        }
+        .card-title i { color: var(--primary-blue); width: 20px; height: 20px; }
+        .card-title .badge-count {
+            margin-left: auto;
+            background: var(--light-blue);
+            color: var(--primary-blue);
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        /* Form */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+        }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group.full { grid-column: 1 / -1; }
+        .form-label {
+            font-size: 11px; font-weight: 700; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: 0.4px;
+            margin-bottom: 6px;
+        }
+        .form-label .req { color: var(--danger); }
+        .form-control {
+            padding: 10px 12px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 13.5px;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-main);
+            background: white;
+            transition: all 0.2s;
+            width: 100%;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(21, 43, 113, 0.1);
+        }
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 32px;
+        }
+        .top-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 900px) {
+            .top-grid { grid-template-columns: 1fr; }
+        }
+
+        /* TABLE - el formato principal */
+        .table-wrap {
+            overflow-x: auto;
+            border: 1.5px solid var(--border-color);
+            border-radius: 14px;
+            margin-bottom: 14px;
+            background: white;
+        }
+        .expense-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12.5px;
+            min-width: 1100px;
+        }
+        .expense-table thead th {
+            background: var(--primary-blue);
+            color: white;
+            text-transform: uppercase;
+            font-size: 10.5px;
+            font-weight: 800;
+            padding: 12px 8px;
+            text-align: left;
+            border-right: 1px solid rgba(255,255,255,0.15);
+            letter-spacing: 0.4px;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+        .expense-table thead th:last-child { border-right: none; }
+        .expense-table thead th.center { text-align: center; }
+        .expense-table thead th.right { text-align: right; }
+        .expense-table tbody td {
+            padding: 6px 6px;
+            border-bottom: 1px solid var(--bg-color);
+            border-right: 1px solid var(--bg-color);
+            vertical-align: middle;
+        }
+        .expense-table tbody td:last-child { border-right: none; }
+        .expense-table tbody tr:last-child td { border-bottom: none; }
+        .expense-table tbody tr:hover { background: var(--bg-color); }
+        .row-num {
+            text-align: center;
+            font-weight: 700;
+            color: var(--text-muted);
+            width: 40px;
+            background: var(--bg-color);
+        }
+        .col-tipo { width: 110px; }
+        .col-folio { width: 140px; }
+        .col-fecha { width: 130px; }
+        .col-proveedor { min-width: 180px; }
+        .col-concepto { min-width: 220px; }
+        .col-importe { width: 120px; }
+        .col-observ { min-width: 160px; }
+        .col-adjuntos { width: 160px; }
+        .col-actions { width: 50px; text-align: center; }
+
+        /* Inputs dentro de la tabla */
+        .table-input, .table-select {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            font-size: 12px;
+            font-family: 'Inter', sans-serif;
+            background: transparent;
+            color: var(--text-main);
+            transition: all 0.15s;
+        }
+        .table-input:hover, .table-select:hover {
+            background: var(--bg-color);
+        }
+        .table-input:focus, .table-select:focus {
+            outline: none;
+            background: white;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 2px rgba(21, 43, 113, 0.1);
+        }
+        .table-input.amount {
+            text-align: right;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+
+        /* Tipo toggle mini */
+        .tipo-toggle {
+            display: flex; gap: 0;
+            border: 1.5px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+        }
+        .tipo-btn {
+            flex: 1;
+            padding: 5px 4px;
+            text-align: center;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.15s;
+            border: none;
+            background: none;
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .tipo-btn.active.factura {
+            background: var(--success);
+            color: white;
+        }
+        .tipo-btn.active.nota {
+            background: var(--warning);
+            color: white;
+        }
+        .tipo-btn:hover:not(.active) {
+            background: var(--bg-color);
+        }
+
+        /* Adjuntos en la tabla */
+        .attach-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .attach-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            font-size: 10px;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 1px dashed var(--border-color);
+            background: var(--bg-color);
+            color: var(--text-muted);
+            transition: all 0.15s;
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            position: relative;
+            overflow: hidden;
+        }
+        .attach-btn:hover {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+            background: var(--light-blue);
+        }
+        .attach-btn.has-file {
+            border-style: solid;
+            background: var(--green-soft);
+            color: var(--green-dark);
+            border-color: var(--success);
+        }
+        .attach-btn input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+        .attach-btn i { width: 12px; height: 12px; }
+        .attach-btn .file-name {
+            max-width: 80px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .attach-btn .remove-attach {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0;
+            line-height: 1;
+            margin-left: 4px;
+            position: relative;
+            z-index: 3;
+        }
+
+        /* Subtotales en la tabla */
+        .subtotal-row td {
+            background: var(--light-blue) !important;
+            font-weight: 800;
+            color: var(--primary-blue);
+            font-size: 12px;
+            border-top: 2px solid var(--primary-blue);
+        }
+        .subtotal-row .subtotal-label {
+            text-align: right;
+            padding-right: 12px;
+        }
+        .subtotal-row .subtotal-amount {
+            text-align: right;
+            padding-right: 12px;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Remove button */
+        .btn-remove-row {
+            background: #fee2e2;
+            color: var(--danger);
+            border: none;
+            cursor: pointer;
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+        .btn-remove-row:hover {
+            background: var(--danger);
+            color: white;
+        }
+        .btn-remove-row i { width: 13px; height: 13px; }
+
+        /* Buttons */
+        .btn {
+            padding: 11px 18px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            font-family: 'Inter', sans-serif;
+        }
+        .btn i { width: 16px; height: 16px; }
+        .btn-primary {
+            background: var(--primary-blue);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #1e40af;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(21, 43, 113, 0.25);
+        }
+        .btn-secondary {
+            background: white;
+            color: var(--primary-blue);
+            border: 1.5px solid var(--border-color);
+        }
+        .btn-secondary:hover {
+            background: var(--light-blue);
+            border-color: var(--primary-blue);
+        }
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+        .btn-danger {
+            background: white;
+            color: var(--danger);
+            border: 1.5px solid #fecaca;
+        }
+        .btn-danger:hover { background: var(--danger); color: white; }
+        .actions-bar {
+            display: flex; gap: 10px;
+            justify-content: flex-end;
+            margin-top: 18px;
+            flex-wrap: wrap;
+        }
+        .actions-bar .left {
+            margin-right: auto;
+        }
+
+        /* Summary cards */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        .summary-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px 18px;
+            border: 1px solid var(--border-color);
+            border-left: 5px solid var(--primary-blue);
+            display: flex; align-items: center; gap: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+        .summary-card.facturado { border-left-color: var(--success); }
+        .summary-card.no-facturado { border-left-color: var(--warning); }
+        .summary-card.total { border-left-color: var(--primary-blue); }
+        .summary-card.devolucion { border-left-color: var(--purple); }
+        .summary-icon {
+            width: 40px; height: 40px; border-radius: 12px;
+            background: var(--light-blue); color: var(--primary-blue);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .summary-card.facturado .summary-icon { background: #dcfce7; color: var(--success); }
+        .summary-card.no-facturado .summary-icon { background: #fef3c7; color: var(--warning); }
+        .summary-card.devolucion .summary-icon { background: #ede9fe; color: var(--purple); }
+        .summary-icon i { width: 22px; height: 22px; }
+        .summary-info { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+        .summary-value {
+            font-size: 18px; font-weight: 800; color: var(--text-main);
+            line-height: 1.1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .summary-label {
+            font-size: 11px; color: var(--text-muted);
+            font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-top: 2px;
+        }
+
+        /* Recent table (últimas 5) */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12.5px;
+        }
+        .data-table thead th {
+            background: var(--bg-color);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 10.5px;
+            font-weight: 800;
+            padding: 11px 12px;
+            text-align: left;
+            border-bottom: 2px solid var(--border-color);
+            letter-spacing: 0.4px;
+        }
+        .data-table tbody td {
+            padding: 11px 12px;
+            border-bottom: 1px solid var(--bg-color);
+            color: var(--text-main);
+            font-weight: 500;
+        }
+        .data-table tbody tr:last-child td { border-bottom: none; }
+        .data-table tbody tr:hover { background: var(--bg-color); }
+        .folio-cell {
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+        .badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 3px 9px; border-radius: 20px;
+            font-size: 10px; font-weight: 700; text-transform: uppercase;
+        }
+        .badge.ok { background: #dcfce7; color: #166534; }
+        .amount-cell {
+            font-weight: 800;
+            text-align: right;
+            color: var(--primary-blue);
+        }
+        .empty-row {
+            text-align: center;
+            color: var(--text-muted);
+            font-style: italic;
+            padding: 24px !important;
+        }
+
+        /* Signature section */
+        .signature-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            align-items: center;
+            padding: 24px;
+            background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 100%);
+            border-radius: 16px;
+            border: 1px solid #c7d2fe;
+        }
+        @media (max-width: 768px) {
+            .signature-section { grid-template-columns: 1fr; }
+        }
+        .signature-user-info {
+            display: flex; align-items: center; gap: 14px;
+        }
+        .signature-avatar {
+            width: 56px; height: 56px;
+            border-radius: 50%;
+            background: var(--primary-blue);
+            color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; font-weight: 800;
+            flex-shrink: 0;
+        }
+        .signature-user-detail {
+            display: flex; flex-direction: column;
+        }
+        .signature-user-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .signature-user-name {
+            font-size: 16px;
+            color: var(--primary-blue);
+            font-weight: 800;
+            margin-top: 2px;
+        }
+        .signature-user-role {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .signature-box {
+            position: relative;
+            background: white;
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 12px;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .signature-box.signed { border-color: var(--primary-blue); border-style: solid; }
+        #signature-canvas {
+            display: block;
+            width: 100%;
+            height: 100px;
+            cursor: crosshair;
+            touch-action: none;
+        }
+        .signature-hint {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            color: #cbd5e1;
+            font-size: 13px;
+            font-style: italic;
+            pointer-events: none;
+            text-align: center;
+        }
+        .signature-hint i { width: 16px; height: 16px; vertical-align: -3px; margin-right: 4px; }
+        .signature-actions {
+            display: flex; gap: 8px; justify-content: flex-end;
+            margin-top: 8px;
+        }
+        .btn-mini {
+            padding: 6px 12px;
+            font-size: 11px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-mini i { width: 12px; height: 12px; }
+        .btn-mini-clear {
+            background: #fee2e2; color: var(--danger);
+        }
+        .btn-mini-clear:hover { background: var(--danger); color: white; }
+        .btn-mini-clear:disabled {
+            background: #f1f5f9; color: #cbd5e1;
+            cursor: not-allowed;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 20px; right: 20px;
+            background: var(--text-main);
+            color: white;
+            padding: 14px 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 9999;
+            display: flex; align-items: center; gap: 10px;
+            font-size: 13px; font-weight: 600;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.success { background: var(--success); }
+        .toast.error { background: var(--danger); }
+        .toast i { width: 18px; height: 18px; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <button class="menu-btn" id="toggle-menu"><i data-lucide="menu"></i></button>
+            <img src="https://i.ibb.co/fdMsnKTg/LOGO2.png" alt="Logo" height="35">
+            <h1 class="header-title">FYTTSA - Comprobación de Gastos (Caja Chica)</h1>
+        </div>
+        <div class="header-right">
+            <div class="user-initial" id="user-initial">U</div>
+            <img src="https://i.ibb.co/jv9mNxYr/LOGO1.png" alt="Logo" height="35" style="border-radius: 8px;">
+        </div>
+    </header>
+
+    <div class="main-layout">
+        <aside class="sidebar" id="sidebar"></aside>
+
+        <main class="content">
+            <h1 class="page-title">
+                <i data-lucide="wallet"></i>
+                Comprobación de Gastos
+            </h1>
+            <p class="page-subtitle">Captura de facturas y notas de caja chica por obra y periodo.</p>
+
+            <!-- 1. OBRA Y PERIODO -->
+            <div class="top-grid">
+                <div class="card">
+                    <h3 class="card-title">
+                        <i data-lucide="building-2"></i>
+                        Obra
+                    </h3>
+                    <div class="form-grid">
+                        <div class="form-group full">
+                            <label class="form-label">Nombre de la obra <span class="req">*</span></label>
+                            <input type="text" class="form-control" id="input-obra" placeholder="Ej. 3B Mexiquense - Coacalco" list="obras-list">
+                            <datalist id="obras-list">
+                                <option value="3B Zarzaparrillas">
+                                <option value="3B Santa Cecilia">
+                                <option value="3B Ixmiquilpan">
+                                <option value="3B Mexiquense - Coacalco">
+                                <option value="3B San Miguel Otlica">
+                                <option value="3B La Escondida">
+                                <option value="3B Los Pinos Ixtapaluca">
+                                <option value="3B Paseo las Américas">
+                                <option value="3B Mexico Neza">
+                                <option value="3B San Buenaventura">
+                                <option value="3B T Bara Tulancingo">
+                                <option value="3B EKT Peñon">
+                                <option value="3B Industria">
+                                <option value="Guarniciones y Banquetas">
+                                <option value="Bajo Puentes">
+                                <option value="Construcción">
+                                <option value="Adecuaciones/Construccion">
+                                <option value="Banamex">
+                                <option value="Black Sheep">
+                                <option value="Imper C100">
+                            </datalist>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Razón Social</label>
+                            <input type="text" class="form-control" id="input-razon" placeholder="Ej. Soluciones Constructivas" list="razones-list">
+                            <datalist id="razones-list">
+                                <option value="Soluciones Constructivas">
+                                <option value="Proveedora de Materiales Especializados GSJ">
+                            </datalist>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">No. Caja</label>
+                            <input type="number" class="form-control" id="input-caja" placeholder="Ej. 1" min="1">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">
+                        <i data-lucide="calendar-range"></i>
+                        Periodo
+                    </h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Fecha de inicio <span class="req">*</span></label>
+                            <input type="date" class="form-control" id="input-fecha-inicio">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Fecha final <span class="req">*</span></label>
+                            <input type="date" class="form-control" id="input-fecha-fin">
+                        </div>
+                        <div class="form-group full">
+                            <label class="form-label">Periodo (descripción)</label>
+                            <input type="text" class="form-control" id="input-periodo" placeholder="Se calcula automáticamente" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. TABLA DE COMPROBANTES (Facturas y Notas juntas) -->
+            <div class="card">
+                <h3 class="card-title">
+                    <i data-lucide="receipt"></i>
+                    Comprobantes
+                    <span class="badge-count" id="items-count">0 items</span>
+                </h3>
+                <div class="table-wrap">
+                    <table class="expense-table" id="expense-table">
+                        <thead>
+                            <tr>
+                                <th class="center col-num">No.</th>
+                                <th class="center col-tipo">Tipo</th>
+                                <th class="col-folio">No. Fact. / Nota</th>
+                                <th class="col-fecha">Fecha</th>
+                                <th class="col-proveedor">Proveedor</th>
+                                <th class="col-concepto">Concepto</th>
+                                <th class="right col-importe">Importe</th>
+                                <th class="col-observ">Observaciones</th>
+                                <th class="col-adjuntos">Adjuntos (PDF/XML/Foto)</th>
+                                <th class="col-actions"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="expense-tbody">
+                            <!-- Filas dinamicas -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="actions-bar">
+                    <button class="btn btn-secondary left" id="btn-add-item">
+                        <i data-lucide="plus"></i> Agregar comprobante
+                    </button>
+                </div>
+            </div>
+
+            <!-- 3. LIQUIDACIÓN DE CAJA -->
+            <div class="card">
+                <h3 class="card-title">
+                    <i data-lucide="coins"></i>
+                    Liquidación de Caja
+                </h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Monto recibido en efectivo</label>
+                        <input type="number" class="form-control" id="input-monto-recibido" placeholder="0.00" step="0.01" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Método de pago principal</label>
+                        <select class="form-control" id="input-metodo">
+                            <option value="Efectivo">Efectivo</option>
+                            <option value="TC">Tarjeta de Crédito (TC)</option>
+                            <option value="TCC">Tarjeta de Crédito Corporativa (TCC)</option>
+                            <option value="TD">Tarjeta de Débito (TD)</option>
+                            <option value="Transferencia">Transferencia</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. SUMATORIAS -->
+            <div class="summary-grid">
+                <div class="summary-card facturado">
+                    <div class="summary-icon"><i data-lucide="file-text"></i></div>
+                    <div class="summary-info">
+                        <span class="summary-value" id="sum-facturado">$0.00</span>
+                        <span class="summary-label">Total Facturado</span>
+                    </div>
+                </div>
+                <div class="summary-card no-facturado">
+                    <div class="summary-icon"><i data-lucide="file-question"></i></div>
+                    <div class="summary-info">
+                        <span class="summary-value" id="sum-no-facturado">$0.00</span>
+                        <span class="summary-label">Total No Facturado</span>
+                    </div>
+                </div>
+                <div class="summary-card total">
+                    <div class="summary-icon"><i data-lucide="calculator"></i></div>
+                    <div class="summary-info">
+                        <span class="summary-value" id="sum-total">$0.00</span>
+                        <span class="summary-label">Importe Total de Gastos</span>
+                    </div>
+                </div>
+                <div class="summary-card devolucion">
+                    <div class="summary-icon"><i data-lucide="banknote"></i></div>
+                    <div class="summary-info">
+                        <span class="summary-value" id="sum-devolucion">$0.00</span>
+                        <span class="summary-label">Se Devuelve en Efectivo</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. ÚLTIMAS 5 COMPROBACIONES -->
+            <div class="card">
+                <h3 class="card-title">
+                    <i data-lucide="history"></i>
+                    Últimas 5 Comprobaciones de Gastos
+                </h3>
+                <div style="overflow-x: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Folio</th>
+                                <th>Obra</th>
+                                <th>Periodo</th>
+                                <th style="text-align: right;">Importe Total</th>
+                                <th style="text-align: center;">Estatus</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recent-tbody">
+                            <tr><td colspan="5" class="empty-row">No hay comprobaciones registradas todavía.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 6. FIRMA (al final) -->
+            <div class="card">
+                <h3 class="card-title">
+                    <i data-lucide="pen-tool"></i>
+                    Firma de Responsable
+                </h3>
+                <div class="signature-section">
+                    <div class="signature-user-info">
+                        <div class="signature-avatar" id="sig-avatar">U</div>
+                        <div class="signature-user-detail">
+                            <span class="signature-user-label">Firmando como:</span>
+                            <span class="signature-user-name" id="sig-user-name">Cargando usuario...</span>
+                            <span class="signature-user-role">Comprobó</span>
+                            <span class="signature-user-role" style="margin-top: 4px; font-size: 11px;" id="sig-date">—</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="signature-box" id="sig-box">
+                            <canvas id="signature-canvas"></canvas>
+                            <div class="signature-hint" id="sig-hint">
+                                <i data-lucide="edit-3"></i>Firma aquí con el mouse o el dedo
+                            </div>
+                        </div>
+                        <div class="signature-actions">
+                            <button type="button" class="btn-mini btn-mini-clear" id="btn-clear-sig" disabled>
+                                <i data-lucide="eraser"></i> Borrar firma
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="actions-bar" style="margin-top: 24px;">
+                    <button class="btn btn-danger" id="btn-cancel">
+                        <i data-lucide="x"></i> Cancelar
+                    </button>
+                    <button class="btn btn-primary" id="btn-save">
+                        <i data-lucide="save"></i> Guardar comprobación
+                    </button>
+                    <button class="btn btn-success" id="btn-submit" disabled>
+                        <i data-lucide="check-circle-2"></i> Firmar y enviar
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="toast" id="toast">
+        <i data-lucide="check-circle"></i>
+        <span id="toast-msg">Mensaje</span>
+    </div>
+
+    <script>
+        // =====================================================
+        // 1. MENU DINAMICO
+        // =====================================================
+        fetch('menu.html')
+            .then(r => r.text())
+            .then(html => {
+                document.getElementById('sidebar').innerHTML = html;
+                lucide.createIcons();
+                const link = document.getElementById('link-cajachica') || document.getElementById('link-caja-chica');
+                if (link) link.classList.add('active');
+            })
+            .catch(err => console.error('Error cargando el menú:', err));
+
+        document.getElementById('toggle-menu').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('open');
+        });
+
+        // =====================================================
+        // 2. USUARIO LOGUEADO
+        // =====================================================
+        function getUserName() {
+            return localStorage.getItem('nombre') || '';
+        }
+        function applyUserName() {
+            const nombre = getUserName();
+            if (nombre) {
+                document.getElementById('sig-user-name').textContent = nombre;
+                document.getElementById('sig-avatar').textContent = nombre.charAt(0).toUpperCase();
+                document.getElementById('user-initial').textContent = nombre.charAt(0).toUpperCase();
+            } else {
+                setTimeout(applyUserName, 1500);
+            }
+        }
+        applyUserName();
+        const today = new Date();
+        document.getElementById('sig-date').textContent = today.toLocaleDateString('es-MX', {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        });
+
+        // =====================================================
+        // 3. PERIODO AUTOMATICO
+        // =====================================================
+        function updatePeriodo() {
+            const ini = document.getElementById('input-fecha-inicio').value;
+            const fin = document.getElementById('input-fecha-fin').value;
+            if (ini && fin) {
+                const dIni = new Date(ini);
+                const dFin = new Date(fin);
+                const diffDays = Math.ceil((dFin - dIni) / (1000 * 60 * 60 * 24)) + 1;
+                const opts = { day: '2-digit', month: 'short', year: 'numeric' };
+                const txt = `Del ${dIni.toLocaleDateString('es-MX', opts)} al ${dFin.toLocaleDateString('es-MX', opts)}` +
+                            (diffDays > 0 ? ` (${diffDays} días)` : '');
+                document.getElementById('input-periodo').value = txt;
+            } else {
+                document.getElementById('input-periodo').value = '';
+            }
+        }
+        document.getElementById('input-fecha-inicio').addEventListener('change', updatePeriodo);
+        document.getElementById('input-fecha-fin').addEventListener('change', updatePeriodo);
+
+        // =====================================================
+        // 4. ITEMS (Comprobantes en tabla)
+        // =====================================================
+        let items = []; // {id, tipo, folio, fecha, proveedor, concepto, importe, observacion, pdfFactura, xmlFactura, fotoNota}
+
+        function newItemId() {
+            return 'item-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>"']/g, c => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            })[c]);
+        }
+
+        function renderItems() {
+            const tbody = document.getElementById('expense-tbody');
+            tbody.innerHTML = '';
+
+            if (items.length === 0) {
+                tbody.innerHTML = `
+                    <tr><td colspan="10" class="empty-row">
+                        No hay comprobantes. Presiona "Agregar comprobante" para comenzar.
+                    </td></tr>
+                `;
+            } else {
+                items.forEach((item, idx) => {
+                    const tr = document.createElement('tr');
+                    tr.dataset.id = item.id;
+                    const folioPlaceholder = item.tipo === 'Factura' ? 'Ej. HMA-2683' : 'Ej. S/N o EDIF 490';
+                    tr.innerHTML = `
+                        <td class="row-num">${idx + 1}</td>
+                        <td class="col-tipo">
+                            <div class="tipo-toggle">
+                                <button type="button" class="tipo-btn factura ${item.tipo === 'Factura' ? 'active' : ''}" data-value="Factura">Factura</button>
+                                <button type="button" class="tipo-btn nota ${item.tipo === 'Nota' ? 'active' : ''}" data-value="Nota">Nota</button>
+                            </div>
+                        </td>
+                        <td class="col-folio">
+                            <input type="text" class="table-input" data-field="folio"
+                                placeholder="${folioPlaceholder}"
+                                value="${escapeHtml(item.folio)}">
+                        </td>
+                        <td class="col-fecha">
+                            <input type="date" class="table-input" data-field="fecha" value="${item.fecha || ''}">
+                        </td>
+                        <td class="col-proveedor">
+                            <input type="text" class="table-input" data-field="proveedor"
+                                placeholder="Nombre del proveedor"
+                                value="${escapeHtml(item.proveedor)}">
+                        </td>
+                        <td class="col-concepto">
+                            <input type="text" class="table-input" data-field="concepto"
+                                placeholder="Descripción del gasto"
+                                value="${escapeHtml(item.concepto)}">
+                        </td>
+                        <td class="col-importe">
+                            <input type="number" class="table-input amount" data-field="importe"
+                                placeholder="0.00" step="0.01" min="0"
+                                value="${item.importe || ''}">
+                        </td>
+                        <td class="col-observ">
+                            <input type="text" class="table-input" data-field="observacion"
+                                placeholder="Ej. EFECTIVO, TD, TC..."
+                                value="${escapeHtml(item.observacion)}">
+                        </td>
+                        <td class="col-adjuntos">
+                            <div class="attach-cell"></div>
+                        </td>
+                        <td class="col-actions">
+                            <button type="button" class="btn-remove-row" data-action="remove" title="Eliminar">
+                                <i data-lucide="trash-2"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                    bindRowEvents(tr, item);
+                    renderAttachments(tr, item);
+                });
+
+                // Filas de subtotal
+                const facturado = items.filter(i => i.tipo === 'Factura').reduce((a, i) => a + (parseFloat(i.importe) || 0), 0);
+                const noFacturado = items.filter(i => i.tipo === 'Nota').reduce((a, i) => a + (parseFloat(i.importe) || 0), 0);
+                const total = facturado + noFacturado;
+
+                if (items.length > 0) {
+                    const subTotalFact = document.createElement('tr');
+                    subTotalFact.className = 'subtotal-row';
+                    subTotalFact.innerHTML = `
+                        <td colspan="6" class="subtotal-label">SUBTOTAL FACTURADO (${items.filter(i => i.tipo === 'Factura').length})</td>
+                        <td class="subtotal-amount">${formatCurrency(facturado)}</td>
+                        <td colspan="3"></td>
+                    `;
+                    tbody.appendChild(subTotalFact);
+
+                    const subTotalNota = document.createElement('tr');
+                    subTotalNota.className = 'subtotal-row';
+                    subTotalNota.innerHTML = `
+                        <td colspan="6" class="subtotal-label">SUBTOTAL NO FACTURADO (${items.filter(i => i.tipo === 'Nota').length})</td>
+                        <td class="subtotal-amount">${formatCurrency(noFacturado)}</td>
+                        <td colspan="3"></td>
+                    `;
+                    tbody.appendChild(subTotalNota);
+
+                    const totalRow = document.createElement('tr');
+                    totalRow.className = 'subtotal-row';
+                    totalRow.style.background = 'var(--primary-blue) !important';
+                    totalRow.style.color = 'white';
+                    totalRow.innerHTML = `
+                        <td colspan="6" class="subtotal-label" style="color: white;">IMPORTE TOTAL GASTADO</td>
+                        <td class="subtotal-amount" style="color: white;">${formatCurrency(total)}</td>
+                        <td colspan="3"></td>
+                    `;
+                    tbody.appendChild(totalRow);
+                }
+            }
+
+            document.getElementById('items-count').textContent = items.length + (items.length === 1 ? ' item' : ' items');
+            lucide.createIcons();
+            updateSummary();
+        }
+
+        function renderAttachments(tr, item) {
+            const cell = tr.querySelector('.attach-cell');
+            if (!cell) return;
+            cell.innerHTML = '';
+
+            if (item.tipo === 'Factura') {
+                // PDF + XML
+                cell.appendChild(makeAttachBtn('PDF', 'pdfFactura', item, 'file-pdf'));
+                cell.appendChild(makeAttachBtn('XML', 'xmlFactura', item, 'file-code'));
+            } else {
+                // Foto o PDF de la nota
+                cell.appendChild(makeAttachBtn('Foto/PDF', 'fotoNota', item, 'image'));
+            }
+            lucide.createIcons();
+        }
+
+        function makeAttachBtn(label, field, item, iconName) {
+            const hasFile = !!(item[field] && item[field + 'Name']);
+            const btn = document.createElement('label');
+            btn.className = 'attach-btn' + (hasFile ? ' has-file' : '');
+            btn.innerHTML = `
+                <i data-lucide="${iconName}"></i>
+                <span class="file-name">${hasFile ? escapeHtml(item[field + 'Name']) : label}</span>
+                ${hasFile ? '<button type="button" class="remove-attach" data-field="' + field + '">&times;</button>' : ''}
+                <input type="file" accept="${field === 'fotoNota' ? 'image/*,.pdf' : (field === 'xmlFactura' ? '.xml,text/xml' : '.pdf,application/pdf')}" data-field="${field}">
+            `;
+            const fileInput = btn.querySelector('input[type="file"]');
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    item[field] = file;
+                    item[field + 'Name'] = file.name;
+                    renderAttachments(tr, item);
+                }
+            });
+            if (hasFile) {
+                const rmBtn = btn.querySelector('.remove-attach');
+                if (rmBtn) {
+                    rmBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        item[field] = null;
+                        item[field + 'Name'] = null;
+                        renderAttachments(tr, item);
+                    });
+                }
+            }
+            return btn;
+        }
+
+        function bindRowEvents(tr, item) {
+            // Tipo toggle
+            tr.querySelectorAll('.tipo-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const newValue = btn.dataset.value;
+                    item.tipo = newValue;
+                    tr.querySelectorAll('.tipo-btn').forEach(b => {
+                        b.classList.toggle('active', b.dataset.value === newValue);
+                    });
+                    // Limpiar adjuntos al cambiar tipo (porque cambian los campos)
+                    item.pdfFactura = null; item.pdfFacturaName = null;
+                    item.xmlFactura = null; item.xmlFacturaName = null;
+                    item.fotoNota = null; item.fotoNotaName = null;
+                    // Actualizar placeholder del folio
+                    const folioInput = tr.querySelector('[data-field="folio"]');
+                    if (folioInput) {
+                        folioInput.placeholder = (newValue === 'Factura' ? 'Ej. HMA-2683' : 'Ej. S/N o EDIF 490');
+                    }
+                    renderAttachments(tr, item);
+                });
+            });
+            // Inputs
+            tr.querySelectorAll('input[data-field]').forEach(input => {
+                if (input.type === 'file') return; // handled separately
+                input.addEventListener('input', () => {
+                    const field = input.dataset.field;
+                    if (field === 'importe') {
+                        item[field] = parseFloat(input.value) || 0;
+                        updateSummary();
+                        // Re-render para actualizar subtotales sin perder foco
+                        // Solo actualizamos las sumatorias y los subtotales
+                        updateSubtotals();
+                    } else {
+                        item[field] = input.value;
+                    }
+                });
+            });
+            // Remove
+            const removeBtn = tr.querySelector('[data-action="remove"]');
+            if (removeBtn) {
+                removeBtn.addEventListener('click', () => {
+                    items = items.filter(i => i.id !== item.id);
+                    renderItems();
+                });
+            }
+        }
+
+        function updateSubtotals() {
+            // Actualiza SOLO las filas de subtotal (sin re-render completo)
+            const tbody = document.getElementById('expense-tbody');
+            const facturado = items.filter(i => i.tipo === 'Factura').reduce((a, i) => a + (parseFloat(i.importe) || 0), 0);
+            const noFacturado = items.filter(i => i.tipo === 'Nota').reduce((a, i) => a + (parseFloat(i.importe) || 0), 0);
+            const total = facturado + noFacturado;
+            const subRows = tbody.querySelectorAll('.subtotal-row');
+            if (subRows.length >= 3) {
+                const fCount = items.filter(i => i.tipo === 'Factura').length;
+                const nCount = items.filter(i => i.tipo === 'Nota').length;
+                subRows[0].children[0].textContent = `SUBTOTAL FACTURADO (${fCount})`;
+                subRows[0].children[1].textContent = formatCurrency(facturado);
+                subRows[1].children[0].textContent = `SUBTOTAL NO FACTURADO (${nCount})`;
+                subRows[1].children[1].textContent = formatCurrency(noFacturado);
+                subRows[2].children[1].textContent = formatCurrency(total);
+            }
+        }
+
+        function addItem() {
+            const newItem = {
+                id: newItemId(),
+                tipo: 'Factura',
+                folio: '',
+                fecha: '',
+                proveedor: '',
+                concepto: '',
+                importe: 0,
+                observacion: '',
+                pdfFactura: null, pdfFacturaName: null,
+                xmlFactura: null, xmlFacturaName: null,
+                fotoNota: null, fotoNotaName: null
+            };
+            items.push(newItem);
+            renderItems();
+            setTimeout(() => {
+                const last = document.querySelector('#expense-tbody tr:last-child');
+                if (last) last.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 50);
+        }
+
+        document.getElementById('btn-add-item').addEventListener('click', addItem);
+        addItem();
+
+        // =====================================================
+        // 5. SUMATORIAS
+        // =====================================================
+        function formatCurrency(num) {
+            return '$' + (num || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function updateSummary() {
+            const facturado = items
+                .filter(i => i.tipo === 'Factura')
+                .reduce((acc, i) => acc + (parseFloat(i.importe) || 0), 0);
+            const noFacturado = items
+                .filter(i => i.tipo === 'Nota')
+                .reduce((acc, i) => acc + (parseFloat(i.importe) || 0), 0);
+            const total = facturado + noFacturado;
+            const recibido = parseFloat(document.getElementById('input-monto-recibido').value) || 0;
+            const devolucion = recibido - total;
+
+            document.getElementById('sum-facturado').textContent = formatCurrency(facturado);
+            document.getElementById('sum-no-facturado').textContent = formatCurrency(noFacturado);
+            document.getElementById('sum-total').textContent = formatCurrency(total);
+            document.getElementById('sum-devolucion').textContent = formatCurrency(devolucion);
+
+            const devCard = document.getElementById('sum-devolucion').parentElement.parentElement;
+            if (devolucion < 0) {
+                devCard.style.borderLeftColor = 'var(--danger)';
+                document.getElementById('sum-devolucion').style.color = 'var(--danger)';
+            } else {
+                devCard.style.borderLeftColor = 'var(--purple)';
+                document.getElementById('sum-devolucion').style.color = 'var(--text-main)';
+            }
+        }
+
+        document.getElementById('input-monto-recibido').addEventListener('input', updateSummary);
+
+        // =====================================================
+        // 6. ULTIMAS 5 COMPROBACIONES
+        // =====================================================
+        let historial = [];
+        function loadHistorial() {
+            try {
+                const data = localStorage.getItem('fyttsa_cajachica_historial');
+                historial = data ? JSON.parse(data) : [];
+            } catch (e) { historial = []; }
+        }
+        function saveHistorial() {
+            localStorage.setItem('fyttsa_cajachica_historial', JSON.stringify(historial));
+        }
+        function generateFolio() {
+            const year = new Date().getFullYear();
+            const count = historial.length + 1;
+            return 'CC-' + year + '-' + String(count).padStart(4, '0');
+        }
+        function renderHistorial() {
+            const tbody = document.getElementById('recent-tbody');
+            if (historial.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-row">No hay comprobaciones registradas todavía.</td></tr>';
+                return;
+            }
+            const ultimas5 = historial.slice(-5).reverse();
+            tbody.innerHTML = ultimas5.map(h => `
+                <tr>
+                    <td class="folio-cell">${escapeHtml(h.folio)}</td>
+                    <td>${escapeHtml(h.obra)}</td>
+                    <td>${escapeHtml(h.periodo)}</td>
+                    <td class="amount-cell">${formatCurrency(h.total)}</td>
+                    <td style="text-align: center;"><span class="badge ok"><i data-lucide="check" style="width:11px;height:11px;"></i>Firmada</span></td>
+                </tr>
+            `).join('');
+            lucide.createIcons();
+        }
+        loadHistorial();
+        renderHistorial();
+
+        // =====================================================
+        // 7. FIRMA (CANVAS)
+        // =====================================================
+        const sigCanvas = document.getElementById('signature-canvas');
+        const sigHint = document.getElementById('sig-hint');
+        const sigBox = document.getElementById('sig-box');
+        const clearSigBtn = document.getElementById('btn-clear-sig');
+        let hasSignature = false;
+
+        function initSignatureCanvas() {
+            if (!sigCanvas) return;
+            const dpr = window.devicePixelRatio || 1;
+            const rect = sigCanvas.getBoundingClientRect();
+            if (rect.width === 0) {
+                setTimeout(initSignatureCanvas, 200);
+                return;
+            }
+            sigCanvas.width = Math.max(1, Math.floor(rect.width * dpr));
+            sigCanvas.height = Math.max(1, Math.floor(rect.height * dpr));
+            const ctx = sigCanvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+            ctx.lineWidth = 2.2;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.strokeStyle = '#152B71';
+        }
+        function bindSignatureEvents() {
+            let drawing = false;
+            let lastX = 0, lastY = 0;
+            function getPos(e) {
+                const r = sigCanvas.getBoundingClientRect();
+                if (e.touches && e.touches.length > 0) {
+                    return { x: e.touches[0].clientX - r.left, y: e.touches[0].clientY - r.top };
+                }
+                return { x: e.clientX - r.left, y: e.clientY - r.top };
+            }
+            function startDraw(e) {
+                e.preventDefault();
+                drawing = true;
+                const p = getPos(e);
+                lastX = p.x; lastY = p.y;
+                if (sigHint) sigHint.style.display = 'none';
+                const ctx = sigCanvas.getContext('2d');
+                ctx.beginPath();
+                ctx.moveTo(p.x, p.y);
+                ctx.lineTo(p.x + 0.1, p.y + 0.1);
+                ctx.stroke();
+            }
+            function draw(e) {
+                if (!drawing) return;
+                e.preventDefault();
+                const ctx = sigCanvas.getContext('2d');
+                const p = getPos(e);
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(p.x, p.y);
+                ctx.stroke();
+                lastX = p.x; lastY = p.y;
+                if (!hasSignature) {
+                    hasSignature = true;
+                    sigBox.classList.add('signed');
+                    clearSigBtn.disabled = false;
+                    checkSubmitReady();
+                }
+            }
+            function endDraw(e) {
+                if (drawing && e) e.preventDefault();
+                drawing = false;
+            }
+            sigCanvas.addEventListener('mousedown', startDraw);
+            sigCanvas.addEventListener('mousemove', draw);
+            sigCanvas.addEventListener('mouseup', endDraw);
+            sigCanvas.addEventListener('mouseleave', endDraw);
+            sigCanvas.addEventListener('touchstart', startDraw, { passive: false });
+            sigCanvas.addEventListener('touchmove', draw, { passive: false });
+            sigCanvas.addEventListener('touchend', endDraw, { passive: false });
+        }
+        function clearSignature() {
+            const ctx = sigCanvas.getContext('2d');
+            ctx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+            hasSignature = false;
+            sigBox.classList.remove('signed');
+            if (sigHint) sigHint.style.display = '';
+            clearSigBtn.disabled = true;
+            checkSubmitReady();
+        }
+        clearSigBtn.addEventListener('click', clearSignature);
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                initSignatureCanvas();
+                bindSignatureEvents();
+            }, 100);
+        });
+        window.addEventListener('resize', () => {
+            if (sigCanvas.offsetWidth > 0) {
+                const oldData = hasSignature ? sigCanvas.toDataURL() : null;
+                initSignatureCanvas();
+                if (oldData) {
+                    const img = new Image();
+                    img.onload = () => {
+                        const ctx = sigCanvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, sigCanvas.clientWidth, sigCanvas.clientHeight);
+                    };
+                    img.src = oldData;
+                }
+            }
+        });
+
+        // =====================================================
+        // 8. VALIDAR Y GUARDAR
+        // =====================================================
+        function validateForm() {
+            const errors = [];
+            const obra = document.getElementById('input-obra').value.trim();
+            const fechaIni = document.getElementById('input-fecha-inicio').value;
+            const fechaFin = document.getElementById('input-fecha-fin').value;
+            if (!obra) errors.push('El nombre de la obra es obligatorio.');
+            if (!fechaIni) errors.push('La fecha de inicio es obligatoria.');
+            if (!fechaFin) errors.push('La fecha final es obligatoria.');
+            if (fechaIni && fechaFin && new Date(fechaIni) > new Date(fechaFin)) {
+                errors.push('La fecha de inicio no puede ser mayor a la fecha final.');
+            }
+            if (items.length === 0) errors.push('Debe agregar al menos un comprobante.');
+            items.forEach((item, idx) => {
+                if (!item.folio) errors.push(`Comprobante ${idx + 1}: falta el folio.`);
+                if (!item.fecha) errors.push(`Comprobante ${idx + 1}: falta la fecha.`);
+                if (!item.proveedor) errors.push(`Comprobante ${idx + 1}: falta el proveedor.`);
+                if (!item.concepto) errors.push(`Comprobante ${idx + 1}: falta el concepto.`);
+                if (!item.importe || item.importe <= 0) errors.push(`Comprobante ${idx + 1}: importe inválido.`);
+            });
+            if (!hasSignature) errors.push('Debe firmar la comprobación.');
+            return errors;
+        }
+        function checkSubmitReady() {
+            document.getElementById('btn-submit').disabled = !hasSignature;
+        }
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('toast');
+            const msgEl = document.getElementById('toast-msg');
+            // Limpiar contenido y crear icono nuevo
+            const iconName = type === 'success' ? 'check-circle' : (type === 'error' ? 'alert-circle' : 'info');
+            toast.innerHTML = `<i data-lucide="${iconName}"></i><span id="toast-msg">${escapeHtml(msg)}</span>`;
+            toast.className = 'toast ' + type;
+            lucide.createIcons();
+            toast.classList.add('show');
+            clearTimeout(window._toastTimer);
+            window._toastTimer = setTimeout(() => toast.classList.remove('show'), 3500);
+        }
+        document.getElementById('btn-save').addEventListener('click', () => {
+            const errors = validateForm();
+            if (errors.length > 0) {
+                showToast('Faltan datos: ' + errors[0], 'error');
+                return;
+            }
+            const folio = generateFolio();
+            const total = items.reduce((acc, i) => acc + (parseFloat(i.importe) || 0), 0);
+            const recibido = parseFloat(document.getElementById('input-monto-recibido').value) || 0;
+            const registro = {
+                folio,
+                obra: document.getElementById('input-obra').value.trim(),
+                razon: document.getElementById('input-razon').value.trim(),
+                caja: document.getElementById('input-caja').value.trim(),
+                fechaInicio: document.getElementById('input-fecha-inicio').value,
+                fechaFin: document.getElementById('input-fecha-fin').value,
+                periodo: document.getElementById('input-periodo').value,
+                items: items.map(i => ({
+                    tipo: i.tipo,
+                    folio: i.folio,
+                    fecha: i.fecha,
+                    proveedor: i.proveedor,
+                    concepto: i.concepto,
+                    importe: i.importe,
+                    observacion: i.observacion,
+                    tienePdfFactura: !!i.pdfFactura,
+                    tieneXmlFactura: !!i.xmlFactura,
+                    tieneFotoNota: !!i.fotoNota
+                })),
+                total,
+                facturado: items.filter(i => i.tipo === 'Factura').reduce((a, i) => a + (parseFloat(i.importe) || 0), 0),
+                noFacturado: items.filter(i => i.tipo === 'Nota').reduce((a, i) => a + (parseFloat(i.importe) || 0), 0),
+                recibido,
+                devolucion: recibido - total,
+                metodo: document.getElementById('input-metodo').value,
+                usuario: getUserName(),
+                fechaRegistro: new Date().toISOString()
+            };
+            historial.push(registro);
+            saveHistorial();
+            renderHistorial();
+            showToast('Comprobación ' + folio + ' guardada correctamente.', 'success');
+            document.getElementById('btn-submit').disabled = !hasSignature;
+        });
+        document.getElementById('btn-submit').addEventListener('click', () => {
+            const errors = validateForm();
+            if (errors.length > 0) {
+                showToast('Faltan datos: ' + errors[0], 'error');
+                return;
+            }
+            showToast('Comprobación firmada y enviada a contabilidad.', 'success');
+            setTimeout(() => {
+                if (confirm('¿Deseas limpiar el formulario para una nueva comprobación?')) {
+                    resetForm();
+                }
+            }, 1500);
+        });
+        document.getElementById('btn-cancel').addEventListener('click', () => {
+            if (confirm('¿Cancelar la comprobación actual? Se perderán los datos no guardados.')) {
+                resetForm();
+            }
+        });
+        function resetForm() {
+            items = [];
+            document.getElementById('input-obra').value = '';
+            document.getElementById('input-razon').value = '';
+            document.getElementById('input-caja').value = '';
+            document.getElementById('input-fecha-inicio').value = '';
+            document.getElementById('input-fecha-fin').value = '';
+            document.getElementById('input-periodo').value = '';
+            document.getElementById('input-monto-recibido').value = '0';
+            document.getElementById('input-metodo').value = 'Efectivo';
+            clearSignature();
+            addItem();
+            updateSummary();
+        }
+
+        lucide.createIcons();
+    </script>
+</body>
+</html>
