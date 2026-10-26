@@ -463,6 +463,99 @@
             margin-right: auto;
         }
 
+        /* === TABS HORIZONTALES === */
+        .tabs-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 2px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            background: var(--bg-color);
+            border: 1.5px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        .tab-btn:hover {
+            background: white;
+            color: var(--text-main);
+            border-color: var(--primary-blue);
+        }
+        .tab-btn.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+            box-shadow: 0 4px 12px rgba(21, 43, 113, 0.25);
+        }
+        .tab-btn i { width: 16px; height: 16px; }
+        .tab-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 22px;
+            height: 22px;
+            padding: 0 6px;
+            border-radius: 11px;
+            font-size: 11px;
+            font-weight: 800;
+            background: white;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+        }
+        .tab-btn.active .tab-badge {
+            background: white;
+            color: var(--primary-blue);
+            border-color: white;
+        }
+        .tab-btn.tab-rechazados.active .tab-badge {
+            background: white;
+            color: var(--danger);
+        }
+        .tab-btn.tab-aprobados.active .tab-badge {
+            background: white;
+            color: var(--success);
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.25s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* === BOTONES DE ACCION ROJOS === */
+        .btn-action-red {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 11px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .btn-action-red:hover {
+            background: #b91c1c;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+        .btn-action-red i { width: 13px; height: 13px; }
+
         /* Summary cards */
         .summary-grid {
             display: grid;
@@ -703,8 +796,29 @@
             </h1>
             <p class="page-subtitle">Captura de facturas y notas de caja chica por obra y periodo.</p>
 
-            <!-- 1. OBRA Y PERIODO -->
-            <div class="top-grid">
+            <!-- TABS HORIZONTALES -->
+            <div class="tabs-bar">
+                <button class="tab-btn tab-nuevo active" data-tab="nuevo">
+                    <i data-lucide="plus-circle"></i> Nuevo
+                </button>
+                <button class="tab-btn tab-guardados" data-tab="guardados">
+                    <i data-lucide="save"></i> Guardados
+                    <span class="tab-badge" id="badge-guardados">0</span>
+                </button>
+                <button class="tab-btn tab-rechazados" data-tab="rechazados">
+                    <i data-lucide="x-circle"></i> Rechazados
+                    <span class="tab-badge" id="badge-rechazados">0</span>
+                </button>
+                <button class="tab-btn tab-aprobados" data-tab="aprobados">
+                    <i data-lucide="check-circle"></i> Aprobados
+                    <span class="tab-badge" id="badge-aprobados">0</span>
+                </button>
+            </div>
+
+            <!-- CONTENIDO TAB NUEVO (el formulario actual) -->
+            <div class="tab-content active" id="content-nuevo">
+                <!-- 1. OBRA Y PERIODO -->
+                <div class="top-grid">
                 <div class="card">
                     <h3 class="card-title">
                         <i data-lucide="building-2"></i>
@@ -858,31 +972,7 @@
                 </div>
             </div>
 
-            <!-- 5. ÚLTIMAS 5 COMPROBACIONES -->
-            <div class="card">
-                <h3 class="card-title">
-                    <i data-lucide="history"></i>
-                    Últimas 5 Comprobaciones de Gastos
-                </h3>
-                <div style="overflow-x: auto;">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Folio</th>
-                                <th>Obra</th>
-                                <th>Periodo</th>
-                                <th style="text-align: right;">Importe Total</th>
-                                <th style="text-align: center;">Estatus</th>
-                            </tr>
-                        </thead>
-                        <tbody id="recent-tbody">
-                            <tr><td colspan="5" class="empty-row">No hay comprobaciones registradas todavía.</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- 6. FIRMA (al final) -->
+            <!-- 5. ÚLTIMA SECCIÓN DEL TAB NUEVO: FIRMA -->
             <div class="card">
                 <h3 class="card-title">
                     <i data-lucide="pen-tool"></i>
@@ -923,6 +1013,101 @@
                     <button class="btn btn-success" id="btn-submit" disabled>
                         <i data-lucide="check-circle-2"></i> Firmar y enviar
                     </button>
+                </div>
+            </div>
+            </div><!-- /tab-content-nuevo -->
+
+            <!-- TAB GUARDADOS -->
+            <div class="tab-content" id="content-guardados">
+                <div class="card">
+                    <h3 class="card-title">
+                        <i data-lucide="save"></i>
+                        Comprobaciones Guardadas
+                        <span class="badge-count" id="count-guardados">0</span>
+                    </h3>
+                    <p style="color:var(--text-muted); font-size:12px; margin-bottom:16px;">
+                        Comprobaciones en borrador que aún puedes editar y enviar a revisión.
+                    </p>
+                    <div style="overflow-x: auto;">
+                        <table class="data-table" id="table-guardados">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Folio</th>
+                                    <th>Obra</th>
+                                    <th style="text-align:right;">Importe</th>
+                                    <th style="text-align:center;">No. Conceptos</th>
+                                    <th style="text-align:center;">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-guardados">
+                                <tr><td colspan="6" class="empty-row">No hay comprobaciones guardadas.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB RECHAZADOS -->
+            <div class="tab-content" id="content-rechazados">
+                <div class="card">
+                    <h3 class="card-title">
+                        <i data-lucide="x-circle"></i>
+                        Comprobaciones Rechazadas
+                        <span class="badge-count" id="count-rechazados">0</span>
+                    </h3>
+                    <p style="color:var(--text-muted); font-size:12px; margin-bottom:16px;">
+                        Comprobaciones rechazadas por el revisor. Edita los datos y vuelve a enviar.
+                    </p>
+                    <div style="overflow-x: auto;">
+                        <table class="data-table" id="table-rechazados">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Folio</th>
+                                    <th>Obra</th>
+                                    <th style="text-align:right;">Importe</th>
+                                    <th style="text-align:center;">No. Conceptos</th>
+                                    <th style="text-align:center;">Observación</th>
+                                    <th style="text-align:center;">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-rechazados">
+                                <tr><td colspan="7" class="empty-row">No hay comprobaciones rechazadas.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB APROBADOS -->
+            <div class="tab-content" id="content-aprobados">
+                <div class="card">
+                    <h3 class="card-title">
+                        <i data-lucide="check-circle"></i>
+                        Comprobaciones Aprobadas
+                        <span class="badge-count" id="count-aprobados">0</span>
+                    </h3>
+                    <p style="color:var(--text-muted); font-size:12px; margin-bottom:16px;">
+                        Comprobaciones revisadas y aprobadas. Solo consulta (no editables).
+                    </p>
+                    <div style="overflow-x: auto;">
+                        <table class="data-table" id="table-aprobados">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Folio</th>
+                                    <th>Obra</th>
+                                    <th style="text-align:right;">Importe</th>
+                                    <th style="text-align:center;">No. Conceptos</th>
+                                    <th style="text-align:center;">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-aprobados">
+                                <tr><td colspan="6" class="empty-row">No hay comprobaciones aprobadas.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </main>
@@ -1291,13 +1476,19 @@
         document.getElementById('input-monto-recibido').addEventListener('input', updateSummary);
 
         // =====================================================
-        // 6. ULTIMAS 5 COMPROBACIONES
+        // 6. HISTORIAL CON STATUS (guardado / rechazado / aprobado)
         // =====================================================
         let historial = [];
+        let editingFolio = null; // folio que se está editando actualmente
+
         function loadHistorial() {
             try {
                 const data = localStorage.getItem('fyttsa_cajachica_historial');
                 historial = data ? JSON.parse(data) : [];
+                // Migracion: si algun registro no tiene status, asignar 'guardado'
+                historial.forEach(h => {
+                    if (!h.status) h.status = 'guardado';
+                });
             } catch (e) { historial = []; }
         }
         function saveHistorial() {
@@ -1305,37 +1496,226 @@
         }
         function generateFolio() {
             const year = new Date().getFullYear();
-            const count = historial.length + 1;
-            return 'CC-' + year + '-' + String(count).padStart(4, '0');
+            // Buscar el maximo numero de folio del año actual
+            let maxNum = 0;
+            historial.forEach(h => {
+                if (h.folio && h.folio.startsWith('CC-' + year + '-')) {
+                    const n = parseInt(h.folio.split('-')[2], 10);
+                    if (!isNaN(n) && n > maxNum) maxNum = n;
+                }
+            });
+            const nextNum = maxNum + 1;
+            return 'CC-' + year + '-' + String(nextNum).padStart(4, '0');
         }
         function updateFolioInput() {
             const folioInput = document.getElementById('input-folio');
-            if (folioInput) {
+            if (folioInput && !editingFolio) {
                 folioInput.value = generateFolio();
             }
         }
-        function renderHistorial() {
-            const tbody = document.getElementById('recent-tbody');
-            if (historial.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="empty-row">No hay comprobaciones registradas todavía.</td></tr>';
+
+        function formatDate(fechaISO) {
+            if (!fechaISO) return '—';
+            const d = new Date(fechaISO);
+            if (isNaN(d)) return fechaISO;
+            return d.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' }) +
+                   ' ' + d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: true });
+        }
+
+        // Renderea las tablas de cada tab
+        function renderTabsTables() {
+            const guardados = historial.filter(h => h.status === 'guardado').reverse();
+            const rechazados = historial.filter(h => h.status === 'rechazado').reverse();
+            const aprobados = historial.filter(h => h.status === 'aprobado').reverse();
+
+            // Badges en los botones de tabs
+            document.getElementById('badge-guardados').textContent = guardados.length;
+            document.getElementById('badge-rechazados').textContent = rechazados.length;
+            document.getElementById('badge-aprobados').textContent = aprobados.length;
+            document.getElementById('count-guardados').textContent = guardados.length;
+            document.getElementById('count-rechazados').textContent = rechazados.length;
+            document.getElementById('count-aprobados').textContent = aprobados.length;
+
+            // Tabla Guardados (accion: Editar)
+            const tbodyG = document.getElementById('tbody-guardados');
+            if (guardados.length === 0) {
+                tbodyG.innerHTML = '<tr><td colspan="6" class="empty-row">No hay comprobaciones guardadas.</td></tr>';
             } else {
-                const ultimas5 = historial.slice(-5).reverse();
-                tbody.innerHTML = ultimas5.map(h => `
+                tbodyG.innerHTML = guardados.map(h => `
                     <tr>
+                        <td style="font-size:11px;">${formatDate(h.fechaRegistro)}</td>
                         <td class="folio-cell">${escapeHtml(h.folio)}</td>
                         <td>${escapeHtml(h.obra)}</td>
-                        <td>${escapeHtml(h.periodo)}</td>
                         <td class="amount-cell">${formatCurrency(h.total)}</td>
-                        <td style="text-align: center;"><span class="badge ok"><i data-lucide="check" style="width:11px;height:11px;"></i>Firmada</span></td>
+                        <td style="text-align:center;">${h.items ? h.items.length : 0}</td>
+                        <td style="text-align:center;">
+                            <button class="btn-action-red" onclick="loadComprobacionForEdit('${escapeHtml(h.folio)}')">
+                                <i data-lucide="edit-3"></i> Editar
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            // Tabla Rechazados (accion: Editar + observacion)
+            const tbodyR = document.getElementById('tbody-rechazados');
+            if (rechazados.length === 0) {
+                tbodyR.innerHTML = '<tr><td colspan="7" class="empty-row">No hay comprobaciones rechazadas.</td></tr>';
+            } else {
+                tbodyR.innerHTML = rechazados.map(h => `
+                    <tr>
+                        <td style="font-size:11px;">${formatDate(h.fechaRegistro)}</td>
+                        <td class="folio-cell">${escapeHtml(h.folio)}</td>
+                        <td>${escapeHtml(h.obra)}</td>
+                        <td class="amount-cell">${formatCurrency(h.total)}</td>
+                        <td style="text-align:center;">${h.items ? h.items.length : 0}</td>
+                        <td style="font-size:11px; color:var(--danger); font-weight:600;">${escapeHtml(h.observacionRechazo || 'Sin observación')}</td>
+                        <td style="text-align:center;">
+                            <button class="btn-action-red" onclick="loadComprobacionForEdit('${escapeHtml(h.folio)}')">
+                                <i data-lucide="edit-3"></i> Editar
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            // Tabla Aprobados (accion: Ver - solo lectura)
+            const tbodyA = document.getElementById('tbody-aprobados');
+            if (aprobados.length === 0) {
+                tbodyA.innerHTML = '<tr><td colspan="6" class="empty-row">No hay comprobaciones aprobadas.</td></tr>';
+            } else {
+                tbodyA.innerHTML = aprobados.map(h => `
+                    <tr>
+                        <td style="font-size:11px;">${formatDate(h.fechaRegistro)}</td>
+                        <td class="folio-cell">${escapeHtml(h.folio)}</td>
+                        <td>${escapeHtml(h.obra)}</td>
+                        <td class="amount-cell">${formatCurrency(h.total)}</td>
+                        <td style="text-align:center;">${h.items ? h.items.length : 0}</td>
+                        <td style="text-align:center;">
+                            <button class="btn-action-red" onclick="loadComprobacionView('${escapeHtml(h.folio)}')">
+                                <i data-lucide="eye"></i> Ver
+                            </button>
+                        </td>
                     </tr>
                 `).join('');
             }
             lucide.createIcons();
-            // Actualizar el folio automatico del input
-            updateFolioInput();
         }
+
+        // Cargar comprobacion en el tab Nuevo para editar
+        function loadComprobacionForEdit(folio) {
+            const h = historial.find(x => x.folio === folio);
+            if (!h) { showToast('No se encontró la comprobación.', 'error'); return; }
+            // Cambiar a tab Nuevo
+            switchTab('nuevo');
+            // Llenar campos
+            editingFolio = folio;
+            document.getElementById('input-folio').value = h.folio;
+            document.getElementById('input-obra').value = h.obra || '';
+            document.getElementById('input-fecha-inicio').value = h.fechaInicio || '';
+            document.getElementById('input-fecha-fin').value = h.fechaFin || '';
+            updatePeriodo();
+            document.getElementById('input-monto-recibido').value = h.recibido || 0;
+            document.getElementById('input-metodo').value = h.metodo || 'Efectivo';
+            // Cargar items
+            items = (h.items || []).map(i => ({
+                id: newItemId(),
+                tipo: i.tipo || 'Factura',
+                folio: i.folio || '',
+                fecha: i.fecha || '',
+                proveedor: i.proveedor || '',
+                concepto: i.concepto || '',
+                importe: parseFloat(i.importe) || 0,
+                observacion: i.observacion || '',
+                pdfFactura: null, pdfFacturaName: null,
+                xmlFactura: null, xmlFacturaName: null,
+                fotoNota: null, fotoNotaName: null
+            }));
+            renderItems();
+            updateSummary();
+            // Limpiar firma (no podemos restaurar la firma del historial)
+            clearSignature();
+            // Scroll arriba
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            showToast('Comprobación ' + folio + ' cargada para edición.', 'success');
+        }
+
+        // Cargar comprobacion en modo solo lectura
+        let viewMode = false;
+        function loadComprobacionView(folio) {
+            const h = historial.find(x => x.folio === folio);
+            if (!h) { showToast('No se encontró la comprobación.', 'error'); return; }
+            switchTab('nuevo');
+            viewMode = true;
+            editingFolio = folio;
+            document.getElementById('input-folio').value = h.folio;
+            document.getElementById('input-obra').value = h.obra || '';
+            document.getElementById('input-fecha-inicio').value = h.fechaInicio || '';
+            document.getElementById('input-fecha-fin').value = h.fechaFin || '';
+            updatePeriodo();
+            document.getElementById('input-monto-recibido').value = h.recibido || 0;
+            document.getElementById('input-metodo').value = h.metodo || 'Efectivo';
+            items = (h.items || []).map(i => ({
+                id: newItemId(),
+                tipo: i.tipo || 'Factura',
+                folio: i.folio || '',
+                fecha: i.fecha || '',
+                proveedor: i.proveedor || '',
+                concepto: i.concepto || '',
+                importe: parseFloat(i.importe) || 0,
+                observacion: i.observacion || '',
+                pdfFactura: null, pdfFacturaName: null,
+                xmlFactura: null, xmlFacturaName: null,
+                fotoNota: null, fotoNotaName: null
+            }));
+            renderItems();
+            updateSummary();
+            clearSignature();
+            // Deshabilitar todos los inputs y botones
+            document.querySelectorAll('#content-nuevo input, #content-nuevo select, #content-nuevo button').forEach(el => {
+                if (el.id !== 'btn-cancel') {
+                    el.disabled = true;
+                    el.dataset.wasDisabled = 'true';
+                }
+            });
+            // Mostrar aviso
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            showToast('Comprobación ' + folio + ' cargada en modo solo lectura.', 'info');
+        }
+
+        // Salir del modo vista/edicion y volver a nuevo
+        function exitEditMode() {
+            editingFolio = null;
+            viewMode = false;
+            // Rehabilitar inputs
+            document.querySelectorAll('#content-nuevo [data-was-disabled]').forEach(el => {
+                el.disabled = false;
+                delete el.dataset.wasDisabled;
+            });
+        }
+
+        // Cambiar de tab
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            const btn = document.querySelector('.tab-btn[data-tab="' + tabName + '"]');
+            const content = document.getElementById('content-' + tabName);
+            if (btn) btn.classList.add('active');
+            if (content) content.classList.add('active');
+            if (tabName !== 'nuevo' && (editingFolio || viewMode)) {
+                exitEditMode();
+                resetForm();
+            }
+            if (tabName !== 'nuevo') {
+                renderTabsTables();
+            }
+        }
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+        });
+
         loadHistorial();
-        renderHistorial();
+        renderTabsTables();
         updateFolioInput();
 
         // =====================================================
@@ -1520,11 +1900,21 @@
                 devolucion: recibido - total,
                 metodo: document.getElementById('input-metodo').value,
                 usuario: getUserName(),
-                fechaRegistro: new Date().toISOString()
+                fechaRegistro: new Date().toISOString(),
+                status: 'guardado'
             };
-            historial.push(registro);
+            // Si estamos editando, reemplazar; si no, agregar
+            const idx = historial.findIndex(h => h.folio === folio);
+            if (idx >= 0) {
+                // Conservar observacionRechazo si tenia y status no era aprobado
+                const oldObs = historial[idx].observacionRechazo;
+                registro.observacionRechazo = oldObs;
+                historial[idx] = registro;
+            } else {
+                historial.push(registro);
+            }
             saveHistorial();
-            renderHistorial();
+            renderTabsTables();
             showToast('Comprobación ' + folio + ' guardada correctamente.', 'success');
             document.getElementById('btn-submit').disabled = !hasSignature;
         });
@@ -1542,11 +1932,27 @@
             }, 1500);
         });
         document.getElementById('btn-cancel').addEventListener('click', () => {
-            if (confirm('¿Cancelar la comprobación actual? Se perderán los datos no guardados.')) {
+            if (viewMode) {
+                // Salir del modo solo lectura
+                exitEditMode();
                 resetForm();
+                showToast('Saliendo del modo solo lectura.', 'info');
+                return;
+            }
+            if (editingFolio) {
+                if (confirm('¿Cancelar la edición? Los cambios no guardados se perderán.')) {
+                    exitEditMode();
+                    resetForm();
+                }
+            } else {
+                if (confirm('¿Cancelar la comprobación actual? Se perderán los datos no guardados.')) {
+                    resetForm();
+                }
             }
         });
         function resetForm() {
+            editingFolio = null;
+            viewMode = false;
             items = [];
             document.getElementById('input-obra').value = '';
             document.getElementById('input-fecha-inicio').value = '';
@@ -1555,6 +1961,11 @@
             document.getElementById('input-monto-recibido').value = '0';
             document.getElementById('input-metodo').value = 'Efectivo';
             clearSignature();
+            // Rehabilitar inputs (en caso de haber salido del modo vista)
+            document.querySelectorAll('#content-nuevo [data-was-disabled]').forEach(el => {
+                el.disabled = false;
+                delete el.dataset.wasDisabled;
+            });
             addItem();
             updateSummary();
             updateFolioInput();
