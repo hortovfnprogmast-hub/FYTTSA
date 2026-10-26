@@ -283,10 +283,392 @@
             .chart-container { height: 200px; }
             .kpi-row { grid-template-columns: repeat(2, 1fr); }
         }
+
+        /* === AVISO DE PRIVACIDAD === */
+        /* Boton flotante */
+        .fab-privacy {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #152B71 0%, #1e40af 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 8px 22px rgba(21, 43, 113, 0.35);
+            z-index: 90;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .fab-privacy:hover {
+            transform: scale(1.08) translateY(-2px);
+            box-shadow: 0 14px 30px rgba(21, 43, 113, 0.45);
+        }
+        .fab-privacy i { width: 26px; height: 26px; }
+        .fab-privacy .fab-pulse {
+            position: absolute;
+            top: -2px; right: -2px;
+            width: 16px; height: 16px;
+            background: #ef4444;
+            border-radius: 50%;
+            border: 2px solid white;
+            animation: pulseRed 1.5s infinite;
+            display: none;
+        }
+        .fab-privacy .fab-pulse.show { display: block; }
+        @keyframes pulseRed {
+            0%   { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70%  { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        /* Overlay y modal */
+        .privacy-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.82);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            animation: pvFade 0.3s ease;
+        }
+        .privacy-overlay.show { display: flex; }
+        @keyframes pvFade { from { opacity: 0; } to { opacity: 1; } }
+
+        .privacy-modal {
+            background: #ffffff;
+            border-radius: 22px;
+            width: 100%;
+            max-width: 760px;
+            max-height: 92vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.4);
+            animation: pvSlide 0.4s cubic-bezier(.2,.8,.3,1);
+        }
+        @keyframes pvSlide {
+            from { opacity: 0; transform: translateY(30px) scale(0.98); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .privacy-header {
+            background: linear-gradient(135deg, #152B71 0%, #1e40af 100%);
+            color: #fff;
+            padding: 22px 28px 18px;
+            flex-shrink: 0;
+        }
+        .privacy-header .ph-top {
+            display: flex; align-items: center; gap: 12px;
+        }
+        .privacy-header .ph-icon {
+            width: 42px; height: 42px;
+            background: rgba(255,255,255,0.18);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .privacy-header .ph-icon i { width: 24px; height: 24px; }
+        .privacy-header h2 {
+            margin: 0;
+            font-size: 19px;
+            font-weight: 800;
+            letter-spacing: 0.2px;
+        }
+        .privacy-header .ph-sub {
+            margin: 2px 0 0 0;
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        .privacy-progress-wrap {
+            margin-top: 14px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .privacy-progress {
+            flex: 1;
+            height: 6px;
+            background: rgba(255,255,255,0.22);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .privacy-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #34d399);
+            width: 0%;
+            transition: width 0.2s ease;
+            border-radius: 3px;
+        }
+        .privacy-progress-label {
+            font-size: 11px;
+            font-weight: 700;
+            min-width: 38px;
+            text-align: right;
+        }
+
+        .privacy-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 26px 30px 12px;
+            line-height: 1.65;
+            color: #1e293b;
+            font-size: 13.5px;
+            scroll-behavior: smooth;
+        }
+        .privacy-body::-webkit-scrollbar { width: 8px; }
+        .privacy-body::-webkit-scrollbar-track { background: #f1f5f9; }
+        .privacy-body::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .privacy-body::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .privacy-body h3 {
+            color: #152B71;
+            font-size: 14.5px;
+            margin: 18px 0 8px 0;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-left: 4px solid #152B71;
+            padding-left: 10px;
+        }
+        .privacy-body h3:first-child { margin-top: 0; }
+        .privacy-body p { margin: 0 0 10px 0; }
+        .privacy-body ul { margin: 0 0 12px 0; padding-left: 22px; }
+        .privacy-body ul li { margin-bottom: 5px; }
+        .privacy-body strong { color: #152B71; }
+        .privacy-body .pv-info-box {
+            background: #eef2ff;
+            border: 1px solid #c7d2fe;
+            border-radius: 12px;
+            padding: 12px 14px;
+            font-size: 12.5px;
+            margin: 14px 0;
+        }
+        .privacy-body .pv-info-box b { color: #152B71; }
+
+        .pv-end-marker {
+            text-align: center;
+            padding: 16px;
+            margin: 20px 0 8px;
+            background: #f1f5f9;
+            border-radius: 12px;
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 700;
+            transition: all 0.35s ease;
+            border: 2px dashed #cbd5e1;
+        }
+        .pv-end-marker.read {
+            background: #dcfce7;
+            color: #166534;
+            border-color: #86efac;
+        }
+        .pv-end-marker i { width: 18px; height: 18px; vertical-align: -3px; margin-right: 6px; }
+
+        .privacy-footer {
+            padding: 18px 28px 22px;
+            border-top: 1px solid #e2e8f0;
+            background: #f8fafc;
+            flex-shrink: 0;
+        }
+
+        .pv-step-row {
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 12px;
+            font-size: 12.5px;
+            color: #475569;
+        }
+        .pv-step-dot {
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            color: #94a3b8;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 800;
+            flex-shrink: 0;
+            transition: all 0.25s;
+        }
+        .pv-step-dot.done {
+            background: #10b981;
+            color: #fff;
+        }
+        .pv-step-dot i { width: 13px; height: 13px; }
+
+        .pv-sig-label {
+            font-size: 12px;
+            color: #475569;
+            font-weight: 700;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .pv-sig-clear {
+            font-size: 11px;
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-weight: 700;
+            display: inline-flex; align-items: center; gap: 4px;
+        }
+        .pv-sig-clear:hover { text-decoration: underline; }
+        .pv-sig-clear:disabled {
+            color: #cbd5e1;
+            cursor: not-allowed;
+        }
+        .pv-sig-clear i { width: 13px; height: 13px; }
+
+        .pv-sig-canvas-wrap {
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: #fff;
+            background-image:
+                linear-gradient(#f8fafc 1px, transparent 1px);
+            background-size: 100% 100%;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 14px;
+        }
+        .pv-sig-canvas-wrap.signed {
+            border-color: #152B71;
+        }
+        #pv-signature-canvas {
+            display: block;
+            width: 100%;
+            height: 110px;
+            cursor: crosshair;
+            touch-action: none;
+        }
+        .pv-sig-hint {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            color: #cbd5e1;
+            font-size: 13px;
+            font-style: italic;
+            pointer-events: none;
+            text-align: center;
+        }
+        .pv-sig-hint i { width: 16px; height: 16px; vertical-align: -3px; margin-right: 4px; }
+
+        .pv-user-confirm {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 100%);
+            border: 1px solid #c7d2fe;
+            border-left: 4px solid #152B71;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 14px;
+        }
+        .pv-user-confirm-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #152B71;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .pv-user-confirm-icon i { width: 20px; height: 20px; }
+        .pv-user-confirm-info {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            flex: 1;
+        }
+        .pv-user-confirm-label {
+            font-size: 11px;
+            color: #64748b;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .pv-user-confirm-name {
+            font-size: 15px;
+            color: #152B71;
+            font-weight: 800;
+            margin-top: 2px;
+            word-break: break-word;
+        }
+        .pv-user-confirm-name.loading {
+            color: #94a3b8;
+            font-weight: 600;
+            font-style: italic;
+        }
+
+        .pv-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+        .pv-btn {
+            padding: 12px 22px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 13.5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            font-family: 'Inter', sans-serif;
+        }
+        .pv-btn i { width: 16px; height: 16px; }
+        .pv-btn-accept {
+            background: #152B71;
+            color: #fff;
+        }
+        .pv-btn-accept:disabled {
+            background: #cbd5e1;
+            color: #94a3b8;
+            cursor: not-allowed;
+        }
+        .pv-btn-accept:not(:disabled):hover {
+            background: #1e40af;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(21, 43, 113, 0.3);
+        }
+        .pv-btn-decline {
+            background: #fff;
+            color: #ef4444;
+            border: 2px solid #fecaca;
+        }
+        .pv-btn-decline:hover {
+            background: #ef4444;
+            color: #fff;
+            border-color: #ef4444;
+        }
+
+        @media (max-width: 600px) {
+            .privacy-modal { max-height: 96vh; border-radius: 16px; }
+            .privacy-header { padding: 16px 18px 12px; }
+            .privacy-header h2 { font-size: 16px; }
+            .privacy-body { padding: 18px 18px 8px; font-size: 13px; }
+            .privacy-footer { padding: 14px 18px 18px; }
+            .pv-actions { flex-direction: column-reverse; }
+            .pv-btn { width: 100%; justify-content: center; }
+        }
+
     </style>
 </head>
 <body>
-
     <header class="header">
         <div class="header-left">
             <button class="menu-btn" id="toggle-menu"><i data-lucide="menu"></i></button>
@@ -632,6 +1014,78 @@
 
     </div>
 
+
+    <!-- Boton flotante de Aviso de Privacidad -->
+    <button class="fab-privacy" id="fabPrivacy" title="Aviso de Privacidad">
+        <i data-lucide="shield-check"></i>
+        <span class="fab-pulse" id="fabPulse"></span>
+    </button>
+
+    <!-- Modal Aviso de Privacidad -->
+    <div class="privacy-overlay" id="privacyOverlay">
+        <div class="privacy-modal" role="dialog" aria-modal="true" aria-labelledby="pvTitle">
+            <div class="privacy-header">
+                <div class="ph-top">
+                    <div class="ph-icon"><i data-lucide="file-lock-2"></i></div>
+                    <div>
+                        <h2 id="pvTitle">Aviso de Privacidad Integral</h2>
+                        <p class="ph-sub">FYTTSA &middot; Ingenier&iacute;a, Construcci&oacute;n, Edificaci&oacute;n y Remodelaci&oacute;n</p>
+                    </div>
+                </div>
+                <div class="privacy-progress-wrap">
+                    <div class="privacy-progress">
+                        <div class="privacy-progress-fill" id="pvProgressFill"></div>
+                    </div>
+                    <span class="privacy-progress-label" id="pvProgressLabel">0%</span>
+                </div>
+            </div>
+
+            <div class="privacy-body" id="pvBody">
+                <!-- Contenido del aviso se inyecta aqui -->
+            </div>
+
+            <div class="privacy-footer">
+                <div class="pv-step-row">
+                    <div class="pv-step-dot" id="pvStep1">1</div>
+                    <span>Leer completo el aviso de privacidad</span>
+                </div>
+                <div class="pv-step-row">
+                    <div class="pv-step-dot" id="pvStep2">2</div>
+                    <span>Firmar electr&oacute;nicamente</span>
+                </div>
+
+                <div class="pv-sig-label">
+                    <span><i data-lucide="pen-tool" style="width:14px;height:14px;vertical-align:-2px;color:#152B71;"></i> Firma electr&oacute;nica</span>
+                    <button type="button" class="pv-sig-clear" id="pvClearSig" disabled>
+                        <i data-lucide="eraser"></i> Borrar firma
+                    </button>
+                </div>
+                <div class="pv-sig-canvas-wrap" id="pvSigWrap">
+                    <canvas id="pv-signature-canvas"></canvas>
+                    <div class="pv-sig-hint" id="pvSigHint">
+                        <i data-lucide="edit-3"></i>Firma aqu&iacute; con el mouse o el dedo
+                    </div>
+                </div>
+                <div class="pv-user-confirm" id="pvUserConfirm">
+                    <div class="pv-user-confirm-icon"><i data-lucide="user-check"></i></div>
+                    <div class="pv-user-confirm-info">
+                        <span class="pv-user-confirm-label">Firmando como:</span>
+                        <strong class="pv-user-confirm-name" id="pvUserName">Cargando usuario...</strong>
+                    </div>
+                </div>
+
+                <div class="pv-actions">
+                    <button type="button" class="pv-btn pv-btn-decline" id="pvDecline">
+                        <i data-lucide="log-out"></i> Rechazar y cerrar sesi&oacute;n
+                    </button>
+                    <button type="button" class="pv-btn pv-btn-accept" id="pvAccept" disabled>
+                        <i data-lucide="check-circle-2"></i> Aceptar y firmar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // 1. CARGAR MENÚ DINÁMICO
         fetch('menu.html')
@@ -715,6 +1169,7 @@
             localStorage.removeItem('usuario'); 
             localStorage.removeItem('privilegio');
             localStorage.removeItem('nombre');
+            // No limpiamos sessionStorage porque ya no usamos flag
             window.location.href = 'index.html'; 
         }
 
@@ -962,6 +1417,483 @@
         } else {
             inicializarGraficas();
         }
+
+
+        // =====================================================
+        // AVISO DE PRIVACIDAD - logica completa
+        // =====================================================
+        // Estrategia: el aviso se muestra SIEMPRE al cargar inicio.html.
+        // El usuario debe leerlo completo, firmar y escribir su nombre
+        // para poder cerrarlo. Si presiona "Rechazar", se cierra sesion.
+        // No se guarda nada en sessionStorage para forzar que aparezca
+        // cada vez que se abra la aplicacion.
+        const PRIVACY_VERSION = 'v1.0'; // Cambiar para auditar aceptaciones
+
+        const PRIVACY_HTML = `
+            <h3><i data-lucide="building-2"></i> 1. Identificaci&oacute;n del Responsable</h3>
+            <p>FYTTSA (en adelante &ldquo;el Responsable&rdquo;), empresa dedicada a la <strong>ingenier&iacute;a, construcci&oacute;n, edificaci&oacute;n y remodelaci&oacute;n</strong>, con domicilio en sus instalaciones administrativas, emite el presente Aviso de Privacidad en cumplimiento a la <strong>Ley Federal de Protecci&oacute;n de Datos Personales en Posesión de los Particulares (LFPDPPP)</strong> y su Reglamento.</p>
+
+            <h3><i data-lucide="database"></i> 2. Datos Personales Recabados</h3>
+            <p>Para el desarrollo de las actividades de construcci&oacute;n, edificaci&oacute;n y remodelaci&oacute;n, as&iacute; como para la gesti&oacute;n laboral y administrativa, recabamos los siguientes datos personales:</p>
+            <ul>
+                <li><strong>Identificaci&oacute;n:</strong> nombre completo, fecha de nacimiento, nacionalidad, CURP, RFC.</li>
+                <li><strong>Contacto:</strong> domicilio particular, tel&eacute;fono fijo y m&oacute;vil, correo electr&oacute;nico.</li>
+                <li><strong>Laborales:</strong> categor&iacute;a laboral (alba&ntilde;iler&iacute;a, herrer&iacute;a, electricidad, plomer&iacute;a, pintura, supervisi&oacute;n), NSS, registro INFONAVIT, experiencia, referencias.</li>
+                <li><strong>Capacitaci&oacute;n:</strong> certificados de oficio, constancias de seguridad, oficios reconocidos.</li>
+                <li><strong>Econ&oacute;micos:</strong> cuenta bancaria y CLABE para pago de n&oacute;mina.</li>
+                <li><strong>Biom&eacute;tricos:</strong> huellas dactilares y reconocimiento facial para control de asistencia y acceso a obras.</li>
+                <li><strong>Salud:</strong> tipo de sangre, antecedentes m&eacute;dicos para el trabajo en obra, constancias de aptitud f&iacute;sica, registro de incidentes y accidentes.</li>
+                <li><strong>Imagen y video:</strong> fotograf&iacute;as y videos tomados en obra para bit&aacute;cora digital, avances y control de seguridad.</li>
+                <li><strong>Veh&iacute;culos:</strong> licencia de conducir, tarjeta de circulaci&oacute;n y p&oacute;liza (en caso de operar unidades de la empresa).</li>
+            </ul>
+
+            <div class="pv-info-box">
+                <b>Nota importante:</b> Algunos de estos datos (biom&eacute;tricos y de salud) se consideran <b>datos sensibles</b> conforme a la LFPDPPP y se tratan con estricta confidencialidad.
+            </div>
+
+            <h3><i data-lucide="target"></i> 3. Finalidades del Tratamiento</h3>
+            <p><strong>Finalidades primarias (necesarias):</strong></p>
+            <ul>
+                <li>Reclutamiento, selecci&oacute;n, contrataci&oacute;n y alta ante IMSS, INFONAVIT y Afore.</li>
+                <li>Control de asistencia biom&eacute;trico en obras y oficinas.</li>
+                <li>Asignaci&oacute;n de Equipo de Protecci&oacute;n Personal (EPP) y capacitaci&oacute;n en seguridad industrial.</li>
+                <li>Gesti&oacute;n de n&oacute;mina, pago de salarios, prestaciones y obligaciones fiscales.</li>
+                <li>Coordinaci&oacute;n y supervisi&oacute;n del trabajo en obra (asignaci&oacute;n de tareas, reportes de avance y bit&aacute;cora diaria).</li>
+                <li>Control de herramientas, materiales, veh&iacute;culos y combustibles entregados al trabajador.</li>
+                <li>Cumplimiento de NOM aplicables (NOM-031-STPS-2011 construcci&oacute;n, NOM-009-STPS-2011 trabajos en altura, entre otras).</li>
+                <li>Atenci&oacute;n de incidentes, accidentes de trabajo y tr&aacute;mites ante el IMSS (ST-7, ST-9).</li>
+                <li>Registro fotogr&aacute;fico del avance de obra y entrega de reportes al cliente.</li>
+            </ul>
+            <p><strong>Finalidades secundarias (no necesarias):</strong></p>
+            <ul>
+                <li>Estad&iacute;sticas internas de productividad, ausentismo y rotaci&oacute;n de personal.</li>
+                <li>Reconocimiento al desempe&ntilde;o y premiaciones.</li>
+                <li>Comunicaci&oacute;n interna y difusi&oacute;n de eventos de la empresa.</li>
+            </ul>
+            <p>El titular puede oponerse al tratamiento de datos para finalidades secundarias enviando un correo a privacidad@fyttsa.com</p>
+
+            <h3><i data-lucide="share-2"></i> 4. Transferencias de Datos</h3>
+            <p>FYTTSA podr&aacute; transferir datos personales en los siguientes supuestos:</p>
+            <ul>
+                <li>IMSS, INFONAVIT y SAR, para cumplimiento de obligaciones laborales.</li>
+                <li>STPS y autoridades laborales, en inspecciones o requerimientos.</li>
+                <li>SAT, para efectos fiscales.</li>
+                <li>Clientes y comitentes de obra, en lo referente a avances y bit&aacute;cora del proyecto.</li>
+                <li>Proveedores de servicios de n&oacute;mina y c&oacute;mputo bajo contratos de confidencialidad.</li>
+                <li>Aseguradoras, en caso de siniestros, accidentes o reclamaciones.</li>
+                <li>Autoridades judiciales o administrativas cuando medie requerimiento legal.</li>
+            </ul>
+
+            <h3><i data-lucide="check-square"></i> 5. Consentimiento</h3>
+            <p>Al firmar electr&oacute;nicamente este Aviso de Privacidad, el titular manifiesta su <strong>consentimiento expreso</strong> para el tratamiento de sus datos personales &mdash;incluyendo los datos sensibles se&ntilde;alados&mdash; para todas las finalidades primarias y secundarias descritas. La firma capturada en este medio electr&oacute;nico tiene la misma validez que una firma aut&oacute;grafa para los efectos de este documento.</p>
+
+            <h3><i data-lucide="scale"></i> 6. Derechos ARCO</h3>
+            <p>El titular puede ejercer en cualquier momento los derechos de:</p>
+            <ul>
+                <li><strong>Acceso:</strong> conocer qu&eacute; datos personales tenemos de usted.</li>
+                <li><strong>Rectificaci&oacute;n:</strong> solicitar correcci&oacute;n de datos inexactos.</li>
+                <li><strong>Cancelaci&oacute;n:</strong> solicitar la eliminaci&oacute;n cuando ya no sean necesarios.</li>
+                <li><strong>Oposici&oacute;n:</strong> oponerse al tratamiento para fines espec&iacute;ficos.</li>
+                <li><strong>Revocaci&oacute;n del consentimiento:</strong> retirar el consentimiento otorgado.</li>
+            </ul>
+            <p>Para ejercer estos derechos, presente solicitud por escrito a <strong>privacidad@fyttsa.com</strong> o en el domicilio de FYTTSA, identific&aacute;ndose con copia de su identificaci&oacute;n oficial. La respuesta se dar&aacute; en un plazo m&aacute;ximo de <strong>20 d&iacute;as h&aacute;biles</strong>.</p>
+
+            <h3><i data-lucide="lock"></i> 7. Medidas de Seguridad</h3>
+            <p>FYTTSA ha implementado medidas t&eacute;cnicas, administrativas y f&iacute;sicas para proteger sus datos personales contra da&ntilde;o, p&eacute;rdida, alteraci&oacute;n, uso no autorizado o acceso fraudulento:</p>
+            <ul>
+                <li>Acceso restringido a sistemas mediante autenticaci&oacute;n de usuario y contrase&ntilde;a.</li>
+                <li>Cifrado de datos sensibles en tr&aacute;nsito y en reposo.</li>
+                <li>Respaldo peri&oacute;dico de la informaci&oacute;n.</li>
+                <li>Capacitaci&oacute;n al personal en protecci&oacute;n de datos.</li>
+                <li>Bit&aacute;coras de auditor&iacute;a en los sistemas.</li>
+            </ul>
+
+            <h3><i data-lucide="archive"></i> 8. Conservaci&oacute;n y Eliminaci&oacute;n</h3>
+            <p>Los datos personales se conservar&aacute;n durante la vigencia de la relaci&oacute;n laboral o comercial y por los plazos que determine la legislaci&oacute;n aplicable (Ley Federal del Trabajo, C&oacute;digo Fiscal, LFPDPPP). Concluidos estos plazos, los datos ser&aacute;n bloqueados y posteriormente eliminados de forma segura.</p>
+
+            <h3><i data-lucide="refresh-cw"></i> 9. Cambios al Aviso de Privacidad</h3>
+            <p>FYTTSA se reserva el derecho de modificar el presente Aviso de Privacidad para adecuarlo a nuevos requerimientos legales, cambios en sus pr&aacute;cticas o incorporaci&oacute;n de nuevos servicios. Las modificaciones se comunicar&aacute;n a trav&eacute;s de los medios electr&oacute;nicos de la empresa y se solicitar&aacute; nuevamente el consentimiento cuando as&iacute; lo disponga la ley.</p>
+
+            <h3><i data-lucide="calendar"></i> 10. Vigencia</h3>
+            <p>El presente Aviso de Privacidad entra en vigor a partir de su aceptaci&oacute;n electr&oacute;nica y se mantiene vigente durante la relaci&oacute;n laboral o comercial, y por el plazo que determine la legislaci&oacute;n aplicable.</p>
+
+            <h3><i data-lucide="mail"></i> 11. Contacto</h3>
+            <p>Para cualquier duda, comentario o solicitud relacionada con este Aviso de Privacidad:</p>
+            <ul>
+                <li><strong>Correo:</strong> privacidad@fyttsa.com</li>
+                <li><strong>Domicilio:</strong> oficinas centrales de FYTTSA.</li>
+                <li><strong>Horario:</strong> lunes a viernes, 9:00 a 14:00 horas.</li>
+            </ul>
+
+            <div class="pv-end-marker" id="pvEndMarker">
+                <i data-lucide="check-circle-2"></i> Fin del aviso. Ya puedes proceder a firmar.
+            </div>
+        `;
+
+        // Estado interno
+        const pvState = {
+            scrolledToBottom: false,
+            hasSignature: false,
+            hasName: false
+        };
+
+        // Referencias DOM
+        const pvOverlay = document.getElementById('privacyOverlay');
+        const pvBody = document.getElementById('pvBody');
+        const pvAccept = document.getElementById('pvAccept');
+        const pvDecline = document.getElementById('pvDecline');
+        const pvProgressFill = document.getElementById('pvProgressFill');
+        const pvProgressLabel = document.getElementById('pvProgressLabel');
+        const pvStep1 = document.getElementById('pvStep1');
+        const pvStep2 = document.getElementById('pvStep2');
+        const pvEndMarker = document.getElementById('pvEndMarker');
+        const pvSigWrap = document.getElementById('pvSigWrap');
+        const pvSigHint = document.getElementById('pvSigHint');
+        const pvClearSig = document.getElementById('pvClearSig');
+        const pvUserName = document.getElementById('pvUserName');
+        const fabPrivacy = document.getElementById('fabPrivacy');
+        const fabPulse = document.getElementById('fabPulse');
+        const pvCanvas = document.getElementById('pv-signature-canvas');
+        let pvCtx = null;
+
+        // Inserta el contenido HTML del aviso
+        function pvRenderContent() {
+            pvBody.innerHTML = PRIVACY_HTML;
+            // Re-renderiza iconos lucide dentro del cuerpo
+            if (window.lucide && typeof lucide.createIcons === 'function') {
+                lucide.createIcons();
+            }
+            // Reasigna referencia al marcador final
+            const endMarker = document.getElementById('pvEndMarker');
+            if (endMarker) {
+                endMarker.addEventListener('click', function(){});
+            }
+        }
+
+        // Muestra el modal
+        function pvShow() {
+            pvRenderContent();
+            pvOverlay.classList.add('show');
+            document.body.style.overflow = 'hidden';
+
+            // Reset estado
+            pvState.scrolledToBottom = false;
+            pvState.hasSignature = false;
+            pvState.hasName = false;
+            pvBody.scrollTop = 0;
+            updatePvProgress();
+            updateAcceptButton();
+            resetSignature();
+            // Sincroniza el nombre del usuario logueado con el panel del modal
+            syncUserNameIntoModal();
+
+            // Inicializa canvas despues de que el modal sea visible
+            requestAnimationFrame(() => {
+                initSignatureCanvas();
+            });
+        }
+
+        // Sincroniza el nombre del usuario que inicio sesion con el panel del modal.
+        // Toma el nombre desde localStorage (donde lo guarda el script de login)
+        // o desde el elemento #welcome-name del panel principal si ya esta cargado.
+        function syncUserNameIntoModal() {
+            if (!pvUserName) return;
+            let nombre = localStorage.getItem('nombre');
+            if (!nombre) {
+                // Intentar leerlo del panel de bienvenida si ya se cargo
+                const welcomeEl = document.getElementById('welcome-name');
+                if (welcomeEl && welcomeEl.innerText && welcomeEl.innerText.trim() !== 'Cargando...') {
+                    nombre = welcomeEl.innerText.trim();
+                }
+            }
+            if (nombre && nombre.trim().length > 0) {
+                pvUserName.textContent = nombre.trim();
+                pvUserName.classList.remove('loading');
+                pvState.hasName = true;
+            } else {
+                pvUserName.textContent = 'Usuario no identificado';
+                pvUserName.classList.add('loading');
+                pvState.hasName = false;
+                // Reintenta en 1.5s por si el nombre llega mas tarde (Firebase/Sheets)
+                setTimeout(() => {
+                    if (!pvState.hasName) syncUserNameIntoModal();
+                }, 1500);
+            }
+            updateAcceptButton();
+        }
+
+        // Oculta el modal
+        function pvHide() {
+            pvOverlay.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        // (Desactivado) Verifica si ya acepto en esta sesion
+        // - Mantenemos la funcion por compatibilidad, pero siempre devuelve false
+        //   para forzar que el aviso aparezca cada vez que se carga la pagina.
+        function pvAlreadyAccepted() {
+            return false;
+        }
+
+        // Marca como aceptado en esta sesion (solo para efecto visual del FAB,
+        // no impide que el aviso se muestre de nuevo al recargar).
+        function pvMarkAccepted() {
+            // No guardamos nada en sessionStorage: el aviso debe mostrarse
+            // cada vez que el usuario abra la aplicacion.
+            // Oculta el pulso rojo del FAB en esta sesion.
+            if (fabPulse) fabPulse.classList.remove('show');
+        }
+
+        // Calcula progreso de lectura
+        function updatePvProgress() {
+            const max = pvBody.scrollHeight - pvBody.clientHeight;
+            if (max <= 0) {
+                pvState.scrolledToBottom = true;
+                pvProgressFill.style.width = '100%';
+                pvProgressLabel.textContent = '100%';
+                markStepDone(pvStep1);
+                markEndMarkerRead(true);
+                updateAcceptButton();
+                return;
+            }
+            const pct = Math.min(100, Math.round((pvBody.scrollTop / max) * 100));
+            pvProgressFill.style.width = pct + '%';
+            pvProgressLabel.textContent = pct + '%';
+
+            // Umbral: 98% o a menos de 20px del final
+            const atBottom = pct >= 98 || (pvBody.scrollTop + pvBody.clientHeight >= pvBody.scrollHeight - 20);
+            if (atBottom && !pvState.scrolledToBottom) {
+                pvState.scrolledToBottom = true;
+                markStepDone(pvStep1);
+                markEndMarkerRead(true);
+                updateAcceptButton();
+            }
+        }
+
+        function markStepDone(el) {
+            if (!el) return;
+            el.classList.add('done');
+            el.innerHTML = '<i data-lucide="check"></i>';
+            if (window.lucide) lucide.createIcons();
+        }
+        function markStepPending(el, num) {
+            if (!el) return;
+            el.classList.remove('done');
+            el.innerHTML = String(num);
+            if (window.lucide) lucide.createIcons();
+        }
+        function markEndMarkerRead(read) {
+            const endMarker = document.getElementById('pvEndMarker');
+            if (!endMarker) return;
+            if (read) {
+                endMarker.classList.add('read');
+            } else {
+                endMarker.classList.remove('read');
+            }
+        }
+
+        function updateAcceptButton() {
+            const ready = pvState.scrolledToBottom && pvState.hasSignature && pvState.hasName;
+            pvAccept.disabled = !ready;
+            if (pvState.hasSignature && pvState.hasName) {
+                markStepDone(pvStep2);
+            } else {
+                markStepPending(pvStep2, 2);
+            }
+        }
+
+        // ===== Canvas de firma =====
+        function initSignatureCanvas() {
+            if (!pvCanvas) return;
+            // Ajusta tamaño segun el contenedor (con DPR para nitidez)
+            const dpr = window.devicePixelRatio || 1;
+            const rect = pvCanvas.getBoundingClientRect();
+            pvCanvas.width = Math.max(1, Math.floor(rect.width * dpr));
+            pvCanvas.height = Math.max(1, Math.floor(rect.height * dpr));
+            pvCtx = pvCanvas.getContext('2d');
+            pvCtx.scale(dpr, dpr);
+            pvCtx.lineWidth = 2.2;
+            pvCtx.lineCap = 'round';
+            pvCtx.lineJoin = 'round';
+            pvCtx.strokeStyle = '#152B71';
+
+            // Limpia listeners previos (por si se reinicializa)
+            const newCanvas = pvCanvas.cloneNode(false);
+            pvCanvas.parentNode.replaceChild(newCanvas, pvCanvas);
+            // reasignamos referencia
+            // (volvemos a obtener el canvas actual del DOM)
+            const canvas = document.getElementById('pv-signature-canvas');
+            // re-bind
+            bindSignatureEvents(canvas);
+            // re-ajuste ctx
+            const c2 = canvas.getContext('2d');
+            c2.scale(dpr, dpr);
+            c2.lineWidth = 2.2;
+            c2.lineCap = 'round';
+            c2.lineJoin = 'round';
+            c2.strokeStyle = '#152B71';
+            // guardamos referencia global
+            window._pvCanvas = canvas;
+            window._pvCtx = c2;
+        }
+
+        function bindSignatureEvents(canvas) {
+            let drawing = false;
+            let lastX = 0, lastY = 0;
+
+            function getPos(e) {
+                const r = canvas.getBoundingClientRect();
+                if (e.touches && e.touches.length > 0) {
+                    return { x: e.touches[0].clientX - r.left, y: e.touches[0].clientY - r.top };
+                }
+                return { x: e.clientX - r.left, y: e.clientY - r.top };
+            }
+
+            function startDraw(e) {
+                e.preventDefault();
+                drawing = true;
+                const p = getPos(e);
+                lastX = p.x; lastY = p.y;
+                // Oculta el hint
+                if (pvSigHint) pvSigHint.style.display = 'none';
+                // Pequeño punto inicial
+                const ctx = canvas.getContext('2d');
+                ctx.beginPath();
+                ctx.moveTo(p.x, p.y);
+                ctx.lineTo(p.x + 0.1, p.y + 0.1);
+                ctx.stroke();
+            }
+
+            function draw(e) {
+                if (!drawing) return;
+                e.preventDefault();
+                const ctx = canvas.getContext('2d');
+                const p = getPos(e);
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(p.x, p.y);
+                ctx.stroke();
+                lastX = p.x; lastY = p.y;
+                // Marca que ya hay firma
+                if (!pvState.hasSignature) {
+                    pvState.hasSignature = true;
+                    pvSigWrap.classList.add('signed');
+                    pvClearSig.disabled = false;
+                    updateAcceptButton();
+                }
+            }
+
+            function endDraw(e) {
+                if (drawing && e) e.preventDefault();
+                drawing = false;
+            }
+
+            // Mouse
+            canvas.addEventListener('mousedown', startDraw);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', endDraw);
+            canvas.addEventListener('mouseleave', endDraw);
+            // Touch
+            canvas.addEventListener('touchstart', startDraw, { passive: false });
+            canvas.addEventListener('touchmove', draw, { passive: false });
+            canvas.addEventListener('touchend', endDraw, { passive: false });
+            canvas.addEventListener('touchcancel', endDraw, { passive: false });
+        }
+
+        function resetSignature() {
+            const canvas = document.getElementById('pv-signature-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            pvState.hasSignature = false;
+            pvSigWrap.classList.remove('signed');
+            if (pvSigHint) pvSigHint.style.display = '';
+            pvClearSig.disabled = true;
+            updateAcceptButton();
+        }
+
+        // ===== Eventos =====
+        // Scroll dentro del cuerpo
+        if (pvBody) {
+            pvBody.addEventListener('scroll', updatePvProgress);
+        }
+
+        // Boton flotante: abre el aviso
+        if (fabPrivacy) {
+            fabPrivacy.addEventListener('click', function() {
+                pvShow();
+            });
+        }
+
+        // Boton Aceptar
+        if (pvAccept) {
+            pvAccept.addEventListener('click', function() {
+                if (pvAccept.disabled) return;
+                pvMarkAccepted();
+                pvHide();
+            });
+        }
+
+        // Boton Rechazar / Cerrar Sesion
+        if (pvDecline) {
+            pvDecline.addEventListener('click', function() {
+                if (confirm('Si rechazas el Aviso de Privacidad, tu sesion se cerrara. Deseas continuar?')) {
+                    pvHide();
+                    cerrarSesion();
+                }
+            });
+        }
+
+        // Borrar firma
+        if (pvClearSig) {
+            pvClearSig.addEventListener('click', resetSignature);
+        }
+
+        // (Eliminado) Event listener del input de nombre
+        // Ahora el nombre se toma directamente del usuario logueado
+        // y se sincroniza automaticamente con syncUserNameIntoModal().
+
+        // Re-dimensionar canvas cuando cambia el tamano de ventana (si el modal esta visible)
+        window.addEventListener('resize', function() {
+            if (pvOverlay.classList.contains('show')) {
+                // conservamos la imagen actual
+                const canvas = document.getElementById('pv-signature-canvas');
+                if (!canvas) return;
+                const oldData = canvas.toDataURL();
+                initSignatureCanvas();
+                // restauramos la imagen en el nuevo tamano
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                img.onload = function() {
+                    ctx.drawImage(img, 0, 0, canvas.clientWidth, canvas.clientHeight);
+                };
+                img.src = oldData;
+            }
+        });
+
+        // ===== Auto-mostrar al inicio de sesion =====
+        // El aviso se muestra SIEMPRE al cargar la pagina.
+        function pvAutoShow() {
+            // Muestra el pulso rojo en el FAB para llamar la atencion
+            if (fabPulse) fabPulse.classList.add('show');
+            // Muestra el modal: pequeño retardo para que carguen iconos y estilos
+            setTimeout(() => {
+                try {
+                    pvShow();
+                    console.log('[FYTTSA Privacy] Aviso de privacidad mostrado al iniciar sesion.');
+                } catch (e) {
+                    console.error('[FYTTSA Privacy] Error al mostrar el aviso:', e);
+                }
+            }, 400);
+        }
+
+        // Ejecuta despues de que el DOM este listo y lucide cargue
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', pvAutoShow);
+        } else {
+            pvAutoShow();
+        }
+
     </script>
 </body>
 </html>
