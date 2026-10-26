@@ -656,6 +656,132 @@
             border-color: #ef4444;
         }
 
+        /* === MODAL DE CONFIRMACION (reemplaza confirm() nativo) === */
+        .confirm-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.82);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            animation: pvFade 0.25s ease;
+        }
+        .confirm-overlay.show { display: flex; }
+
+        .confirm-modal {
+            background: #ffffff;
+            border-radius: 22px;
+            width: 100%;
+            max-width: 440px;
+            overflow: hidden;
+            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.45);
+            animation: pvSlide 0.35s cubic-bezier(.2,.8,.3,1);
+        }
+        .confirm-modal-header {
+            padding: 26px 28px 14px;
+            text-align: center;
+            position: relative;
+        }
+        .confirm-icon-wrap {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 14px;
+            border-radius: 50%;
+            background: #fef2f2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: confirmPulse 1.6s ease-in-out infinite;
+        }
+        @keyframes confirmPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.35); }
+            50%      { box-shadow: 0 0 0 12px rgba(239, 68, 68, 0); }
+        }
+        .confirm-icon-wrap i {
+            width: 36px;
+            height: 36px;
+            color: #ef4444;
+        }
+        .confirm-modal-header h3 {
+            margin: 0 0 6px 0;
+            font-size: 18px;
+            font-weight: 800;
+            color: #152B71;
+        }
+        .confirm-modal-header p {
+            margin: 0;
+            font-size: 13.5px;
+            color: #64748b;
+            line-height: 1.5;
+        }
+        .confirm-modal-body {
+            padding: 4px 28px 20px;
+        }
+        .confirm-warn-box {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-left: 4px solid #f59e0b;
+            border-radius: 12px;
+            padding: 10px 14px;
+            font-size: 12.5px;
+            color: #92400e;
+            line-height: 1.5;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        .confirm-warn-box i {
+            width: 16px;
+            height: 16px;
+            color: #f59e0b;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        .confirm-modal-footer {
+            padding: 0 28px 24px;
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        .confirm-btn {
+            flex: 1;
+            padding: 13px 18px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 13.5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: none;
+            font-family: 'Inter', sans-serif;
+        }
+        .confirm-btn i { width: 16px; height: 16px; }
+        .confirm-btn-cancel {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+        }
+        .confirm-btn-cancel:hover {
+            background: #e2e8f0;
+            transform: translateY(-1px);
+        }
+        .confirm-btn-logout {
+            background: #ef4444;
+            color: #fff;
+        }
+        .confirm-btn-logout:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(239, 68, 68, 0.35);
+        }
+
         @media (max-width: 600px) {
             .privacy-modal { max-height: 96vh; border-radius: 16px; }
             .privacy-header { padding: 16px 18px 12px; }
@@ -664,6 +790,8 @@
             .privacy-footer { padding: 14px 18px 18px; }
             .pv-actions { flex-direction: column-reverse; }
             .pv-btn { width: 100%; justify-content: center; }
+            .confirm-modal-footer { flex-direction: column-reverse; }
+            .confirm-btn { width: 100%; }
         }
 
     </style>
@@ -1082,6 +1210,33 @@
                         <i data-lucide="check-circle-2"></i> Aceptar y firmar
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmacion (reemplaza confirm() nativo) -->
+    <div class="confirm-overlay" id="confirmOverlay">
+        <div class="confirm-modal" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle">
+            <div class="confirm-modal-header">
+                <div class="confirm-icon-wrap">
+                    <i data-lucide="alert-triangle"></i>
+                </div>
+                <h3 id="confirmTitle">&iquest;Cerrar sesi&oacute;n?</h3>
+                <p>Si rechazas el Aviso de Privacidad, tu sesi&oacute;n se cerrar&aacute; inmediatamente y deber&aacute;s volver a iniciar sesi&oacute;n para continuar.</p>
+            </div>
+            <div class="confirm-modal-body">
+                <div class="confirm-warn-box">
+                    <i data-lucide="info"></i>
+                    <span>Al rechazar no podr&aacute;s acceder al panel de FYTTSA hasta que aceptes el aviso completo.</span>
+                </div>
+            </div>
+            <div class="confirm-modal-footer">
+                <button type="button" class="confirm-btn confirm-btn-cancel" id="confirmCancel">
+                    <i data-lucide="x"></i> Cancelar
+                </button>
+                <button type="button" class="confirm-btn confirm-btn-logout" id="confirmLogout">
+                    <i data-lucide="log-out"></i> S&iacute;, cerrar sesi&oacute;n
+                </button>
             </div>
         </div>
     </div>
@@ -1834,15 +1989,53 @@
             });
         }
 
-        // Boton Rechazar / Cerrar Sesion
+        // ===== Modal de Confirmacion (reemplaza confirm() nativo) =====
+        const confirmOverlay = document.getElementById('confirmOverlay');
+        const confirmCancelBtn = document.getElementById('confirmCancel');
+        const confirmLogoutBtn = document.getElementById('confirmLogout');
+
+        // Muestra el modal de confirmacion
+        function showConfirmLogout() {
+            if (!confirmOverlay) return;
+            confirmOverlay.classList.add('show');
+            // Re-renderiza iconos por si acaso
+            if (window.lucide) lucide.createIcons();
+        }
+        // Oculta el modal de confirmacion
+        function hideConfirmLogout() {
+            if (!confirmOverlay) return;
+            confirmOverlay.classList.remove('show');
+        }
+
+        // Boton Rechazar / Cerrar Sesion -> abre el modal de confirmacion
         if (pvDecline) {
             pvDecline.addEventListener('click', function() {
-                if (confirm('Si rechazas el Aviso de Privacidad, tu sesion se cerrara. Deseas continuar?')) {
-                    pvHide();
-                    cerrarSesion();
-                }
+                showConfirmLogout();
             });
         }
+
+        // Boton "Cancelar" del modal de confirmacion -> vuelve al aviso de privacidad
+        if (confirmCancelBtn) {
+            confirmCancelBtn.addEventListener('click', function() {
+                hideConfirmLogout();
+            });
+        }
+
+        // Boton "Si, cerrar sesion" -> ejecuta el cierre de sesion
+        if (confirmLogoutBtn) {
+            confirmLogoutBtn.addEventListener('click', function() {
+                hideConfirmLogout();
+                pvHide();
+                cerrarSesion();
+            });
+        }
+
+        // Cerrar con tecla Escape vuelve al aviso (no cierra sesion)
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && confirmOverlay && confirmOverlay.classList.contains('show')) {
+                hideConfirmLogout();
+            }
+        });
 
         // Borrar firma
         if (pvClearSig) {
