@@ -72,6 +72,23 @@
         @media (max-width: 768px) {
             .top-grid .form-grid { grid-template-columns: 1fr !important; }
         }
+        /* En computadora: 6 rubros en 2 filas de 3 columnas (3 arriba, 3 abajo) */
+        .req-data-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px 24px;
+        }
+        .req-data-grid .form-group.span-full {
+            grid-column: 1 / -1;
+        }
+        /* En tablet: 2 columnas */
+        @media (max-width: 1024px) {
+            .req-data-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        /* En celular: 1 columna (uno abajo de otro) */
+        @media (max-width: 768px) {
+            .req-data-grid { grid-template-columns: 1fr; }
+        }
         .table-wrap { overflow-x: auto; border: 1.5px solid var(--border-color); border-radius: 14px; margin-bottom: 14px; background: white; }
         .expense-table { width: 100%; border-collapse: collapse; font-size: 12.5px; min-width: 1100px; }
         .expense-table thead th { background: var(--primary-blue); color: white; text-transform: uppercase; font-size: 10.5px; font-weight: 800; padding: 12px 8px; text-align: left; border-right: 1px solid rgba(255,255,255,0.15); letter-spacing: 0.4px; position: sticky; top: 0; z-index: 2; }
@@ -208,8 +225,8 @@
                 <div class="top-grid">
                     <div class="card">
                         <h3 class="card-title"><i data-lucide="clipboard"></i> Datos de la Requisición</h3>
-                        <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 18px 24px;">
-                            <div class="form-group" style="grid-column: 1 / -1;">
+                        <div class="req-data-grid">
+                            <div class="form-group">
                                 <label class="form-label">Folio</label>
                                 <input type="text" class="form-control" id="input-folio" readonly>
                             </div>
