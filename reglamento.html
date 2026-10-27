@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reglamento Interno para Residentes de Obra | FYTTSA</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <style>
+        :root {
+            --primary-blue: #152B71;
+            --light-blue: #eef2ff;
+            --bg-color: #f8fafc;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 50;
+        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .menu-btn { background: none; border: none; cursor: pointer; color: var(--text-main); padding: 5px; }
+        .header-title { margin: 0; font-size: 15px; font-weight: 700; color: var(--primary-blue); display: none; }
+        @media (min-width: 768px) { .header-title { display: block; } }
+        .header-right { display: flex; align-items: center; gap: 12px; }
+        .user-initial {
+            width: 35px; height: 35px; border-radius: 50%;
+            background-color: var(--primary-blue); color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 16px;
+        }
+
+        /* LAYOUT */
+        .main-layout { display: flex; flex: 1; overflow: hidden; }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 260px; background: white;
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto; transition: transform 0.3s ease;
+            display: flex; flex-direction: column;
+        }
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; height: calc(100vh - 60px); transform: translateX(-100%); z-index: 40; }
+            .sidebar.open { transform: translateX(0); }
+        }
+        .sidebar-nav { padding: 15px 10px; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 15px; color: var(--text-main); text-decoration: none; font-size: 14px; font-weight: 500; border-radius: 10px; margin-bottom: 2px; transition: all 0.2s; }
+        .nav-item:hover { background-color: var(--bg-color); }
+        .nav-item.active { background-color: var(--light-blue); color: var(--primary-blue); font-weight: 700; border-left: 4px solid var(--primary-blue); }
+        .nav-item.active i { color: var(--primary-blue); }
+
+        /* CONTENIDO */
+        .content { flex: 1; padding: 30px; overflow-y: auto; }
+
+        .doc-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+        }
+        @media (max-width: 768px) {
+            .content { padding: 16px; }
+            .doc-container { padding: 22px; border-radius: 14px; }
+        }
+
+        .doc-company {
+            text-align: center;
+            color: var(--primary-blue);
+            font-weight: 800;
+            font-size: 13px;
+            margin: 0 0 6px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .doc-title {
+            text-align: center;
+            color: var(--primary-blue);
+            font-weight: 800;
+            font-size: 22px;
+            margin: 0 0 25px 0;
+            text-transform: uppercase;
+            line-height: 1.25;
+        }
+        .doc-meta {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            background: var(--bg-color);
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 11.5px;
+            color: var(--text-muted);
+            margin-bottom: 28px;
+        }
+        .doc-meta b { color: var(--primary-blue); }
+
+        .doc-section-title {
+            text-transform: uppercase;
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin: 30px 0 14px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--light-blue);
+            letter-spacing: 0.5px;
+        }
+        .doc-h3 {
+            color: var(--primary-blue);
+            font-size: 15px;
+            margin: 22px 0 10px 0;
+            font-weight: 800;
+        }
+        .doc-p { margin: 0 0 12px 0; line-height: 1.7; color: var(--text-main); font-size: 14px; }
+        .doc-p strong { color: var(--primary-blue); }
+        .doc-ul { margin: 0 0 14px 0; padding-left: 24px; line-height: 1.7; }
+        .doc-ul li { margin-bottom: 6px; font-size: 14px; color: var(--text-main); }
+        .doc-ul ul { margin: 6px 0 6px 0; padding-left: 22px; }
+        .doc-ul ul li { margin-bottom: 3px; font-size: 13.5px; }
+
+        .doc-quote {
+            background: #f8fafc;
+            border-left: 4px solid var(--primary-blue);
+            padding: 16px 20px;
+            border-radius: 10px;
+            margin: 16px 0;
+            font-style: italic;
+            color: var(--text-main);
+            line-height: 1.7;
+            font-size: 14px;
+        }
+        .doc-quote strong { color: var(--primary-blue); font-style: normal; }
+
+        .doc-info-box {
+            background: #eef2ff;
+            border: 1px solid #c7d2fe;
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 13px;
+            margin: 16px 0;
+            line-height: 1.6;
+            color: var(--text-main);
+        }
+        .doc-info-box b { color: var(--primary-blue); }
+
+        .doc-page-marker {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 11px;
+            font-weight: 700;
+            margin: 22px 0 18px 0;
+            padding: 8px 0;
+            border-top: 1px dashed #cbd5e1;
+            border-bottom: 1px dashed #cbd5e1;
+        }
+
+        /* === BLOQUE DE FIRMA AL FINAL === */
+        .sign-block {
+            margin-top: 36px;
+            padding: 26px;
+            background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+            border: 1px solid var(--border-color);
+            border-left: 6px solid var(--primary-blue);
+            border-radius: 16px;
+        }
+        .sign-block h3 {
+            display: flex; align-items: center; gap: 8px;
+            color: var(--primary-blue);
+            font-size: 17px;
+            font-weight: 800;
+            margin: 0 0 14px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .sign-block h3 i { width: 22px; height: 22px; }
+
+        .sign-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+        @media (max-width: 600px) { .sign-row { grid-template-columns: 1fr; } }
+        .sign-field {
+            background: white;
+            border-radius: 10px;
+            padding: 12px 14px;
+            border: 1px solid var(--border-color);
+        }
+        .sign-field-label {
+            font-size: 10.5px;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 4px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .sign-field-label i { width: 13px; height: 13px; color: var(--primary-blue); }
+        .sign-field-value {
+            font-size: 15px;
+            color: var(--primary-blue);
+            font-weight: 800;
+            word-break: break-word;
+        }
+        .sign-field-value.loading {
+            color: #94a3b8;
+            font-weight: 600;
+            font-style: italic;
+        }
+
+        .sign-sig-label {
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 8px;
+        }
+        .sign-sig-clear {
+            font-size: 11px;
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-weight: 700;
+            display: inline-flex; align-items: center; gap: 4px;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+        .sign-sig-clear:hover { text-decoration: underline; }
+        .sign-sig-clear:disabled { color: #cbd5e1; cursor: not-allowed; }
+        .sign-sig-clear i { width: 13px; height: 13px; }
+
+        .sign-sig-wrap {
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            background: #fff;
+            background-image: linear-gradient(#f8fafc 1px, transparent 1px);
+            background-size: 100% 100%;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+        .sign-sig-wrap.signed { border-color: var(--primary-blue); }
+        #signatureCanvas {
+            display: block;
+            width: 100%;
+            height: 140px;
+            cursor: crosshair;
+            touch-action: none;
+        }
+        @media (max-width: 600px) { #signatureCanvas { height: 120px; } }
+        .sign-sig-hint {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            color: #cbd5e1;
+            font-size: 13px;
+            font-style: italic;
+            pointer-events: none;
+            text-align: center;
+        }
+        .sign-sig-hint i { width: 16px; height: 16px; vertical-align: -3px; margin-right: 4px; }
+
+        .sign-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .sign-btn {
+            padding: 14px 22px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            font-family: 'Inter', sans-serif;
+        }
+        .sign-btn i { width: 18px; height: 18px; }
+        .sign-btn-accept {
+            background: var(--primary-blue);
+            color: #fff;
+            flex: 1;
+            justify-content: center;
+        }
+        .sign-btn-accept:disabled {
+            background: #cbd5e1;
+            color: #94a3b8;
+            cursor: not-allowed;
+        }
+        .sign-btn-accept:not(:disabled):hover {
+            background: #1e40af;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(21, 43, 113, 0.3);
+        }
+        .sign-btn-accept.saving { background: #64748b; cursor: wait; }
+        .sign-btn-accept.signed { background: var(--success); }
+        .sign-btn-clear {
+            background: white;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+        }
+        .sign-btn-clear:hover { background: var(--bg-color); }
+
+        .sign-status {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            margin-bottom: 14px;
+            font-size: 12.5px;
+            font-weight: 700;
+        }
+        .sign-status.pending {
+            background: #fef3c7;
+            color: #92400e;
+            border-left: 4px solid var(--warning);
+        }
+        .sign-status.signed {
+            background: #dcfce7;
+            color: #166534;
+            border-left: 4px solid var(--success);
+        }
+        .sign-status i { width: 18px; height: 18px; }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 3000;
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 14px 18px;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            max-width: 380px;
+            min-width: 280px;
+            transform: translateX(120%);
+            transition: transform 0.35s cubic-bezier(.2,.8,.3,1);
+            border-left: 5px solid var(--info);
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.success { border-left-color: var(--success); }
+        .toast.error { border-left-color: var(--danger); }
+        .toast-icon {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            background: #eef2ff;
+            color: var(--info);
+        }
+        .toast.success .toast-icon { background: #dcfce7; color: var(--success); }
+        .toast.error .toast-icon { background: #fee2e2; color: var(--danger); }
+        .toast-icon i { width: 16px; height: 16px; }
+        .toast-content { flex: 1; min-width: 0; }
+        .toast-title { font-size: 13px; font-weight: 800; color: var(--text-main); margin: 0 0 2px 0; }
+        .toast-desc { font-size: 11.5px; color: var(--text-muted); margin: 0; line-height: 1.4; }
+        .toast-close {
+            background: none; border: none; cursor: pointer;
+            color: #94a3b8; padding: 2px;
+        }
+        .toast-close i { width: 14px; height: 14px; }
+
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .spin { animation: spin 1s linear infinite; }
+
+        /* === CAJA DE BIENVENIDA === */
+        .welcome-box {
+            max-width: 800px;
+            margin: 0 auto 25px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 24px;
+            padding: 36px 40px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px rgba(21, 43, 113, 0.08);
+        }
+        .welcome-box h1 { margin: 0 0 5px 0; font-size: 24px; color: var(--text-main); font-weight: 700; }
+        .welcome-box h2 { margin: 0 0 12px 0; font-size: 30px; color: var(--primary-blue); text-transform: uppercase; font-weight: 800; line-height: 1.2; }
+        .welcome-box p { color: var(--text-muted); margin: 0 0 18px 0; font-size: 13px; }
+        .welcome-box .logout-btn {
+            padding: 11px 22px;
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+        }
+        .welcome-box .logout-btn:hover { background-color: #b91c1c; transform: translateY(-2px); }
+        .welcome-box .logout-btn i { width: 16px; height: 16px; }
+
+        /* === TARJETA INFORMATIVA === */
+        .info-section { max-width: 800px; margin: 0 auto 25px; }
+        .info-title {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 18px; font-weight: 800;
+            color: var(--primary-blue);
+            margin: 0 0 16px 0;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border-color);
+        }
+        .info-title i { width: 22px; height: 22px; }
+        .info-card {
+            background: white;
+            border-radius: 16px;
+            padding: 22px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+        }
+        .info-card h3 {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 14px; font-weight: 700; color: var(--text-main);
+            margin: 0 0 12px 0;
+        }
+        .info-card h3 i { color: var(--primary-blue); width: 18px; height: 18px; }
+        .info-card p { margin: 0 0 10px 0; color: var(--text-main); font-size: 13px; line-height: 1.6; }
+        .info-card p:last-child { margin-bottom: 0; }
+        .info-card p strong { color: var(--primary-blue); }
+
+        @media (max-width: 768px) {
+            .welcome-box { padding: 25px; border-radius: 18px; }
+            .welcome-box h2 { font-size: 22px; }
+        }
+
+        @media (max-width: 600px) {
+            .toast { left: 16px; right: 16px; max-width: none; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <button class="menu-btn" id="toggle-menu"><i data-lucide="menu"></i></button>
+            <img src="https://i.ibb.co/fdMsnKTg/LOGO2.png" alt="Logo" height="35">
+            <h1 class="header-title">FYTTSA - Ingeniería, Construcción, Edificación y Remodelación</h1>
+        </div>
+
+        <div class="header-right">
+            <div class="user-initial" id="user-initial">U</div>
+            <img src="https://i.ibb.co/jv9mNxYr/LOGO1.png" alt="Logo" height="35" style="border-radius: 8px;">
+        </div>
+    </header>
+
+    <div class="main-layout">
+        <aside class="sidebar" id="sidebar"></aside>
+
+        <main class="content">
+            <!-- TARJETA INFORMATIVA -->
+            <div class="info-section">
+                <h2 class="info-title">
+                    <i data-lucide="file-text"></i> Reglamento Interno para Residentes de Obra
+                </h2>
+                <div class="info-card">
+                    <h3><i data-lucide="info"></i> Lectura y firma obligatoria</h3>
+                    <p>El presente <strong>Reglamento Interno para Residentes de Obra</strong> es de car&aacute;cter obligatorio para todos los residentes asignados a proyectos de FYTTSA.</p>
+                    <p>Debes <strong>leerlo completo</strong>, <strong>firmarlo electr&oacute;nicamente</strong> al final del documento y <strong>aceptar</strong> los compromisos descritos. Tu nombre y la fecha se capturan autom&aacute;ticamente desde tu sesi&oacute;n.</p>
+                    <p>Al aceptar, el sistema guarda autom&aacute;ticamente: <strong>nombre del firmante</strong>, <strong>firma electr&oacute;nica</strong> (imagen), <strong>fecha y hora de firma</strong>, <strong>versi&oacute;n del reglamento</strong> y un resumen del contenido aceptado, para efectos de auditor&iacute;a.</p>
+                </div>
+            </div>
+
+            <div class="doc-container">
+
+                <p class="doc-company">EL SOLUCIONES CONSTRUCTIVAS Y DURABLES S.A. DE C.V.</p>
+                <h1 class="doc-title">Reglamento Interno para Residentes de Obra</h1>
+                <div class="doc-meta">
+                    <span><b>Empresa:</b> FYTTSA</span>
+                    <span><b>Versión:</b> v1.0</span>
+                    <span><b>Carácter:</b> Obligatorio</span>
+                </div>
+
+                <h2 class="doc-section-title">Declaración de Compromiso</h2>
+                <div class="doc-quote">
+                    Yo, <strong id="quoteName">el residente firmante</strong>, en mi carácter de <strong>Residente de Obra</strong>, me comprometo a cumplir y hacer cumplir el presente reglamento, desempeñando mis funciones con responsabilidad, disciplina, liderazgo y profesionalismo para garantizar la correcta ejecución de los proyectos.
+                </div>
+
+                <h2 class="doc-section-title">Funciones y Responsabilidades del Residente de Obra</h2>
+
+                <h3 class="doc-h3">1. Supervisión y control de obra</h3>
+                <p class="doc-p">El Residente de Obra deberá:</p>
+                <ul class="doc-ul">
+                    <li>Supervisar permanentemente la ejecución de los trabajos.</li>
+                    <li>Verificar cumplimiento de:
+                        <ul>
+                            <li>Planos.</li>
+                            <li>Especificaciones.</li>
+                            <li>Programas de obra.</li>
+                            <li>Alcances autorizados.</li>
+                        </ul>
+                    </li>
+                    <li>Resolver oportunamente dudas y problemas técnicos.</li>
+                    <li>Conocer integralmente el proyecto:
+                        <ul>
+                            <li>Planos.</li>
+                            <li>Procedimientos.</li>
+                            <li>Bitácoras.</li>
+                            <li>Alcances contratados.</li>
+                        </ul>
+                    </li>
+                    <li>Revisar antes de iniciar obra:
+                        <ul>
+                            <li>Planos autorizados.</li>
+                            <li>Catálogo de conceptos.</li>
+                            <li>Programas de ejecución.</li>
+                            <li>Presupuesto y suministros.</li>
+                        </ul>
+                    </li>
+                    <li>Verificar:
+                        <ul>
+                            <li>Niveles.</li>
+                            <li>Plomos.</li>
+                            <li>Alineaciones.</li>
+                            <li>Preparación de colados.</li>
+                        </ul>
+                    </li>
+                    <li>Aplicar controles para evitar desperdicios y errores.</li>
+                    <li>Registrar en bitácora cualquier cambio o modificación antes de ejecutarlo.</li>
+                </ul>
+                <div class="doc-page-marker">Página 1 de 4</div>
+
+                <p class="doc-company">EL SOLUCIONES CONSTRUCTIVAS Y DURABLES S.A. DE C.V.</p>
+
+                <h3 class="doc-h3">2. Administración y operación</h3>
+                <p class="doc-p">El Residente de Obra deberá:</p>
+                <ul class="doc-ul">
+                    <li>Ser el primero en llegar a la obra.</li>
+                    <li>Coordinar al personal en los frentes correctos de trabajo.</li>
+                    <li>Evitar tiempos muertos e improductividad.</li>
+                    <li>Supervisar:
+                        <ul>
+                            <li>Limpieza.</li>
+                            <li>Almacén.</li>
+                            <li>Vigilancia.</li>
+                        </ul>
+                    </li>
+                    <li>Ajustar la cantidad de personal según necesidades de obra.</li>
+                    <li>Garantizar el buen uso de:
+                        <ul>
+                            <li>Herramienta.</li>
+                            <li>Equipo.</li>
+                            <li>Maquinaria.</li>
+                        </ul>
+                    </li>
+                    <li>Verificar limpieza y resguardo de equipo al finalizar jornada.</li>
+                </ul>
+
+                <h3 class="doc-h3">3. Comunicación y seguimiento</h3>
+                <p class="doc-p">El Residente de Obra deberá:</p>
+                <ul class="doc-ul">
+                    <li>Mantener comunicación constante con oficina y equipo operativo.</li>
+                    <li>Confirmar y dar seguimiento a instrucciones y acuerdos.</li>
+                    <li>Reportar avances de obra tres veces al día.</li>
+                    <li>Enviar diariamente:
+                        <ul>
+                            <li>Lista de asistencia.</li>
+                            <li>Evidencia fotográfica.</li>
+                        </ul>
+                    </li>
+                    <li>Reportar:
+                        <ul>
+                            <li>Viajes de material.</li>
+                            <li>Retiros.</li>
+                            <li>Movimientos relevantes.</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h3 class="doc-h3">4. Requisiciones y control financiero</h3>
+                <p class="doc-p">El Residente de Obra deberá:</p>
+                <ul class="doc-ul">
+                    <li>Realizar directamente las requisiciones de material.</li>
+                    <li>Solicitar materiales con mínimo 48 horas de anticipación.</li>
+                    <li>Utilizar caja chica únicamente para gastos menores y urgentes.</li>
+                    <li>Comprobar gastos de caja chica en máximo 3 días.</li>
+                    <li>Revisar y validar:
+                        <ul>
+                            <li>Estimaciones.</li>
+                            <li>Pagos.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <div class="doc-page-marker">Página 2 de 4</div>
+
+                <p class="doc-company">EL SOLUCIONES CONSTRUCTIVAS Y DURABLES S.A. DE C.V.</p>
+
+                <ul class="doc-ul">
+                    <li>Nóminas.</li>
+                    <li>Verificar presupuesto antes de autorizar cambios o gastos adicionales.</li>
+                    <li>Reportar semanalmente un el avance del proyecto asignado, comparando el progreso real contra el programa de obra (proyectado). En caso de existir atrasos o desviaciones, deberá informar las causas que los originan, el impacto esperado en tiempo y costos, así como las acciones correctivas para mitigarlos. Cuando dichas acciones ya estén en marcha, deberá reportar su estatus, responsables y avances hasta su solución.</li>
+                </ul>
+
+                <h3 class="doc-h3">5. Control documental</h3>
+                <p class="doc-p">El Residente de Obra deberá:</p>
+                <ul class="doc-ul">
+                    <li>Mantener desde el inicio:
+                        <ul>
+                            <li>Carpeta de obra.</li>
+                            <li>Planos actualizados.</li>
+                            <li>Documentación técnica.</li>
+                        </ul>
+                    </li>
+                    <li>Mantener actualizados:
+                        <ul>
+                            <li>Reportes.</li>
+                            <li>Bitácoras.</li>
+                            <li>Minutas.</li>
+                            <li>Evidencia fotográfica.</li>
+                            <li>Remisiones y controles de material.</li>
+                        </ul>
+                    </li>
+                    <li>Actualizar documentación durante toda la obra.</li>
+                    <li>Resguardar correctamente la bitácora de obra.</li>
+                    <li>Entregar al cierre:
+                        <ul>
+                            <li>Planos finales.</li>
+                            <li>Manuales.</li>
+                            <li>Garantías.</li>
+                            <li>Documentación de cierre.</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h3 class="doc-h3">6. Seguridad y cumplimiento</h3>
+                <p class="doc-p">El Residente de Obra deberá:</p>
+                <ul class="doc-ul">
+                    <li>Garantizar el cumplimiento de normas de seguridad.</li>
+                    <li>Exigir el uso obligatorio de equipo de protección personal.</li>
+                    <li>Verificar que el personal cuente con:
+                        <ul>
+                            <li>Alta ante IMSS.</li>
+                            <li>Accesos autorizados.</li>
+                            <li>Documentación requerida.</li>
+                        </ul>
+                    </li>
+                    <li>Garantizar presencia del responsable eléctrico en inspecciones especializadas.</li>
+                </ul>
+                <div class="doc-page-marker">Página 3 de 4</div>
+
+                <p class="doc-company">EL SOLUCIONES CONSTRUCTIVAS Y DURABLES S.A. DE C.V.</p>
+
+                <h3 class="doc-h3">7. Desempeño y conducta</h3>
+                <p class="doc-p">El Residente de Obra deberá actuar con:</p>
+                <ul class="doc-ul">
+                    <li>Liderazgo.</li>
+                    <li>Disciplina.</li>
+                    <li>Sentido de urgencia.</li>
+                    <li>Responsabilidad.</li>
+                    <li>Enfoque a resultados.</li>
+                </ul>
+                <p class="doc-p">Teniendo como prioridad:</p>
+                <ul class="doc-ul">
+                    <li>Cumplimiento de programas.</li>
+                    <li>Control de costos.</li>
+                    <li>Calidad de ejecución.</li>
+                    <li>Seguridad.</li>
+                    <li>Productividad continua.</li>
+                </ul>
+                <p class="doc-p">El Residente de Obra es responsable de mantener el orden, la coordinación y un ambiente de trabajo profesional entre todas las personas relacionadas con la obra. Ante cualquier conflicto, deberá actuar con imparcialidad y criterio profesional para su atención y resolución.</p>
+                <div class="doc-info-box">
+                    <b>Cero tolerancia:</b> Existe cero tolerancia a la violencia, amenazas, hostigamiento, discriminación o cualquier falta de respeto. El Residente será responsable de intervenir y dar seguimiento a cualquier situación que afecte la convivencia, seguridad o desempeño del equipo.
+                </div>
+
+                <h3 class="doc-h3">Medidas disciplinarias</h3>
+                <p class="doc-p">El incumplimiento de este reglamento podrá generar:</p>
+                <ul class="doc-ul">
+                    <li>Reportes administrativos.</li>
+                    <li>Sanciones internas.</li>
+                    <li>Suspensión de funciones.</li>
+                    <li>Terminación de la relación laboral o contractual.</li>
+                </ul>
+
+                <h2 class="doc-section-title">Aceptación</h2>
+                <p class="doc-p">Declaro haber leído y comprendido el presente <strong>Reglamento Interno para Residentes de Obra</strong> y me comprometo a cumplirlo. La firma electrónica capturada en este medio tiene la misma validez que una firma autógrafa para los efectos de este documento.</p>
+                <div class="doc-page-marker">Página 4 de 4</div>
+
+                <!-- === BLOQUE DE FIRMA === -->
+                <div class="sign-block" id="signBlock">
+                    <h3><i data-lucide="pen-tool"></i> Firma de Aceptación</h3>
+
+                    <div class="sign-status pending" id="signStatusBox">
+                        <i data-lucide="alert-circle"></i>
+                        <span id="signStatusText">Aún no has firmado este reglamento.</span>
+                    </div>
+
+                    <div class="sign-row">
+                        <div class="sign-field">
+                            <div class="sign-field-label"><i data-lucide="user-check"></i> Nombre del firmante</div>
+                            <div class="sign-field-value loading" id="signerName">Cargando usuario...</div>
+                        </div>
+                        <div class="sign-field">
+                            <div class="sign-field-label"><i data-lucide="calendar"></i> Fecha de firma</div>
+                            <div class="sign-field-value" id="signerDate">—</div>
+                        </div>
+                    </div>
+
+                    <div class="sign-sig-label">
+                        <span>Firma electrónica</span>
+                        <button type="button" class="sign-sig-clear" id="clearSig" disabled>
+                            <i data-lucide="eraser"></i> Borrar firma
+                        </button>
+                    </div>
+                    <div class="sign-sig-wrap" id="sigWrap">
+                        <canvas id="signatureCanvas"></canvas>
+                        <div class="sign-sig-hint" id="sigHint">
+                            <i data-lucide="edit-3"></i>Firma aquí con el mouse o el dedo
+                        </div>
+                    </div>
+
+                    <div class="sign-actions">
+                        <button type="button" class="sign-btn sign-btn-clear" id="declineBtn">
+                            <i data-lucide="log-out"></i> Rechazar y cerrar sesión
+                        </button>
+                        <button type="button" class="sign-btn sign-btn-accept" id="acceptBtn" disabled>
+                            <i data-lucide="check-circle-2"></i> Aceptar y firmar
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast">
+        <div class="toast-icon"><i data-lucide="info"></i></div>
+        <div class="toast-content">
+            <p class="toast-title" id="toastTitle">Título</p>
+            <p class="toast-desc" id="toastDesc">Descripción</p>
+        </div>
+        <button class="toast-close" id="toastClose"><i data-lucide="x"></i></button>
+    </div>
+
+    <script>
+        // 1. MENU
+        fetch('menu.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('sidebar').innerHTML = html;
+                lucide.createIcons();
+                const paginaActual = document.getElementById('link-reglamento') || document.getElementById('link-inicio');
+                if(paginaActual) paginaActual.classList.add('active');
+            })
+            .catch(error => console.error('Error cargando el menú:', error));
+
+        // 2. Hamburguesa
+        document.getElementById('toggle-menu').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('open');
+        });
+
+        // 3. NOMBRE DEL USUARIO (desde localStorage, con fallback a Firebase y Google Sheets)
+        const idUsuario = localStorage.getItem('usuario');
+        let nombreGuardado = localStorage.getItem('nombre');
+
+        function aplicarNombre(nombre) {
+            if (!nombre) return;
+            const limpio = nombre.trim();
+            document.getElementById('user-initial').innerText = limpio.charAt(0).toUpperCase();
+            // Nombre en la caja de bienvenida
+            const welcomeName = document.getElementById('welcome-name');
+            if (welcomeName) welcomeName.innerText = limpio;
+            // Nombre en el bloque de firma
+            const signerName = document.getElementById('signerName');
+            signerName.innerText = limpio;
+            signerName.classList.remove('loading');
+            // Nombre en la declaración de compromiso
+            const quoteName = document.getElementById('quoteName');
+            if (quoteName) quoteName.textContent = limpio;
+            // Habilita el botón si ya hay firma
+            updateAcceptButton();
+        }
+
+        if (nombreGuardado) {
+            aplicarNombre(nombreGuardado);
+        } else if (idUsuario) {
+            const fbScript = document.createElement('script');
+            fbScript.src = "https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js";
+            fbScript.onload = () => {
+                const fbStore = document.createElement('script');
+                fbStore.src = "https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js";
+                fbStore.onload = () => {
+                    const firebaseConfig = {
+                        apiKey: "AIzaSyD9Ihkh0NaP5vVbKntobmVTb53T0yDAZjU",
+                        authDomain: "fyttsa-ae508.firebaseapp.com",
+                        projectId: "fyttsa-ae508",
+                        storageBucket: "fyttsa-ae508.firebasestorage.app",
+                        messagingSenderId: "860564632264",
+                        appId: "1:860564632264:web:30edf5a8f837e284ab2bfd",
+                        measurementId: "G-7PQ1R77YJ3"
+                    };
+                    if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+                    const db = firebase.firestore();
+                    db.collection("usuarios").doc(idUsuario).get().then(doc => {
+                        if (doc.exists && doc.data().nombre) {
+                            aplicarNombre(doc.data().nombre);
+                            localStorage.setItem('nombre', doc.data().nombre);
+                        } else {
+                            buscarEnGoogleSheets(idUsuario);
+                        }
+                    }).catch(() => buscarEnGoogleSheets(idUsuario));
+                };
+                document.head.appendChild(fbStore);
+            };
+            document.head.appendChild(fbScript);
+        }
+
+        function buscarEnGoogleSheets(usuarioId) {
+            const scriptURL = "https://script.google.com/macros/s/AKfycbzXU8zmHurIHSmo4-eZNHxjGM9_XM2qcXyWX1ijILY2s10ZbJBrVe2OQvVxLcNdk40/exec";
+            fetch(scriptURL, {
+                method: 'POST',
+                body: JSON.stringify({ usuario: usuarioId, accion: 'consultarNombre' }),
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+            })
+            .then(r => r.json())
+            .then(res => {
+                if (res.success && res.nombre) {
+                    aplicarNombre(res.nombre);
+                    localStorage.setItem('nombre', res.nombre);
+                }
+            })
+            .catch(err => console.warn('No se pudo obtener el nombre desde Sheets:', err));
+        }
+
+        function cerrarSesion() {
+            localStorage.removeItem('usuario');
+            localStorage.removeItem('privilegio');
+            localStorage.removeItem('nombre');
+            window.location.href = 'index.html';
+        }
+
+        // 4. FECHA ACTUAL en el bloque de firma
+        function setFechaActual() {
+            const ahora = new Date();
+            const opts = { year: 'numeric', month: 'long', day: 'numeric' };
+            const fechaStr = ahora.toLocaleDateString('es-MX', opts) + ' · ' + ahora.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('signerDate').textContent = fechaStr;
+        }
+        setFechaActual();
+        setInterval(setFechaActual, 60000); // refresca cada minuto
+
+        lucide.createIcons();
+
+        // =====================================================
+        // GUARDAR FIRMA EN FIREBASE
+        // =====================================================
+        const REGLAMENTO_VERSION = 'v1.0';
+        const REGLAMENTO_RESUMEN = 'Reglamento Interno para Residentes de Obra - FYTTSA Soluciones Constructivas y Durables S.A. de C.V. Incluye: Declaracion de compromiso y 7 secciones (1. Supervision y control de obra; 2. Administracion y operacion; 3. Comunicacion y seguimiento; 4. Requisiciones y control financiero; 5. Control documental; 6. Seguridad y cumplimiento; 7. Desempeno y conducta), Medidas disciplinarias y Aceptacion. El firmante declara haber leido y comprendido el reglamento y se compromete a cumplirlo.';
+
+        // Estado
+        const state = {
+            hasSignature: false,
+            alreadySigned: false
+        };
+
+        // Referencias
+        const canvas = document.getElementById('signatureCanvas');
+        const sigWrap = document.getElementById('sigWrap');
+        const sigHint = document.getElementById('sigHint');
+        const clearSig = document.getElementById('clearSig');
+        const acceptBtn = document.getElementById('acceptBtn');
+        const declineBtn = document.getElementById('declineBtn');
+        const signerName = document.getElementById('signerName');
+        const signStatusBox = document.getElementById('signStatusBox');
+        const signStatusText = document.getElementById('signStatusText');
+
+        // ===== Toast =====
+        const toast = document.getElementById('toast');
+        const toastTitle = document.getElementById('toastTitle');
+        const toastDesc = document.getElementById('toastDesc');
+        const toastClose = document.getElementById('toastClose');
+        let toastTimer = null;
+
+        function showToast(titulo, descripcion, tipo) {
+            toast.classList.remove('success', 'error');
+            if (tipo === 'success') toast.classList.add('success');
+            else if (tipo === 'error') toast.classList.add('error');
+            toastTitle.textContent = titulo;
+            toastDesc.textContent = descripcion;
+            const iconEl = toast.querySelector('.toast-icon');
+            const iconName = tipo === 'success' ? 'check-circle-2' : (tipo === 'error' ? 'alert-circle' : 'info');
+            iconEl.innerHTML = '<i data-lucide="' + iconName + '"></i>';
+            toast.classList.add('show');
+            if (window.lucide) lucide.createIcons();
+            if (toastTimer) clearTimeout(toastTimer);
+            toastTimer = setTimeout(hideToast, 6000);
+        }
+        function hideToast() { toast.classList.remove('show'); }
+        toastClose.addEventListener('click', hideToast);
+
+        // ===== Canvas =====
+        function initCanvas() {
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+            canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+            ctx.lineWidth = 2.2;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.strokeStyle = '#152B71';
+        }
+
+        function bindEvents(cv) {
+            let drawing = false;
+            let lastX = 0, lastY = 0;
+
+            function getPos(e) {
+                const r = cv.getBoundingClientRect();
+                if (e.touches && e.touches.length > 0) {
+                    return { x: e.touches[0].clientX - r.left, y: e.touches[0].clientY - r.top };
+                }
+                return { x: e.clientX - r.left, y: e.clientY - r.top };
+            }
+
+            function start(e) {
+                e.preventDefault();
+                drawing = true;
+                const p = getPos(e);
+                lastX = p.x; lastY = p.y;
+                if (sigHint) sigHint.style.display = 'none';
+                const ctx = cv.getContext('2d');
+                ctx.beginPath();
+                ctx.moveTo(p.x, p.y);
+                ctx.lineTo(p.x + 0.1, p.y + 0.1);
+                ctx.stroke();
+            }
+
+            function draw(e) {
+                if (!drawing) return;
+                e.preventDefault();
+                const ctx = cv.getContext('2d');
+                const p = getPos(e);
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(p.x, p.y);
+                ctx.stroke();
+                lastX = p.x; lastY = p.y;
+                if (!state.hasSignature) {
+                    state.hasSignature = true;
+                    sigWrap.classList.add('signed');
+                    clearSig.disabled = false;
+                    updateAcceptButton();
+                }
+            }
+
+            function end(e) {
+                if (drawing && e) e.preventDefault();
+                drawing = false;
+            }
+
+            cv.addEventListener('mousedown', start);
+            cv.addEventListener('mousemove', draw);
+            cv.addEventListener('mouseup', end);
+            cv.addEventListener('mouseleave', end);
+            cv.addEventListener('touchstart', start, { passive: false });
+            cv.addEventListener('touchmove', draw, { passive: false });
+            cv.addEventListener('touchend', end, { passive: false });
+            cv.addEventListener('touchcancel', end, { passive: false });
+        }
+
+        function resetSignature() {
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            state.hasSignature = false;
+            sigWrap.classList.remove('signed');
+            if (sigHint) sigHint.style.display = '';
+            clearSig.disabled = true;
+            updateAcceptButton();
+        }
+
+        function updateAcceptButton() {
+            const nombreListo = signerName && signerName.textContent
+                && signerName.textContent !== 'Cargando usuario...'
+                && signerName.textContent !== 'Usuario no identificado';
+            const ready = state.hasSignature && nombreListo && !state.alreadySigned;
+            acceptBtn.disabled = !ready;
+        }
+
+        // ===== Guardado Firebase =====
+        function guardarFirmaFirebase(payload) {
+            return new Promise((resolve, reject) => {
+                const fbScript = document.createElement('script');
+                fbScript.src = "https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js";
+                fbScript.onload = () => {
+                    const fbStore = document.createElement('script');
+                    fbStore.src = "https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js";
+                    fbStore.onload = () => {
+                        try {
+                            const firebaseConfig = {
+                                apiKey: "AIzaSyD9Ihkh0NaP5vVbKntobmVTb53T0yDAZjU",
+                                authDomain: "fyttsa-ae508.firebaseapp.com",
+                                projectId: "fyttsa-ae508",
+                                storageBucket: "fyttsa-ae508.firebasestorage.app",
+                                messagingSenderId: "860564632264",
+                                appId: "1:860564632264:web:30edf5a8f837e284ab2bfd",
+                                measurementId: "G-7PQ1R77YJ3"
+                            };
+                            if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+                            const db = firebase.firestore();
+                            db.collection("firmas_reglamento").add(payload)
+                                .then(docRef => resolve({ id: docRef.id }))
+                                .catch(err => reject(err));
+                        } catch (e) {
+                            reject(e);
+                        }
+                    };
+                    fbStore.onerror = () => reject(new Error('No se pudo cargar firebase-firestore.js'));
+                    document.head.appendChild(fbStore);
+                };
+                fbScript.onerror = () => reject(new Error('No se pudo cargar firebase-app.js'));
+                document.head.appendChild(fbScript);
+            });
+        }
+
+        // Fallback Google Sheets
+        function guardarFirmaSheets(payload) {
+            const scriptURL = "https://script.google.com/macros/s/AKfycbzXU8zmHurIHSmo4-eZNHxjGM9_XM2qcXyWX1ijILY2s10ZbJBrVe2OQvVxLcNdk40/exec";
+            return fetch(scriptURL, {
+                method: 'POST',
+                body: JSON.stringify({ accion: 'guardarFirmaReglamento', payload: payload }),
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+            }).then(r => r.json());
+        }
+
+        function construirPayload() {
+            const ahora = new Date();
+            const firmaDataUrl = canvas.toDataURL('image/png');
+            const nombre = (signerName.textContent || '').trim();
+            const opts = { year: 'numeric', month: 'long', day: 'numeric' };
+            const fechaDisplay = ahora.toLocaleDateString('es-MX', opts) + ' · ' + ahora.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+
+            const payload = {
+                usuario_id: localStorage.getItem('usuario') || '',
+                nombre: nombre,
+                fecha_firma_iso: ahora.toISOString(),
+                fecha_firma_display: fechaDisplay,
+                reglamento_version: REGLAMENTO_VERSION,
+                reglamento_resumen: REGLAMENTO_RESUMEN,
+                firma_data_url: firmaDataUrl,
+                aceptado: true,
+                user_agent: navigator.userAgent
+            };
+            return payload;
+        }
+
+        async function guardarFirma() {
+            const payload = construirPayload();
+            if (!payload.firma_data_url || payload.firma_data_url.length < 200) {
+                throw new Error('La firma no es válida o está vacía.');
+            }
+            if (!payload.nombre || payload.nombre === 'Usuario no identificado') {
+                throw new Error('No se pudo determinar el nombre del usuario.');
+            }
+            try {
+                const result = await guardarFirmaFirebase(payload);
+                return { ok: true, fuente: 'firebase', id: result.id };
+            } catch (fbErr) {
+                console.warn('[FYTTSA Reglamento] Firebase falló, intentando Sheets:', fbErr);
+                try {
+                    const sheetsRes = await guardarFirmaSheets(payload);
+                    if (sheetsRes && sheetsRes.success) {
+                        return { ok: true, fuente: 'sheets', id: sheetsRes.id || null };
+                    }
+                    throw new Error(sheetsRes && sheetsRes.error ? sheetsRes.error : 'Sheets respondió sin success');
+                } catch (shErr) {
+                    console.error('[FYTTSA Reglamento] Sheets también falló:', shErr);
+                    throw new Error('No se pudo guardar en Firebase ni en Sheets: ' + (shErr.message || shErr));
+                }
+            }
+        }
+
+        async function aceptarYFirmar() {
+            if (acceptBtn.disabled || state.alreadySigned) return;
+            acceptBtn.classList.add('saving');
+            acceptBtn.disabled = true;
+            acceptBtn.innerHTML = '<i data-lucide="loader-2" class="spin"></i> Guardando firma...';
+            if (window.lucide) lucide.createIcons();
+
+            try {
+                const result = await guardarFirma();
+                state.alreadySigned = true;
+                showToast(
+                    'Firma registrada con éxito',
+                    'Tu firma se guardó en ' + (result.fuente === 'firebase' ? 'Firebase' : 'Google Sheets') + (result.id ? ' (ID: ' + result.id + ')' : '') + '.',
+                    'success'
+                );
+                // Actualiza estado visible
+                if (signStatusBox) {
+                    signStatusBox.classList.remove('pending');
+                    signStatusBox.classList.add('signed');
+                    signStatusBox.querySelector('i').setAttribute('data-lucide', 'check-circle-2');
+                    if (window.lucide) lucide.createIcons();
+                }
+                if (signStatusText) {
+                    const opts = { year: 'numeric', month: 'long', day: 'numeric' };
+                    const fechaCorta = new Date().toLocaleDateString('es-MX', opts);
+                    signStatusText.textContent = 'Firmaste este reglamento el ' + fechaCorta + '.';
+                }
+                acceptBtn.classList.remove('saving');
+                acceptBtn.classList.add('signed');
+                acceptBtn.innerHTML = '<i data-lucide="check"></i> Reglamento firmado';
+                if (window.lucide) lucide.createIcons();
+                acceptBtn.disabled = true;
+                clearSig.disabled = true;
+            } catch (err) {
+                console.error('[FYTTSA Reglamento] Error al guardar:', err);
+                showToast(
+                    'No se pudo guardar la firma',
+                    (err && err.message ? err.message : 'Intenta de nuevo en unos segundos.'),
+                    'error'
+                );
+                acceptBtn.classList.remove('saving');
+                acceptBtn.disabled = false;
+                acceptBtn.innerHTML = '<i data-lucide="check-circle-2"></i> Aceptar y firmar';
+                if (window.lucide) lucide.createIcons();
+            }
+        }
+
+        // ===== Eventos =====
+        acceptBtn.addEventListener('click', aceptarYFirmar);
+        clearSig.addEventListener('click', resetSignature);
+        declineBtn.addEventListener('click', () => {
+            if (confirm('¿Rechazar el reglamento y cerrar sesión?')) {
+                cerrarSesion();
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            const oldData = canvas.toDataURL();
+            initCanvas();
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0, canvas.clientWidth, canvas.clientHeight);
+            };
+            img.src = oldData;
+        });
+
+        // Inicializa canvas cuando el DOM esté listo
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                initCanvas();
+                bindEvents(canvas);
+            });
+        } else {
+            initCanvas();
+            bindEvents(canvas);
+        }
+    </script>
+</body>
+</html>
