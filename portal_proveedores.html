@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal de Proveedores | FYTTSA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        :root{--primary-blue:#152B71;--light-blue:#eef2ff;--bg-color:#f8fafc;--text-main:#1e293b;--text-muted:#64748b;--border-color:#e2e8f0;--success:#10b981;--warning:#f59e0b;--danger:#ef4444;--info:#3b82f6;--purple:#8b5cf6}
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:'Inter',sans-serif;background:var(--bg-color);display:flex;flex-direction:column;height:100vh;overflow:hidden}
+        .header{display:flex;justify-content:space-between;align-items:center;padding:10px 20px;background:#fff;border-bottom:1px solid var(--border-color);z-index:50;flex-shrink:0}
+        .header-left{display:flex;align-items:center;gap:15px}
+        .menu-btn{background:none;border:none;cursor:pointer;color:var(--text-main);padding:5px}
+        .header-title{margin:0;font-size:15px;font-weight:700;color:var(--primary-blue);display:none}
+        @media(min-width:768px){.header-title{display:block}}
+        .header-right{display:flex;align-items:center;gap:12px}
+        .user-initial{width:35px;height:35px;border-radius:50%;background:var(--primary-blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:16px}
+        .main-layout{display:flex;flex:1;overflow:hidden}
+        .sidebar{width:260px;background:#fff;border-right:1px solid var(--border-color);overflow-y:auto;transition:transform .3s;display:flex;flex-direction:column;flex-shrink:0}
+        @media(max-width:768px){.sidebar{position:fixed;height:calc(100vh - 60px);transform:translateX(-100%);z-index:40}.sidebar.open{transform:translateX(0)}.header-title{display:none}}
+        .sidebar-nav{padding:15px 10px}.sidebar-section{margin-bottom:15px;padding-bottom:10px;border-bottom:1px solid var(--border-color)}.sidebar-section:last-child{border-bottom:none}
+        .sidebar .section-title{font-size:11px;font-weight:800;color:var(--text-muted);text-transform:uppercase;margin:10px 15px;display:block}
+        .nav-item{display:flex;align-items:center;gap:12px;padding:10px 15px;color:var(--text-main);text-decoration:none;font-size:14px;font-weight:500;border-radius:10px;margin-bottom:2px;transition:.2s}
+        .nav-item:hover{background:var(--bg-color)}.nav-item.active{background:var(--light-blue);color:var(--primary-blue);font-weight:700;border-left:4px solid var(--primary-blue)}
+        .content{flex:1;padding:30px;overflow-y:auto}
+        @media(max-width:768px){.content{padding:20px}}
+        .page-title{display:flex;align-items:center;gap:12px;font-size:22px;font-weight:800;color:var(--primary-blue);margin-bottom:8px}
+        .page-title i{width:28px;height:28px}
+        .page-subtitle{color:var(--text-muted);font-size:13px;margin-bottom:25px}
+
+        /* Selector de proveedor */
+        .prov-selector{background:#fff;border-radius:20px;padding:24px;border:1px solid var(--border-color);box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:20px}
+        .prov-selector-row{display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap}
+        .form-group{display:flex;flex-direction:column;flex:1;min-width:250px}
+        .form-label{font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
+        .form-control{padding:12px 14px;border:1.5px solid var(--border-color);border-radius:10px;font-size:14px;font-family:'Inter',sans-serif;color:var(--text-main);background:#fff;transition:.2s;width:100%}
+        .form-control:focus{outline:none;border-color:var(--primary-blue);box-shadow:0 0 0 3px rgba(21,43,113,.1)}
+        .btn{padding:12px 22px;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:8px;border:none;font-family:'Inter',sans-serif}
+        .btn i{width:16px;height:16px}
+        .btn-primary{background:var(--primary-blue);color:#fff}
+        .btn-primary:hover{background:#1e40af;transform:translateY(-1px)}
+
+        /* KPIs */
+        .summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px}
+        .summary-card{background:#fff;border-radius:16px;padding:16px 18px;border:1px solid var(--border-color);border-left:5px solid var(--primary-blue);display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,.03)}
+        .summary-card.success{border-left-color:var(--success)}.summary-card.info{border-left-color:var(--info)}.summary-card.purple{border-left-color:var(--purple)}
+        .summary-icon{width:40px;height:40px;border-radius:12px;background:var(--light-blue);color:var(--primary-blue);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .summary-card.success .summary-icon{background:#dcfce7;color:var(--success)}
+        .summary-card.info .summary-icon{background:#dbeafe;color:var(--info)}
+        .summary-card.purple .summary-icon{background:#ede9fe;color:var(--purple)}
+        .summary-icon i{width:22px;height:22px}
+        .summary-info{display:flex;flex-direction:column;min-width:0;flex:1}
+        .summary-value{font-size:18px;font-weight:800;color:var(--text-main);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .summary-label{font-size:11px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.3px;margin-top:2px}
+
+        /* Filtros */
+        .filters-bar{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:18px;padding:16px;background:var(--bg-color);border-radius:12px;border:1px solid var(--border-color)}
+        .filter-group{display:flex;flex-direction:column;gap:4px;flex:1;min-width:140px}
+        .filter-label{font-size:10px;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px}
+        .filter-input,.filter-select{padding:9px 12px;border:1.5px solid var(--border-color);border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text-main);background:#fff;transition:.2s;width:100%}
+        .filter-input:focus,.filter-select:focus{outline:none;border-color:var(--primary-blue);box-shadow:0 0 0 3px rgba(21,43,113,.1)}
+
+        /* Tabla */
+        .card{background:#fff;border-radius:20px;padding:24px;border:1px solid var(--border-color);box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:20px}
+        .card-title{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:var(--text-main);margin-bottom:18px;padding-bottom:12px;border-bottom:2px solid var(--light-blue)}
+        .card-title i{color:var(--primary-blue);width:20px;height:20px}
+        .card-title .badge-count{margin-left:auto;background:var(--light-blue);color:var(--primary-blue);font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px}
+        .table-wrap{overflow-x:auto;border:1.5px solid var(--border-color);border-radius:14px;background:#fff}
+        .data-table{width:100%;border-collapse:collapse;font-size:12px;min-width:900px}
+        .data-table thead th{background:var(--primary-blue);color:#fff;text-transform:uppercase;font-size:10px;font-weight:800;padding:10px 8px;text-align:left;border-right:1px solid rgba(255,255,255,.15);letter-spacing:.4px;position:sticky;top:0;z-index:2;white-space:nowrap}
+        .data-table thead th:last-child{border-right:none}
+        .data-table thead th.center{text-align:center}.data-table thead th.right{text-align:right}
+        .data-table tbody td{padding:8px;border-bottom:1px solid var(--bg-color);border-right:1px solid var(--bg-color);vertical-align:middle}
+        .data-table tbody td:last-child{border-right:none}
+        .data-table tbody tr:last-child td{border-bottom:none}
+        .data-table tbody tr:hover{background:var(--bg-color)}
+        .amount-cell{font-weight:700;text-align:right;color:var(--primary-blue)}
+        .empty-row{text-align:center;color:var(--text-muted);font-style:italic;padding:24px!important}
+        .cat-row td{background:var(--light-blue);font-weight:800;color:var(--primary-blue);font-size:11px;text-transform:uppercase;padding:8px}
+        .toast{position:fixed;top:20px;right:20px;background:var(--text-main);color:#fff;padding:14px 20px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.2);z-index:9999;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;transform:translateX(120%);transition:transform .3s ease}
+        .toast.show{transform:translateX(0)}.toast.success{background:var(--success)}.toast.error{background:var(--danger)}.toast.info{background:var(--info)}
+        .toast i{width:18px;height:18px}
+        .info-banner{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--light-blue);border:1px solid #c7d2fe;border-radius:12px;margin-bottom:16px;font-size:13px;color:var(--primary-blue);font-weight:600}
+        .info-banner i{width:18px;height:18px;flex-shrink:0}
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <button class="menu-btn" id="toggle-menu"><i data-lucide="menu"></i></button>
+            <img src="https://i.ibb.co/fdMsnKTg/LOGO2.png" alt="Logo" height="35">
+            <h1 class="header-title">FYTTSA - Portal de Proveedores</h1>
+        </div>
+        <div class="header-right">
+            <div class="user-initial" id="user-initial">P</div>
+            <img src="https://i.ibb.co/jv9mNxYr/LOGO1.png" alt="Logo" height="35" style="border-radius:8px">
+        </div>
+    </header>
+    <div class="main-layout">
+        <aside class="sidebar" id="sidebar"></aside>
+        <main class="content">
+            <h1 class="page-title"><i data-lucide="truck"></i> Portal de Proveedores</h1>
+            <p class="page-subtitle">Consulta los conceptos del presupuesto que te han sido asignados.</p>
+
+            <!-- Selector de proveedor -->
+            <div class="prov-selector">
+                <div class="prov-selector-row">
+                    <div class="form-group">
+                        <label class="form-label">Selecciona tu empresa</label>
+                        <select class="form-control" id="select-proveedor">
+                            <option value="">— Selecciona tu proveedor —</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" id="btn-consultar"><i data-lucide="search"></i> Consultar</button>
+                </div>
+            </div>
+
+            <!-- Resultado -->
+            <div id="result-section" style="display:none">
+                <div class="info-banner" id="info-proveedor">
+                    <i data-lucide="info"></i>
+                    <span id="info-proveedor-text">—</span>
+                </div>
+
+                <!-- KPIs -->
+                <div class="summary-grid" id="kpi-grid"></div>
+
+                <!-- Tabla de conceptos -->
+                <div class="card">
+                    <h3 class="card-title"><i data-lucide="clipboard-list"></i> Conceptos Asignados <span class="badge-count" id="count-conceptos">0</span></h3>
+                    <div class="filters-bar">
+                        <div class="filter-group" style="flex:2"><label class="filter-label">Buscar</label><input type="text" class="filter-input" id="filter-buscar" placeholder="Código, concepto..."></div>
+                        <div class="filter-group"><label class="filter-label">Categoría</label><select class="filter-select" id="filter-categoria"><option value="">Todas</option></select></div>
+                    </div>
+                    <div class="table-wrap">
+                        <table class="data-table" id="table-conceptos">
+                            <thead><tr>
+                                <th class="center" style="width:36px">#</th>
+                                <th>Código</th><th>Concepto</th><th class="center">Unidad</th>
+                                <th class="right">Cant. Asignada</th><th class="right">P.U.</th>
+                                <th class="right">Importe</th><th class="center">% del Concepto</th>
+                            </tr></thead>
+                            <tbody id="tbody-conceptos"><tr><td colspan="8" class="empty-row">Sin conceptos asignados.</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Resumen por categoría -->
+                <div class="card">
+                    <h3 class="card-title"><i data-lucide="layers"></i> Resumen por Categoría</h3>
+                    <div class="table-wrap">
+                        <table class="data-table">
+                            <thead><tr><th>Categoría</th><th class="center">Conceptos</th><th class="right">Cantidad</th><th class="right">Importe Total</th><th class="right">% de tu Asignación</th></tr></thead>
+                            <tbody id="tbody-cat"><tr><td colspan="5" class="empty-row">Sin datos.</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <div class="toast" id="toast"><i data-lucide="check-circle"></i><span id="toast-msg">Mensaje</span></div>
+    <script>
+        // MENU
+        fetch('menu.html').then(r=>r.text()).then(h=>{document.getElementById('sidebar').innerHTML=h;lucide.createIcons();const l=document.getElementById('link-portal-proveedores');if(l)l.classList.add('active')}).catch(e=>console.error(e));
+        document.getElementById('toggle-menu').addEventListener('click',()=>document.getElementById('sidebar').classList.toggle('open'));
+
+        // HELPERS
+        function esc(s){if(s===null||s===undefined)return'';return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c])}
+        function fmtC(n){return'$'+(n||0).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2})}
+        function fmtN(n){return(n||0).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2})}
+        function toast(m,t='success'){const el=document.getElementById('toast');const ic=t==='success'?'check-circle':t==='error'?'alert-circle':'info';el.innerHTML=`<i data-lucide="${ic}"></i><span>${esc(m)}</span>`;el.className='toast '+t;lucide.createIcons();el.classList.add('show');clearTimeout(window._tt);window._tt=setTimeout(()=>el.classList.remove('show'),3500)}
+
+        // DATA (shared with presupuesto_obra.html)
+        const BUDGET_KEY='fyttsa_presupuesto_items',PROV_KEY='fyttsa_proveedores';
+        let items=[],proveedores=[],selectedProvId='';
+
+        function loadAll(){try{items=JSON.parse(localStorage.getItem(BUDGET_KEY)||'[]')}catch(e){items=[]}try{proveedores=JSON.parse(localStorage.getItem(PROV_KEY)||'[]')}catch(e){proveedores=[]}}
+
+        function fillProvSelect(){
+            const sel=document.getElementById('select-proveedor');
+            sel.innerHTML='<option value="">— Selecciona tu proveedor —</option>'+proveedores.map(p=>`<option value="${p.id}">${esc(p.nombre)}</option>`).join('');
+            if(selectedProvId)sel.value=selectedProvId
+        }
+
+        document.getElementById('btn-consultar').addEventListener('click',()=>{
+            const sel=document.getElementById('select-proveedor');selectedProvId=sel.value;
+            if(!selectedProvId){toast('Selecciona tu empresa primero','error');return}
+            const prov=proveedores.find(p=>p.id===selectedProvId);
+            if(!prov){toast('Proveedor no encontrado','error');return}
+            document.getElementById('user-initial').textContent=prov.nombre.charAt(0).toUpperCase();
+            document.getElementById('result-section').style.display='block';
+            document.getElementById('info-proveedor-text').innerHTML=`<strong>${esc(prov.nombre)}</strong> — ${esc(prov.contacto||'Sin contacto')} | ${esc(prov.telefono||'Sin teléfono')} | ${esc(prov.correo||'Sin correo')}`;
+            renderConceptos();renderCats();renderKPIs(prov);
+            toast(`Bienvenido, ${prov.nombre}`,'success');
+            document.getElementById('result-section').scrollIntoView({behavior:'smooth'})
+        });
+
+        function getMyConceptos(){
+            return items.filter(it=>(it.asignaciones||[]).some(a=>a.proveedorId===selectedProvId)).map(it=>{
+                const asig=it.asignaciones.find(a=>a.proveedorId===selectedProvId);
+                return{...it,miCantidad:asig.cantidad||0,miImporte:asig.importe||0,miPct:it.importe>0?((asig.importe||0)/it.importe*100):0}
+            })
+        }
+
+        function renderKPIs(prov){
+            const mine=getMyConceptos();const totalImporte=mine.reduce((a,i)=>a+i.miImporte,0);const totalCant=mine.reduce((a,i)=>a+i.miCantidad,0);const cats=new Set(mine.map(i=>i.categoria)).size;
+            document.getElementById('kpi-grid').innerHTML=`
+                <div class="summary-card"><div class="summary-icon"><i data-lucide="clipboard-list"></i></div><div class="summary-info"><span class="summary-value">${mine.length}</span><span class="summary-label">Conceptos Asignados</span></div></div>
+                <div class="summary-card success"><div class="summary-icon"><i data-lucide="dollar-sign"></i></div><div class="summary-info"><span class="summary-value">${fmtC(totalImporte)}</span><span class="summary-label">Importe Total</span></div></div>
+                <div class="summary-card info"><div class="summary-icon"><i data-lucide="layers"></i></div><div class="summary-info"><span class="summary-value">${fmtN(totalCant)}</span><span class="summary-label">Cantidad Total</span></div></div>
+                <div class="summary-card purple"><div class="summary-icon"><i data-lucide="tags"></i></div><div class="summary-info"><span class="summary-value">${cats}</span><span class="summary-label">Categorías</span></div></div>`;
+            lucide.createIcons()
+        }
+
+        function renderConceptos(){
+            const tb=document.getElementById('tbody-conceptos');
+            const bus=document.getElementById('filter-buscar').value.toLowerCase().trim();const cat=document.getElementById('filter-categoria').value;
+            let mine=getMyConceptos();
+            const cats=[...new Set(mine.map(i=>i.categoria))].sort();const sel=document.getElementById('filter-categoria');const cv=sel.value;sel.innerHTML='<option value="">Todas</option>'+cats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');sel.value=cv;
+            if(bus)mine=mine.filter(i=>(i.codigo+' '+i.concepto+' '+i.categoria).toLowerCase().includes(bus));
+            if(cat)mine=mine.filter(i=>i.categoria===cat);
+            document.getElementById('count-conceptos').textContent=mine.length;
+            if(!mine.length){tb.innerHTML='<tr><td colspan="8" class="empty-row">No tienes conceptos asignados con estos filtros.</td></tr>';return}
+            let html='',n=0,lastCat='';mine.forEach(it=>{
+                if(it.categoria!==lastCat){lastCat=it.categoria;html+=`<tr class="cat-row"><td colspan="8">${esc(it.categoria)}</td></tr>`}
+                n++;const barColor=it.miPct>=99.5?'var(--success)':it.miPct>=50?'var(--info)':'var(--warning)';
+                html+=`<tr><td style="text-align:center;font-weight:700;color:var(--text-muted)">${n}</td><td style="font-family:'Courier New',monospace;font-weight:700;color:var(--primary-blue);font-size:11px">${esc(it.codigo)}</td><td style="font-weight:500">${esc(it.concepto)}</td><td style="text-align:center;font-size:11px">${esc(it.unidad)}</td><td class="amount-cell">${fmtN(it.miCantidad)}</td><td class="amount-cell" style="color:var(--text-muted)">${fmtC(it.precioUnitario)}</td><td class="amount-cell">${fmtC(it.miImporte)}</td><td style="text-align:center"><div style="display:inline-flex;align-items:center;gap:6px"><div style="width:50px;height:6px;background:var(--bg-color);border-radius:3px;overflow:hidden"><div style="height:100%;width:${it.miPct}%;background:${barColor};border-radius:3px"></div></div><span style="font-weight:800;font-size:11px">${it.miPct.toFixed(1)}%</span></div></td></tr>`
+            });
+            // Total
+            const totalImp=mine.reduce((a,i)=>a+i.miImporte,0);const totalCant=mine.reduce((a,i)=>a+i.miCantidad,0);
+            html+=`<tr style="background:var(--light-blue);font-weight:800"><td colspan="4" style="color:var(--primary-blue);padding:14px 8px">TOTAL (${mine.length} conceptos)</td><td class="amount-cell" style="color:var(--primary-blue)">${fmtN(totalCant)}</td><td></td><td class="amount-cell" style="color:var(--primary-blue)">${fmtC(totalImp)}</td><td></td></tr>`;
+            tb.innerHTML=html
+        }
+        document.getElementById('filter-buscar').addEventListener('input',renderConceptos);
+        document.getElementById('filter-categoria').addEventListener('change',renderConceptos);
+
+        function renderCats(){
+            const mine=getMyConceptos();const tb=document.getElementById('tbody-cat');
+            const porCat={};mine.forEach(it=>{if(!porCat[it.categoria])porCat[it.categoria]={count:0,cantidad:0,importe:0};porCat[it.categoria].count++;porCat[it.categoria].cantidad+=it.miCantidad;porCat[it.categoria].importe+=it.miImporte});
+            const cats=Object.entries(porCat).sort((a,b)=>b[1].importe-a[1].importe);const total=cats.reduce((a,[,p])=>a+p.importe,0);
+            if(!cats.length){tb.innerHTML='<tr><td colspan="5" class="empty-row">Sin datos.</td></tr>';return}
+            tb.innerHTML=cats.map(([cat,p])=>{const pct=total>0?(p.importe/total*100).toFixed(1):'0.0';return `<tr><td style="font-weight:700;color:var(--primary-blue)">${esc(cat)}</td><td style="text-align:center">${p.count}</td><td class="amount-cell">${fmtN(p.cantidad)}</td><td class="amount-cell">${fmtC(p.importe)}</td><td style="text-align:right;font-weight:800">${pct}%</td></tr>`}).join('')+
+                `<tr style="background:var(--light-blue);font-weight:800"><td style="color:var(--primary-blue);padding:14px 12px">TOTAL (${cats.length} categorías)</td><td style="text-align:center;color:var(--primary-blue)">${cats.reduce((a,[,p])=>a+p.count,0)}</td><td class="amount-cell" style="color:var(--primary-blue)">${fmtN(cats.reduce((a,[,p])=>a+p.cantidad,0))}</td><td class="amount-cell" style="color:var(--primary-blue)">${fmtC(total)}</td><td style="text-align:right;color:var(--primary-blue)">100.0%</td></tr>`
+        }
+
+        loadAll();fillProvSelect();lucide.createIcons();
+    </script>
+</body>
+</html>
