@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presupuesto de Obra | FYTTSA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        :root {
+            --primary-blue: #152B71; --light-blue: #eef2ff; --bg-color: #f8fafc;
+            --text-main: #1e293b; --text-muted: #64748b; --border-color: #e2e8f0;
+            --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --info: #3b82f6; --purple: #8b5cf6;
+        }
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:'Inter',sans-serif;background:var(--bg-color);display:flex;flex-direction:column;height:100vh;overflow:hidden}
+        .header{display:flex;justify-content:space-between;align-items:center;padding:10px 20px;background:#fff;border-bottom:1px solid var(--border-color);z-index:50;flex-shrink:0}
+        .header-left{display:flex;align-items:center;gap:15px}
+        .menu-btn{background:none;border:none;cursor:pointer;color:var(--text-main);padding:5px}
+        .header-title{margin:0;font-size:15px;font-weight:700;color:var(--primary-blue);display:none}
+        @media(min-width:768px){.header-title{display:block}}
+        .header-right{display:flex;align-items:center;gap:12px}
+        .user-initial{width:35px;height:35px;border-radius:50%;background:var(--primary-blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:16px}
+        .main-layout{display:flex;flex:1;overflow:hidden}
+        .sidebar{width:260px;background:#fff;border-right:1px solid var(--border-color);overflow-y:auto;transition:transform .3s;display:flex;flex-direction:column;flex-shrink:0}
+        @media(max-width:768px){.sidebar{position:fixed;height:calc(100vh - 60px);transform:translateX(-100%);z-index:40}.sidebar.open{transform:translateX(0)}.header-title{display:none}}
+        .sidebar-nav{padding:15px 10px}
+        .sidebar-section{margin-bottom:15px;padding-bottom:10px;border-bottom:1px solid var(--border-color)}
+        .sidebar-section:last-child{border-bottom:none}
+        .sidebar .section-title{font-size:11px;font-weight:800;color:var(--text-muted);text-transform:uppercase;margin:10px 15px;display:block}
+        .nav-item{display:flex;align-items:center;gap:12px;padding:10px 15px;color:var(--text-main);text-decoration:none;font-size:14px;font-weight:500;border-radius:10px;margin-bottom:2px;transition:.2s}
+        .nav-item:hover{background:var(--bg-color)}
+        .nav-item.active{background:var(--light-blue);color:var(--primary-blue);font-weight:700;border-left:4px solid var(--primary-blue)}
+        .content{flex:1;padding:30px;overflow-y:auto}
+        @media(max-width:768px){.content{padding:20px}}
+        .page-title{display:flex;align-items:center;gap:12px;font-size:22px;font-weight:800;color:var(--primary-blue);margin-bottom:8px}
+        .page-title i{width:28px;height:28px}
+        .page-subtitle{color:var(--text-muted);font-size:13px;margin-bottom:25px}
+        .tabs-bar{display:flex;gap:8px;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--border-color);flex-wrap:wrap}
+        .tab-btn{background:var(--bg-color);border:1.5px solid var(--border-color);color:var(--text-muted);padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;border-radius:10px;display:inline-flex;align-items:center;gap:8px;transition:.2s;font-family:'Inter',sans-serif}
+        .tab-btn:hover{background:#fff;color:var(--text-main);border-color:var(--primary-blue)}
+        .tab-btn.active{background:var(--primary-blue);color:#fff;border-color:var(--primary-blue);box-shadow:0 4px 12px rgba(21,43,113,.25)}
+        .tab-btn i{width:16px;height:16px}
+        .tab-content{display:none}
+        .tab-content.active{display:block;animation:fadeIn .25s ease}
+        @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+        .card{background:#fff;border-radius:20px;padding:24px;border:1px solid var(--border-color);box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:20px}
+        .card-title{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:var(--text-main);margin-bottom:18px;padding-bottom:12px;border-bottom:2px solid var(--light-blue)}
+        .card-title i{color:var(--primary-blue);width:20px;height:20px}
+        .card-title .badge-count{margin-left:auto;background:var(--light-blue);color:var(--primary-blue);font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px}
+        .summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px}
+        .summary-card{background:#fff;border-radius:16px;padding:16px 18px;border:1px solid var(--border-color);border-left:5px solid var(--primary-blue);display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,.03)}
+        .summary-card.success{border-left-color:var(--success)}
+        .summary-card.warning{border-left-color:var(--warning)}
+        .summary-card.info{border-left-color:var(--info)}
+        .summary-card.purple{border-left-color:var(--purple)}
+        .summary-icon{width:40px;height:40px;border-radius:12px;background:var(--light-blue);color:var(--primary-blue);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .summary-card.success .summary-icon{background:#dcfce7;color:var(--success)}
+        .summary-card.warning .summary-icon{background:#fef3c7;color:var(--warning)}
+        .summary-card.info .summary-icon{background:#dbeafe;color:var(--info)}
+        .summary-card.purple .summary-icon{background:#ede9fe;color:var(--purple)}
+        .summary-icon i{width:22px;height:22px}
+        .summary-info{display:flex;flex-direction:column;min-width:0;flex:1}
+        .summary-value{font-size:18px;font-weight:800;color:var(--text-main);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .summary-label{font-size:11px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.3px;margin-top:2px}
+        .filters-bar{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:18px;padding:16px;background:var(--bg-color);border-radius:12px;border:1px solid var(--border-color)}
+        .filter-group{display:flex;flex-direction:column;gap:4px;flex:1;min-width:140px}
+        .filter-label{font-size:10px;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px}
+        .filter-input,.filter-select{padding:9px 12px;border:1.5px solid var(--border-color);border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text-main);background:#fff;transition:.2s;width:100%}
+        .filter-input:focus,.filter-select:focus{outline:none;border-color:var(--primary-blue);box-shadow:0 0 0 3px rgba(21,43,113,.1)}
+        .btn-filter{background:var(--primary-blue);color:#fff;border:none;padding:10px 18px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:.2s;font-family:'Inter',sans-serif;height:40px}
+        .btn-filter:hover{background:#1e40af}
+        .btn-filter i{width:14px;height:14px}
+        .table-wrap{overflow-x:auto;border:1.5px solid var(--border-color);border-radius:14px;background:#fff}
+        .expense-table{width:100%;border-collapse:collapse;font-size:12px;min-width:1200px}
+        .expense-table thead th{background:var(--primary-blue);color:#fff;text-transform:uppercase;font-size:10px;font-weight:800;padding:10px 8px;text-align:left;border-right:1px solid rgba(255,255,255,.15);letter-spacing:.4px;position:sticky;top:0;z-index:2;white-space:nowrap}
+        .expense-table thead th:last-child{border-right:none}
+        .expense-table thead th.center{text-align:center}
+        .expense-table thead th.right{text-align:right}
+        .expense-table tbody td{padding:8px;border-bottom:1px solid var(--bg-color);border-right:1px solid var(--bg-color);vertical-align:middle}
+        .expense-table tbody td:last-child{border-right:none}
+        .expense-table tbody tr:last-child td{border-bottom:none}
+        .expense-table tbody tr:hover{background:var(--bg-color)}
+        .row-num{text-align:center;font-weight:700;color:var(--text-muted);background:var(--bg-color);width:36px}
+        .cat-row td{background:var(--light-blue);font-weight:800;color:var(--primary-blue);font-size:11px;text-transform:uppercase;padding:8px}
+        .amount-cell{font-weight:700;text-align:right;color:var(--primary-blue)}
+        .empty-row{text-align:center;color:var(--text-muted);font-style:italic;padding:24px!important}
+        .btn{padding:11px 18px;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:8px;border:none;font-family:'Inter',sans-serif}
+        .btn i{width:16px;height:16px}
+        .btn-primary{background:var(--primary-blue);color:#fff}
+        .btn-primary:hover{background:#1e40af;transform:translateY(-1px)}
+        .btn-secondary{background:#fff;color:var(--primary-blue);border:1.5px solid var(--border-color)}
+        .btn-secondary:hover{background:var(--light-blue);border-color:var(--primary-blue)}
+        .btn-success{background:var(--success);color:#fff}
+        .btn-success:hover{background:#059669}
+        .btn-danger{background:#fff;color:var(--danger);border:1.5px solid #fecaca}
+        .btn-danger:hover{background:var(--danger);color:#fff}
+        .actions-bar{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
+        .actions-bar .left{margin-right:auto}
+        .btn-table-action{border:none;cursor:pointer;width:28px;height:28px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;transition:.15s;margin:0 2px}
+        .btn-table-action i{width:14px;height:14px}
+        .btn-assign{background:#dbeafe;color:var(--info)}
+        .btn-assign:hover{background:var(--info);color:#fff}
+        .btn-table-edit{background:#dcfce7;color:var(--success)}
+        .btn-table-edit:hover{background:var(--success);color:#fff}
+        .btn-table-delete{background:#fee2e2;color:var(--danger)}
+        .btn-table-delete:hover{background:var(--danger);color:#fff}
+        .assign-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:4px;font-size:9px;font-weight:800;text-transform:uppercase}
+        .assign-badge.full{background:#dcfce7;color:#166534}
+        .assign-badge.partial{background:#fef3c7;color:#92400e}
+        .assign-badge.none{background:#f1f5f9;color:var(--text-muted)}
+        .progress-mini{height:6px;background:var(--bg-color);border-radius:3px;overflow:hidden;width:60px;display:inline-block;vertical-align:middle;margin-right:4px}
+        .progress-mini-fill{height:100%;border-radius:3px;transition:width .5s}
+        .toast{position:fixed;top:20px;right:20px;background:var(--text-main);color:#fff;padding:14px 20px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.2);z-index:9999;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;transform:translateX(120%);transition:transform .3s ease}
+        .toast.show{transform:translateX(0)}
+        .toast.success{background:var(--success)}
+        .toast.error{background:var(--danger)}
+        .toast.info{background:var(--info)}
+        .toast i{width:18px;height:18px}
+        .modal-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.82);backdrop-filter:blur(6px);z-index:2000;align-items:center;justify-content:center;padding:16px}
+        .modal-overlay.show{display:flex}
+        .modal-box{background:#fff;border-radius:20px;width:100%;max-width:680px;padding:24px;box-shadow:0 30px 70px rgba(0,0,0,.4);animation:slideIn .3s cubic-bezier(.2,.8,.3,1);max-height:90vh;overflow-y:auto}
+        @keyframes slideIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+        .modal-header{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:14px;border-bottom:2px solid var(--light-blue)}
+        .modal-icon{width:44px;height:44px;border-radius:12px;background:var(--light-blue);color:var(--primary-blue);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .modal-icon i{width:24px;height:24px}
+        .modal-title{font-size:16px;font-weight:800;color:var(--text-main)}
+        .modal-subtitle{font-size:12px;color:var(--text-muted);margin-top:2px}
+        .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+        .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+        .form-group{display:flex;flex-direction:column}
+        .form-group.full{grid-column:1/-1}
+        .form-label{font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
+        .form-label .req{color:var(--danger)}
+        .form-control{padding:10px 12px;border:1.5px solid var(--border-color);border-radius:10px;font-size:13.5px;font-family:'Inter',sans-serif;color:var(--text-main);background:#fff;transition:.2s;width:100%}
+        .form-control:focus{outline:none;border-color:var(--primary-blue);box-shadow:0 0 0 3px rgba(21,43,113,.1)}
+        .file-upload-zone{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;border:2px dashed var(--border-color);border-radius:16px;background:var(--bg-color);cursor:pointer;transition:.2s;text-align:center;min-height:180px}
+        .file-upload-zone:hover{border-color:var(--primary-blue);background:var(--light-blue)}
+        .file-upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+        .assign-row{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:10px;align-items:end;padding:10px;background:var(--bg-color);border-radius:10px;margin-bottom:8px}
+        .assign-row .form-group{margin:0}
+        .assign-progress{margin-top:14px;padding:12px;background:var(--light-blue);border-radius:10px}
+        .assign-progress-bar{height:10px;background:#fff;border-radius:5px;overflow:hidden;margin-top:6px}
+        .assign-progress-fill{height:100%;border-radius:5px;transition:width .5s}
+        .btn-remove-assign{background:#fee2e2;color:var(--danger);border:none;cursor:pointer;width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:.15s}
+        .btn-remove-assign:hover{background:var(--danger);color:#fff}
+        .btn-remove-assign i{width:14px;height:14px}
+        .data-table{width:100%;border-collapse:collapse;font-size:12.5px}
+        .data-table th{background:var(--bg-color);color:var(--text-muted);text-transform:uppercase;font-size:10.5px;font-weight:800;padding:11px 12px;text-align:left;border-bottom:2px solid var(--border-color);letter-spacing:.4px}
+        .data-table td{padding:11px 12px;border-bottom:1px solid var(--bg-color);color:var(--text-main);font-weight:500}
+        .data-table tbody tr:last-child td{border-bottom:none}
+        .data-table tbody tr:hover{background:var(--bg-color)}
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <button class="menu-btn" id="toggle-menu"><i data-lucide="menu"></i></button>
+            <img src="https://i.ibb.co/fdMsnKTg/LOGO2.png" alt="Logo" height="35">
+            <h1 class="header-title">FYTTSA - Presupuesto de Obra</h1>
+        </div>
+        <div class="header-right">
+            <div class="user-initial" id="user-initial">U</div>
+            <img src="https://i.ibb.co/jv9mNxYr/LOGO1.png" alt="Logo" height="35" style="border-radius:8px">
+        </div>
+    </header>
+    <div class="main-layout">
+        <aside class="sidebar" id="sidebar"></aside>
+        <main class="content">
+            <h1 class="page-title"><i data-lucide="file-spreadsheet"></i> Presupuesto de Obra</h1>
+            <p class="page-subtitle">Gestiona el presupuesto contratado vs ejecutado y asigna proveedores por partida.</p>
+            <div class="tabs-bar">
+                <button class="tab-btn active" data-tab="presupuesto"><i data-lucide="clipboard-list"></i> Presupuesto</button>
+                <button class="tab-btn" data-tab="proveedores"><i data-lucide="users"></i> Proveedores</button>
+                <button class="tab-btn" data-tab="asignaciones"><i data-lucide="git-branch"></i> Asignaciones</button>
+            </div>
+
+            <!-- TAB PRESUPUESTO -->
+            <div class="tab-content active" id="content-presupuesto">
+                <div class="summary-grid" id="kpi-grid"></div>
+                <div class="card">
+                    <h3 class="card-title"><i data-lucide="search"></i> Partidas del Presupuesto <span class="badge-count" id="count-items">0</span></h3>
+                    <div class="filters-bar">
+                        <div class="filter-group"><label class="filter-label">Buscar</label><input type="text" class="filter-input" id="filter-buscar" placeholder="Código, concepto..."></div>
+                        <div class="filter-group"><label class="filter-label">Categoría</label><select class="filter-select" id="filter-categoria"><option value="">Todas</option></select></div>
+                        <div class="filter-group"><label class="filter-label">Asignación</label><select class="filter-select" id="filter-asignacion"><option value="">Todas</option><option value="completa">Completas</option><option value="parcial">Parciales</option><option value="sin">Sin asignar</option></select></div>
+                        <div class="filter-group" style="flex:0 0 auto"><label class="filter-label">&nbsp;</label><button class="btn-filter" id="btn-limpiar"><i data-lucide="refresh-cw"></i> Limpiar</button></div>
+                    </div>
+                    <div class="table-wrap">
+                        <table class="expense-table" id="table-presupuesto">
+                            <thead><tr>
+                                <th class="center" style="width:36px">#</th>
+                                <th>Código</th><th>Concepto</th><th class="center">Unidad</th>
+                                <th class="right">Cant.</th><th class="right">P.U.</th><th class="right">Importe</th>
+                                <th class="center">Asignado</th><th class="center">% Asig.</th>
+                                <th class="center">Provs.</th><th class="center">Acción</th>
+                            </tr></thead>
+                            <tbody id="tbody-presupuesto"><tr><td colspan="11" class="empty-row">No hay presupuesto cargado. Importa un CSV más abajo.</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Import CSV al final -->
+                <div class="card" id="card-upload">
+                    <h3 class="card-title"><i data-lucide="upload-cloud"></i> Importar Presupuesto desde Excel/CSV</h3>
+                    <p style="color:var(--text-muted);font-size:12px;margin-bottom:16px">Guarda tu Excel como <strong>.csv (UTF-8, delimitado por comas)</strong>. Columnas: CÓDIGO, CONCEPTO, UNIDAD, CANTIDAD, P.U. (o PRECIO UNITARIO), IMPORTE. Las filas que sean encabezados de categoría (sin código) se detectan automáticamente.</p>
+                    <div id="upload-empty">
+                        <div class="file-upload-zone" id="upload-zone">
+                            <input type="file" id="csv-input" accept=".csv,text/csv">
+                            <div style="color:var(--primary-blue);margin-bottom:12px"><i data-lucide="file-spreadsheet" style="width:48px;height:48px"></i></div>
+                            <div style="font-size:14px;color:var(--text-main);font-weight:700"><strong>Haz clic</strong> o arrastra tu CSV aquí</div>
+                            <div style="font-size:11px;color:var(--text-muted);margin-top:4px">Formato: .csv (UTF-8)</div>
+                        </div>
+                        <div id="upload-preview" style="margin-top:16px;display:none">
+                            <span id="upload-info" style="font-size:13px;font-weight:600"></span>
+                            <div class="actions-bar" style="margin-top:0">
+                                <button class="btn btn-danger" id="btn-cancel-upload"><i data-lucide="x"></i> Cancelar</button>
+                                <button class="btn btn-success" id="btn-confirm-upload"><i data-lucide="check"></i> Cargar</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="upload-loaded" style="display:none">
+                        <div style="display:flex;align-items:center;gap:14px;padding:18px;background:#dcfce7;border:1px solid #86efac;border-radius:12px">
+                            <i data-lucide="check-circle" style="width:36px;height:36px;color:var(--success);flex-shrink:0"></i>
+                            <div style="flex:1"><div style="font-weight:800;color:#166534;font-size:14px">Presupuesto cargado</div><div style="font-size:12px;color:#166534;margin-top:2px" id="loaded-info">—</div></div>
+                            <button class="btn btn-secondary" id="btn-reload" style="background:#fff;color:var(--primary-blue);border-color:var(--primary-blue)"><i data-lucide="refresh-cw"></i> Cargar nuevo CSV</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB PROVEEDORES -->
+            <div class="tab-content" id="content-proveedores">
+                <div class="card">
+                    <h3 class="card-title"><i data-lucide="users"></i> Proveedores <span class="badge-count" id="count-provs">0</span></h3>
+                    <div class="actions-bar" style="margin-top:0;margin-bottom:14px"><button class="btn btn-primary left" id="btn-add-prov"><i data-lucide="plus"></i> Agregar Proveedor</button></div>
+                    <div class="table-wrap">
+                        <table class="data-table"><thead><tr><th>Nombre</th><th>Contacto</th><th>Teléfono</th><th>Correo</th><th class="center">Conceptos</th><th class="right">Importe Total</th><th class="center">Acciones</th></tr></thead>
+                            <tbody id="tbody-provs"><tr><td colspan="7" class="empty-row">No hay proveedores registrados.</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB ASIGNACIONES -->
+            <div class="tab-content" id="content-asignaciones">
+                <div class="card">
+                    <h3 class="card-title"><i data-lucide="git-branch"></i> Resumen de Asignaciones</h3>
+                    <p style="color:var(--text-muted);font-size:12px;margin-bottom:16px">Vista general de qué proveedor tiene qué conceptos asignados.</p>
+                    <div class="table-wrap">
+                        <table class="data-table"><thead><tr><th>Proveedor</th><th class="center">Conceptos</th><th class="right">Cantidad Total</th><th class="right">Importe Total</th><th class="right">% del Presupuesto</th></tr></thead>
+                            <tbody id="tbody-asig"><tr><td colspan="5" class="empty-row">No hay asignaciones.</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Asignar Proveedores -->
+    <div class="modal-overlay" id="modal-assign">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div class="modal-icon"><i data-lucide="git-branch"></i></div>
+                <div><div class="modal-title">Asignar Proveedores</div><div class="modal-subtitle" id="assign-info">—</div></div>
+            </div>
+            <input type="hidden" id="assign-item-id">
+            <div id="assign-list"></div>
+            <div class="assign-progress" id="assign-progress">
+                <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700">
+                    <span>Total asignado:</span><span id="assign-total">0 / 0</span>
+                </div>
+                <div class="assign-progress-bar"><div class="assign-progress-fill" id="assign-fill" style="width:0%;background:var(--success)"></div></div>
+            </div>
+            <div class="actions-bar">
+                <button class="btn btn-secondary" id="btn-add-assign"><i data-lucide="plus"></i> Agregar proveedor</button>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-danger" id="modal-assign-cancel"><i data-lucide="x"></i> Cancelar</button>
+                <button class="btn btn-success" id="modal-assign-save"><i data-lucide="check"></i> Guardar asignaciones</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Proveedor -->
+    <div class="modal-overlay" id="modal-prov">
+        <div class="modal-box" style="max-width:520px">
+            <div class="modal-header"><div class="modal-icon"><i data-lucide="user-plus"></i></div><div><div class="modal-title" id="modal-prov-title">Agregar Proveedor</div></div></div>
+            <input type="hidden" id="edit-prov-id">
+            <div class="form-grid">
+                <div class="form-group full"><label class="form-label">Nombre / Razón Social <span class="req">*</span></label><input type="text" class="form-control" id="prov-nombre" placeholder="Ej. Constructora ABC"></div>
+                <div class="form-group"><label class="form-label">Contacto</label><input type="text" class="form-control" id="prov-contacto" placeholder="Ej. Juan Pérez"></div>
+                <div class="form-group"><label class="form-label">Teléfono</label><input type="text" class="form-control" id="prov-tel" placeholder="555-1234"></div>
+                <div class="form-group full"><label class="form-label">Correo</label><input type="text" class="form-control" id="prov-correo" placeholder="abc@ejemplo.com"></div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-danger" id="modal-prov-cancel"><i data-lucide="x"></i> Cancelar</button>
+                <button class="btn btn-success" id="modal-prov-save"><i data-lucide="check"></i> Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"><i data-lucide="check-circle"></i><span id="toast-msg">Mensaje</span></div>
+
+    <script>
+        // MENU
+        fetch('menu.html').then(r=>r.text()).then(h=>{document.getElementById('sidebar').innerHTML=h;lucide.createIcons();const l=document.getElementById('link-presupuesto');if(l)l.classList.add('active')}).catch(e=>console.error(e));
+        document.getElementById('toggle-menu').addEventListener('click',()=>document.getElementById('sidebar').classList.toggle('open'));
+        (function(){const n=localStorage.getItem('nombre')||'';if(n)document.getElementById('user-initial').textContent=n.charAt(0).toUpperCase();else setTimeout(arguments.callee,1500)})();
+
+        // HELPERS
+        function esc(s){if(s===null||s===undefined)return '';return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c])}
+        function fmtC(n){return '$'+(n||0).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2})}
+        function fmtN(n){return(n||0).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2})}
+        function toast(m,t='success'){const el=document.getElementById('toast');const ic=t==='success'?'check-circle':t==='error'?'alert-circle':'info';el.innerHTML=`<i data-lucide="${ic}"></i><span>${esc(m)}</span>`;el.className='toast '+t;lucide.createIcons();el.classList.add('show');clearTimeout(window._tt);window._tt=setTimeout(()=>el.classList.remove('show'),3500)}
+
+        // CSV PARSER
+        function parseCSV(text){if(text.charCodeAt(0)===0xFEFF)text=text.slice(1);text=text.replace(/\r\n/g,'\n').replace(/\r/g,'\n');const lines=text.split('\n').filter(l=>l.trim()!=='');if(!lines.length)return{headers:[],rows:[]};const fl=lines[0];const sc=(fl.match(/;/g)||[]).length;const cm=(fl.match(/,/g)||[]).length;const sep=sc>cm?';':',';function pl(line){const r=[];let c='',q=false;for(let i=0;i<line.length;i++){const ch=line[i];if(ch==='"'){if(q&&line[i+1]==='"'){c+='"';i++}else q=!q}else if(ch===sep&&!q){r.push(c.trim());c=''}else c+=ch}r.push(c.trim());return r}const headers=pl(lines[0]).map(h=>h.toUpperCase().trim());const rows=[];for(let i=1;i<lines.length;i++){const v=pl(lines[i]);if(v.length===1&&!v[0])continue;const o={};headers.forEach((h,idx)=>o[h]=v[idx]||'');rows.push(o)}return{headers,rows}}
+        function normalizeItem(row){function gf(...n){for(const x of n){if(row[x]!==undefined&&row[x]!=='')return row[x]}return''}
+            const cod=gf('CÓDIGO','CODIGO','CLAVE'),cant=parseFloat(String(gf('CANTIDAD','CANT','CANT.')).replace(/[^0-9.-]/g,''))||0;
+            const pu=parseFloat(String(gf('P.U.','PU','PRECIO UNITARIO','PRECIO UNIT.','PRECIO')).replace(/[^0-9.-]/g,''))||0;
+            const imp=parseFloat(String(gf('IMPORTE','IMP.')).replace(/[^0-9.-]/g,''))||0;
+            return{codigo:cod,concepto:gf('CONCEPTO','DESCRIPCION','DESCRIPCIÓN'),unidad:gf('UNIDAD','UN.'),cantidad:cant,precioUnitario:pu,importe:imp>0?imp:cant*pu,categoria:'',asignaciones:[]}}
+
+        // DATA
+        const BUDGET_KEY='fyttsa_presupuesto_items',PROV_KEY='fyttsa_proveedores';
+        let items=[],proveedores=[],pendingImport=null,editItemId=-1;
+
+        function loadAll(){try{items=JSON.parse(localStorage.getItem(BUDGET_KEY)||'[]')}catch(e){items=[]}try{proveedores=JSON.parse(localStorage.getItem(PROV_KEY)||'[]')}catch(e){proveedores=[]}}
+        function saveItems(){localStorage.setItem(BUDGET_KEY,JSON.stringify(items))}
+        function saveProvs(){localStorage.setItem(PROV_KEY,JSON.stringify(proveedores))}
+        function genProvId(){return 'p'+Date.now()+Math.floor(Math.random()*100)}
+
+        // FILE
+        document.getElementById('csv-input').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;if(!f.name.toLowerCase().endsWith('.csv')){toast('Debe ser .csv','error');return}const r=new FileReader();r.onload=ev=>{try{const p=parseCSV(ev.target.result);if(!p.rows.length){toast('CSV vacío','error');return}pendingImport=[];let lastCat='';p.rows.forEach(r=>{const it=normalizeItem(r);if(!it.codigo&&it.concepto&&it.concepto===it.concepto.toUpperCase()){lastCat=it.concepto;return}if(!it.codigo&&!it.concepto)return;it.categoria=lastCat||'GENERAL';it.id=pendingImport.length;pendingImport.push(it)});document.getElementById('upload-info').innerHTML=`<i data-lucide="file-check" style="width:18px;height:18px;color:var(--success);vertical-align:-3px"></i> <strong>${f.name}</strong> · ${pendingImport.length} partidas`;document.getElementById('upload-preview').style.display='block';lucide.createIcons();toast(`${pendingImport.length} partidas listas`,'info')}catch(err){toast('Error: '+err.message,'error')}};r.readAsText(f,'UTF-8')});
+        const uz=document.getElementById('upload-zone');uz.addEventListener('dragover',e=>{e.preventDefault();uz.classList.add('dragover')});uz.addEventListener('dragleave',()=>uz.classList.remove('dragover'));uz.addEventListener('drop',e=>{e.preventDefault();uz.classList.remove('dragover');if(e.dataTransfer.files.length)document.getElementById('csv-input').files=e.dataTransfer.files,document.getElementById('csv-input').dispatchEvent(new Event('change'))});
+        document.getElementById('btn-confirm-upload').addEventListener('click',()=>{if(!pendingImport||!pendingImport.length){toast('Nada que importar','error');return}items=pendingImport;saveItems();pendingImport=null;document.getElementById('upload-preview').style.display='none';document.getElementById('csv-input').value='';renderAll();toast(`Presupuesto cargado: ${items.length} partidas`,'success')});
+        document.getElementById('btn-cancel-upload').addEventListener('click',()=>{pendingImport=null;document.getElementById('upload-preview').style.display='none';document.getElementById('csv-input').value=''});
+        document.getElementById('btn-reload').addEventListener('click',()=>{if(items.length&&!confirm(`¿Reemplazar ${items.length} partidas?`))return;document.getElementById('upload-loaded').style.display='none';document.getElementById('upload-empty').style.display='block';document.getElementById('csv-input').value='';pendingImport=null});
+
+        function updateUploadState(){const e=document.getElementById('upload-empty'),l=document.getElementById('upload-loaded');if(items.length){e.style.display='none';l.style.display='block';document.getElementById('loaded-info').textContent=`${items.length} partidas · ${fmtC(items.reduce((a,i)=>a+i.importe,0))}`}else{e.style.display='block';l.style.display='none'}}
+
+        // RENDER PRESUPUESTO
+        function getAssignedInfo(it){if(!it.asignaciones||!it.asignaciones.length)return{total:0,pct:0,count:0,status:'none'};const t=it.asignaciones.reduce((a,x)=>a+(x.importe||0),0);const pct=it.importe>0?(t/it.importe*100):0;let st='partial';if(pct>=99.5)st='full';else if(pct<=0.5)st='none';return{total:t,pct:pct,count:it.asignaciones.length,status:st}}
+
+        function renderPresupuesto(){
+            const tb=document.getElementById('tbody-presupuesto');const bus=document.getElementById('filter-buscar').value.toLowerCase().trim();const cat=document.getElementById('filter-categoria').value;const asig=document.getElementById('filter-asignacion').value;
+            const cats=[...new Set(items.map(i=>i.categoria))].sort();const sel=document.getElementById('filter-categoria');const cv=sel.value;sel.innerHTML='<option value="">Todas</option>'+cats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');sel.value=cv;
+            let f=items.filter(i=>{if(bus&&!(i.codigo+' '+i.concepto+' '+i.categoria).toLowerCase().includes(bus))return false;if(cat&&i.categoria!==cat)return false;const ai=getAssignedInfo(i);if(asig==='completa'&&ai.status!=='full')return false;if(asig==='parcial'&&ai.status!=='parcial')return false;if(asig==='sin'&&ai.status!=='none')return false;return true});
+            if(!f.length){tb.innerHTML='<tr><td colspan="11" class="empty-row">No hay partidas que coincidan.</td></tr>'}else{
+                let html='',n=0,lastCat='';f.forEach(it=>{
+                    if(it.categoria!==lastCat){lastCat=it.categoria;html+=`<tr class="cat-row"><td colspan="11">${esc(it.categoria)}</td></tr>`}
+                    n++;const ai=getAssignedInfo(it);const badge=ai.status==='full'?`<span class="assign-badge full">Completo</span>`:ai.status==='partial'?`<span class="assign-badge partial">${ai.pct.toFixed(0)}%</span>`:`<span class="assign-badge none">Sin asignar</span>`;
+                    const barColor=ai.status==='full'?'var(--success)':ai.status==='partial'?'var(--warning)':'var(--border-color)';
+                    html+=`<tr><td class="row-num">${n}</td><td style="font-family:'Courier New',monospace;font-weight:700;color:var(--primary-blue);font-size:11px">${esc(it.codigo)}</td><td style="font-weight:500">${esc(it.concepto)}</td><td style="text-align:center;font-size:11px">${esc(it.unidad)}</td><td class="amount-cell">${fmtN(it.cantidad)}</td><td class="amount-cell" style="color:var(--text-muted)">${fmtC(it.precioUnitario)}</td><td class="amount-cell">${fmtC(it.importe)}</td><td style="text-align:center">${badge}</td><td style="text-align:center"><div class="progress-mini"><div class="progress-mini-fill" style="width:${ai.pct}%;background:${barColor}"></div></div>${ai.pct.toFixed(0)}%</td><td style="text-align:center;font-weight:700">${ai.count||'—'}</td><td style="text-align:center"><button class="btn-table-action btn-assign" onclick="openAssignModal(${it.id})" title="Asignar proveedores"><i data-lucide="git-branch"></i></button></td></tr>`
+                });tb.innerHTML=html}
+            document.getElementById('count-items').textContent=f.length;lucide.createIcons();renderKPIs()
+        }
+
+        function renderKPIs(){
+            const totalImporte=items.reduce((a,i)=>a+i.importe,0);const totalAsignado=items.reduce((a,i)=>a+getAssignedInfo(i).total,0);const pctAsig=totalImporte>0?(totalAsignado/totalImporte*100):0;const completas=items.filter(i=>getAssignedInfo(i).status==='full').length;const sinAsig=items.filter(i=>getAssignedInfo(i).status==='none').length;
+            document.getElementById('kpi-grid').innerHTML=`
+                <div class="summary-card"><div class="summary-icon"><i data-lucide="clipboard-list"></i></div><div class="summary-info"><span class="summary-value">${items.length}</span><span class="summary-label">Partidas</span></div></div>
+                <div class="summary-card info"><div class="summary-icon"><i data-lucide="dollar-sign"></i></div><div class="summary-info"><span class="summary-value">${fmtC(totalImporte)}</span><span class="summary-label">Importe Total</span></div></div>
+                <div class="summary-card success"><div class="summary-icon"><i data-lucide="git-branch"></i></div><div class="summary-info"><span class="summary-value">${fmtC(totalAsignado)}</span><span class="summary-label">Asignado (${pctAsig.toFixed(1)}%)</span></div></div>
+                <div class="summary-card purple"><div class="summary-icon"><i data-lucide="users"></i></div><div class="summary-info"><span class="summary-value">${proveedores.length}</span><span class="summary-label">Proveedores</span></div></div>
+                <div class="summary-card success"><div class="summary-icon"><i data-lucide="check-circle"></i></div><div class="summary-info"><span class="summary-value">${completas}</span><span class="summary-label">Completas</span></div></div>
+                <div class="summary-card warning"><div class="summary-icon"><i data-lucide="alert-circle"></i></div><div class="summary-info"><span class="summary-value">${sinAsig}</span><span class="summary-label">Sin Asignar</span></div></div>`;
+            lucide.createIcons()
+        }
+        document.getElementById('filter-buscar').addEventListener('input',renderPresupuesto);
+        document.getElementById('filter-categoria').addEventListener('change',renderPresupuesto);
+        document.getElementById('filter-asignacion').addEventListener('change',renderPresupuesto);
+        document.getElementById('btn-limpiar').addEventListener('click',()=>{document.getElementById('filter-buscar').value='';document.getElementById('filter-categoria').value='';document.getElementById('filter-asignacion').value='';renderPresupuesto()});
+
+        // MODAL ASIGNAR
+        let assignRows=[];
+        function openAssignModal(itemId){
+            const it=items.find(i=>i.id===itemId);if(!it)return;
+            document.getElementById('assign-item-id').value=itemId;
+            document.getElementById('assign-info').textContent=`${it.codigo} — ${it.concepto.substring(0,60)}${it.concepto.length>60?'...':''} | Total: ${fmtC(it.importe)}`;
+            assignRows=it.asignaciones?[...it.asignaciones.map(a=>({...a}))]:[];
+            if(!assignRows.length)assignRows.push({proveedorId:'',cantidad:0,importe:0});
+            renderAssignRows();updateAssignProgress();
+            document.getElementById('modal-assign').classList.add('show');lucide.createIcons()
+        }
+        function renderAssignRows(){
+            const c=document.getElementById('assign-list');c.innerHTML='';
+            assignRows.forEach((row,idx)=>{
+                const div=document.createElement('div');div.className='assign-row';
+                const provOpts=proveedores.map(p=>`<option value="${p.id}" ${row.proveedorId===p.id?'selected':''}>${esc(p.nombre)}</option>`).join('');
+                div.innerHTML=`
+                    <div class="form-group"><label class="form-label">Proveedor ${idx+1}</label><select class="form-control assign-prov">${provOpts||'<option value="">Sin proveedores</option>'}</select></div>
+                    <div class="form-group"><label class="form-label">Cantidad</label><input type="number" class="form-control assign-cant" value="${row.cantidad||0}" step="0.01" min="0"></div>
+                    <div class="form-group"><label class="form-label">Importe</label><input type="number" class="form-control assign-imp" value="${row.importe||0}" step="0.01" min="0"></div>
+                    <button class="btn-remove-assign" onclick="removeAssignRow(${idx})"><i data-lucide="trash-2"></i></button>`;
+                c.appendChild(div);
+                div.querySelector('.assign-prov').addEventListener('change',e=>{row.proveedorId=e.target.value;row.proveedorNombre=(proveedores.find(p=>p.id===e.target.value)||{}).nombre||''});
+                div.querySelector('.assign-cant').addEventListener('input',e=>{row.cantidad=parseFloat(e.target.value)||0;updateAssignProgress()});
+                div.querySelector('.assign-imp').addEventListener('input',e=>{row.importe=parseFloat(e.target.value)||0;updateAssignProgress()})
+            });
+            lucide.createIcons()
+        }
+        function removeAssignRow(idx){assignRows.splice(idx,1);if(!assignRows.length)assignRows.push({proveedorId:'',cantidad:0,importe:0});renderAssignRows();updateAssignProgress()}
+        function updateAssignProgress(){
+            const it=items.find(i=>i.id===parseInt(document.getElementById('assign-item-id').value));if(!it)return;
+            const total=assignRows.reduce((a,r)=>a+(r.importe||0),0);const pct=it.importe>0?(total/it.importe*100):0;
+            document.getElementById('assign-total').textContent=`${fmtC(total)} / ${fmtC(it.importe)} (${pct.toFixed(1)}%)`;
+            const fill=document.getElementById('assign-fill');fill.style.width=Math.min(100,pct)+'%';fill.style.background=pct>=99.5?'var(--success)':pct>100?'var(--danger)':'var(--warning)';
+        }
+        document.getElementById('btn-add-assign').addEventListener('click',()=>{assignRows.push({proveedorId:'',cantidad:0,importe:0});renderAssignRows()});
+        document.getElementById('modal-assign-cancel').addEventListener('click',()=>document.getElementById('modal-assign').classList.remove('show'));
+        document.getElementById('modal-assign-save').addEventListener('click',()=>{
+            const it=items.find(i=>i.id===parseInt(document.getElementById('assign-item-id').value));if(!it)return;
+            const valid=assignRows.filter(r=>r.proveedorId&&r.proveedorId!=='');if(!valid.length){toast('Asigna al menos un proveedor','error');return}
+            const total=valid.reduce((a,r)=>a+(r.importe||0),0);if(total>it.importe*1.01){if(!confirm(`El total asignado (${fmtC(total)}) excede el importe de la partida (${fmtC(it.importe)}). ¿Continuar?`))return}
+            it.asignaciones=valid.map(r=>({proveedorId:r.proveedorId,proveedorNombre:(proveedores.find(p=>p.id===r.proveedorId)||{}).nombre||'',cantidad:r.cantidad,importe:r.importe}));
+            saveItems();renderPresupuesto();renderAsignaciones();renderProveedores();document.getElementById('modal-assign').classList.remove('show');toast('Asignaciones guardadas','success')
+        });
+
+        // PROVEEDORES CRUD
+        document.getElementById('btn-add-prov').addEventListener('click',()=>openProvModal(-1));
+        function openProvModal(idx){
+            if(idx>=0){const p=proveedores[idx];document.getElementById('modal-prov-title').textContent='Editar Proveedor';document.getElementById('edit-prov-id').value=idx;document.getElementById('prov-nombre').value=p.nombre;document.getElementById('prov-contacto').value=p.contacto||'';document.getElementById('prov-tel').value=p.telefono||'';document.getElementById('prov-correo').value=p.correo||''}
+            else{document.getElementById('modal-prov-title').textContent='Agregar Proveedor';document.getElementById('edit-prov-id').value=-1;document.getElementById('prov-nombre').value='';document.getElementById('prov-contacto').value='';document.getElementById('prov-tel').value='';document.getElementById('prov-correo').value=''}
+            document.getElementById('modal-prov').classList.add('show')
+        }
+        function editProv(idx){openProvModal(idx)}
+        function deleteProv(idx){if(confirm(`¿Eliminar a "${proveedores[idx].nombre}"?`)){proveedores.splice(idx,1);saveProvs();renderProveedores();renderPresupuesto();toast('Proveedor eliminado')}}
+        document.getElementById('modal-prov-cancel').addEventListener('click',()=>document.getElementById('modal-prov').classList.remove('show'));
+        document.getElementById('modal-prov-save').addEventListener('click',()=>{
+            const n=document.getElementById('prov-nombre').value.trim();if(!n){toast('El nombre es obligatorio','error');return}
+            const data={nombre:n,contacto:document.getElementById('prov-contacto').value.trim(),telefono:document.getElementById('prov-tel').value.trim(),correo:document.getElementById('prov-correo').value.trim()};
+            const idx=parseInt(document.getElementById('edit-prov-id').value);
+            if(idx>=0)proveedores[idx]=data;else{data.id=genProvId();proveedores.push(data)}
+            saveProvs();renderProveedores();renderPresupuesto();document.getElementById('modal-prov').classList.remove('show');toast('Proveedor guardado','success')
+        });
+
+        function renderProveedores(){
+            const tb=document.getElementById('tbody-provs');document.getElementById('count-provs').textContent=proveedores.length;
+            if(!proveedores.length){tb.innerHTML='<tr><td colspan="7" class="empty-row">No hay proveedores.</td></tr>';return}
+            tb.innerHTML=proveedores.map((p,idx)=>{
+                let count=0,total=0;items.forEach(it=>{(it.asignaciones||[]).forEach(a=>{if(a.proveedorId===p.id){count++;total+=a.importe||0}})});
+                return `<tr><td style="font-weight:700;color:var(--primary-blue)">${esc(p.nombre)}</td><td>${esc(p.contacto||'—')}</td><td>${esc(p.telefono||'—')}</td><td>${esc(p.correo||'—')}</td><td style="text-align:center;font-weight:700">${count}</td><td class="amount-cell">${fmtC(total)}</td><td style="text-align:center"><button class="btn-table-action btn-table-edit" onclick="editProv(${idx})" title="Editar"><i data-lucide="edit-3"></i></button><button class="btn-table-action btn-table-delete" onclick="deleteProv(${idx})" title="Eliminar"><i data-lucide="trash-2"></i></button></td></tr>`
+            }).join('');lucide.createIcons()
+        }
+
+        // ASIGNACIONES
+        function renderAsignaciones(){
+            const tb=document.getElementById('tbody-asig');const totalBudget=items.reduce((a,i)=>a+i.importe,0);
+            const porProv={};items.forEach(it=>{(it.asignaciones||[]).forEach(a=>{if(!porProv[a.proveedorId])porProv[a.proveedorId]={nombre:a.proveedorNombre||'—',count:0,cantidad:0,importe:0};porProv[a.proveedorId].count++;porProv[a.proveedorId].cantidad+=a.cantidad||0;porProv[a.proveedorId].importe+=a.importe||0})});
+            const ps=Object.entries(porProv).sort((a,b)=>b[1].importe-a[1].importe);
+            if(!ps.length){tb.innerHTML='<tr><td colspan="5" class="empty-row">No hay asignaciones.</td></tr>';return}
+            tb.innerHTML=ps.map(([id,p])=>{const pct=totalBudget>0?(p.importe/totalBudget*100).toFixed(1):'0.0';return `<tr><td style="font-weight:700;color:var(--primary-blue)">${esc(p.nombre)}</td><td style="text-align:center">${p.count}</td><td class="amount-cell">${fmtN(p.cantidad)}</td><td class="amount-cell">${fmtC(p.importe)}</td><td style="text-align:right;font-weight:800">${pct}%</td></tr>`}).join('')+
+                `<tr style="background:var(--light-blue);font-weight:800"><td style="color:var(--primary-blue);padding:14px 12px">TOTAL (${ps.length} proveedores)</td><td style="text-align:center;color:var(--primary-blue)">${ps.reduce((a,[,p])=>a+p.count,0)}</td><td class="amount-cell" style="color:var(--primary-blue)">${fmtN(ps.reduce((a,[,p])=>a+p.cantidad,0))}</td><td class="amount-cell" style="color:var(--primary-blue)">${fmtC(ps.reduce((a,[,p])=>a+p.importe,0))}</td><td style="text-align:right;color:var(--primary-blue)">100.0%</td></tr>`
+        }
+
+        // TABS
+        function switchTab(t){document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));document.querySelector(`.tab-btn[data-tab="${t}"]`)?.classList.add('active');document.getElementById('content-'+t)?.classList.add('active');if(t==='asignaciones')renderAsignaciones();if(t==='proveedores')renderProveedores();if(t==='presupuesto')renderPresupuesto()}
+        document.querySelectorAll('.tab-btn').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
+
+        function renderAll(){renderPresupuesto();renderProveedores();renderAsignaciones();updateUploadState()}
+        loadAll();renderAll();lucide.createIcons();
+    </script>
+</body>
+</html>
