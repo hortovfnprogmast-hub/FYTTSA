@@ -79,7 +79,7 @@
         .section-title { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin: 10px 15px; }
         .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 15px; color: var(--text-main); text-decoration: none; font-size: 14px; font-weight: 500; border-radius: 10px; margin-bottom: 2px; transition: all 0.2s; }
         .nav-item:hover { background-color: var(--bg-color); }
-        .nav-item.active { background-color: #d1d5db; color: #000000; font-weight: 700; border-left: 4px solid #000000; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+        .nav-item.active { background-color: #9ca3af !important; color: #000000 !important; font-weight: 800 !important; border-left: 4px solid #000000 !important; box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important; }
         .nav-item.active i { color: var(--primary-blue); }
 
         /* --- CONTENIDO PRINCIPAL --- */
@@ -1245,6 +1245,11 @@
     </div>
 
     <script>
+        // 0. SCROLL AL INICIO DEL DASHBOARD
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+
         // 1. CARGAR MENÚ DINÁMICO
         fetch('menu.html')
             .then(response => response.text())
@@ -1784,6 +1789,10 @@
         function pvHide() {
             pvOverlay.classList.remove('show');
             document.body.style.overflow = '';
+            // Scroll al inicio del dashboard
+            window.scrollTo(0, 0);
+            const contentEl = document.querySelector('.content');
+            if (contentEl) contentEl.scrollTop = 0;
         }
 
         // (Desactivado) Verifica si ya acepto en esta sesion
@@ -2070,6 +2079,10 @@
         // ===== Auto-mostrar al inicio de sesion =====
         // El aviso se muestra SIEMPRE al cargar la pagina.
         function pvAutoShow() {
+            // Scroll al inicio del dashboard
+            window.scrollTo(0, 0);
+            const contentEl = document.querySelector('.content');
+            if (contentEl) contentEl.scrollTop = 0;
             // Muestra el pulso rojo en el FAB para llamar la atencion
             if (fabPulse) fabPulse.classList.add('show');
             // Muestra el modal: pequeño retardo para que carguen iconos y estilos
