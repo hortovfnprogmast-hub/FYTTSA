@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <style>
-        :root{--primary-blue:#152B71;--light-blue:#eef2ff;--bg-color:#f8fafc;--text-main:#1e293b;--text-muted:#64748b;--border-color:#e2e8f0;--success:#10b981;--warning:#f59e0b;--danger:#ef4444;--info:#3b82f6;--purple:#8b5cf6}
+        :root{--primary-blue:#000000;--light-blue:#e8e8e8;--bg-color:#f8fafc;--text-main:#1e293b;--text-muted:#64748b;--border-color:#e2e8f0;--success:#10b981;--warning:#f59e0b;--danger:#ef4444;--info:#404040;--purple:#8b5cf6}
         *{box-sizing:border-box;margin:0;padding:0}
         body{font-family:'Inter',sans-serif;background:var(--bg-color);display:flex;flex-direction:column;height:100vh;overflow:hidden}
         .header{display:flex;justify-content:space-between;align-items:center;padding:10px 20px;background:#fff;border-bottom:1px solid var(--border-color);z-index:50;flex-shrink:0}
@@ -45,7 +45,7 @@
         /* Sections */
         .reg-section{background:#fff;border-radius:20px;padding:28px;border:1px solid var(--border-color);box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:24px;scroll-margin-top:120px}
         .reg-section.read{border-left:4px solid var(--success)}
-        .reg-section.current{border-left:4px solid var(--primary-blue);box-shadow:0 4px 20px rgba(21,43,113,.12)}
+        .reg-section.current{border-left:4px solid var(--primary-blue);box-shadow:0 4px 20px rgba(0, 0, 0,.12)}
         .reg-section h2{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:800;color:var(--primary-blue);margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid var(--light-blue)}
         .reg-section h2 i{width:22px;height:22px}
         .reg-section h3{font-size:15px;font-weight:800;color:var(--text-main);margin:18px 0 8px;padding-left:12px;border-left:4px solid var(--primary-blue)}
@@ -53,7 +53,7 @@
         .reg-section ul{margin:0 0 12px 0;padding-left:22px}
         .reg-section ul li{font-size:13px;line-height:1.6;color:var(--text-main);margin-bottom:5px}
         .reg-section ul li strong{color:var(--primary-blue)}
-        .reg-section .intro-box{background:var(--light-blue);border:1px solid #c7d2fe;border-radius:12px;padding:14px 16px;font-size:13px;color:var(--primary-blue);margin-bottom:16px;line-height:1.5}
+        .reg-section .intro-box{background:var(--light-blue);border:1px solid #cccccc;border-radius:12px;padding:14px 16px;font-size:13px;color:var(--primary-blue);margin-bottom:16px;line-height:1.5}
         .reg-section .intro-box strong{font-weight:800}
 
         /* Step indicator */
@@ -61,7 +61,7 @@
         .step-item{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--text-muted)}
         .step-dot{width:24px;height:24px;border-radius:50%;background:var(--bg-color);color:var(--text-muted);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;transition:all .25s}
         .step-dot.done{background:var(--success);color:#fff}
-        .step-dot.current{background:var(--primary-blue);color:#fff;box-shadow:0 0 0 4px rgba(21,43,113,.15)}
+        .step-dot.current{background:var(--primary-blue);color:#fff;box-shadow:0 0 0 4px rgba(0, 0, 0,.15)}
         .step-item.done{color:var(--success)}
         .step-item.current{color:var(--primary-blue)}
 
@@ -74,7 +74,7 @@
         .sig-card{background:#fff;border-radius:20px;padding:28px;border:1px solid var(--border-color);box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:24px}
         .sig-card h3{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:800;color:var(--primary-blue);margin-bottom:18px;padding-bottom:12px;border-bottom:2px solid var(--light-blue)}
         .sig-card h3 i{width:22px;height:22px}
-        .sig-section{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center;padding:20px;background:linear-gradient(135deg,#eef2ff 0%,#f8fafc 100%);border-radius:16px;border:1px solid #c7d2fe}
+        .sig-section{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center;padding:20px;background:linear-gradient(135deg,#e8e8e8 0%,#f8fafc 100%);border-radius:16px;border:1px solid #cccccc}
         @media(max-width:768px){.sig-section{grid-template-columns:1fr}}
         .sig-user-info{display:flex;align-items:center;gap:14px}
         .sig-avatar{width:56px;height:56px;border-radius:50%;background:var(--primary-blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;flex-shrink:0}
@@ -99,7 +99,7 @@
         .btn i{width:16px;height:16px}
         .btn-accept{background:var(--primary-blue);color:#fff}
         .btn-accept:disabled{background:#cbd5e1;color:#94a3b8;cursor:not-allowed}
-        .btn-accept:not(:disabled):hover{background:#1e40af;transform:translateY(-2px);box-shadow:0 8px 18px rgba(21,43,113,.3)}
+        .btn-accept:not(:disabled):hover{background:#1a1a1a;transform:translateY(-2px);box-shadow:0 8px 18px rgba(0, 0, 0,.3)}
         .btn-decline{background:#fef2f2;color:var(--danger);border:2px solid #fecaca}
         .btn-decline:hover{background:var(--danger);color:#fff;border-color:var(--danger)}
         .btn-decline:disabled{background:#f1f5f9;color:#cbd5e1;border-color:#e2e8f0;cursor:not-allowed}
@@ -112,17 +112,22 @@
         .toast.error{background:var(--danger)}
         .toast i{width:18px;height:18px}
     </style>
+
+    <!-- Firebase SDK + FYTTSA shared data helper -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="fyttsa-data.js"></script>
 </head>
 <body>
     <header class="header">
         <div class="header-left">
             <button class="menu-btn" id="toggle-menu"><i data-lucide="menu"></i></button>
-            <img src="https://i.ibb.co/fdMsnKTg/LOGO2.png" alt="Logo" height="35">
+            <img src="https://i.ibb.co/x8Bw8KR8/MARFIL-1.jpg" alt="Logo" height="35">
             <h1 class="header-title">FYTTSA - Reglamento Interno</h1>
         </div>
         <div class="header-right">
             <div class="user-initial" id="user-initial">U</div>
-            <img src="https://i.ibb.co/jv9mNxYr/LOGO1.png" alt="Logo" height="35" style="border-radius:8px">
+            <img src="https://i.ibb.co/x8Bw8KR8/MARFIL-1.jpg" alt="Logo" height="35" style="border-radius:8px">
         </div>
     </header>
     <div class="main-layout">
@@ -310,7 +315,8 @@
 
     <script>
         // MENU (mismo formato que todas las paginas)
-        fetch('menu.html').then(r=>r.text()).then(html=>{document.getElementById('sidebar').innerHTML=html;lucide.createIcons();const l=document.getElementById('link-reglamento');if(l)l.classList.add('active')}).catch(e=>console.error('Error cargando el menú:',e));
+        fetch('menu.html').then(r=>r.text()).then(html=>{document.getElementById('sidebar').innerHTML=html;lucide.createIcons();
+                fyttsa_applyPrivilegeMenu();const l=document.getElementById('link-reglamento');if(l)l.classList.add('active')}).catch(e=>console.error('Error cargando el menú:',e));
         document.getElementById('toggle-menu').addEventListener('click',()=>document.getElementById('sidebar').classList.toggle('open'));
 
         // Usuario
@@ -414,7 +420,7 @@
             sigCanvas.height=Math.max(1,Math.floor(rect.height*dpr));
             const ctx=sigCanvas.getContext('2d');
             ctx.scale(dpr,dpr);
-            ctx.lineWidth=2.2;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#152B71'
+            ctx.lineWidth=2.2;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#000000'
         }
         function bindSig(){
             let drawing=false,lx=0,ly=0;
@@ -431,10 +437,10 @@
         window.addEventListener('resize',()=>{if(sigCanvas.offsetWidth>0){const old=hasSignature?sigCanvas.toDataURL():null;initSig();if(old){const img=new Image();img.onload=()=>{sigCanvas.getContext('2d').drawImage(img,0,0,sigCanvas.clientWidth,sigCanvas.clientHeight)};img.src=old}}});
 
         // Buttons
+        const REG_KEY='fyttsa_reglamento_aceptado';
         document.getElementById('btn-accept').addEventListener('click',()=>{
             if(document.getElementById('btn-accept').disabled)return;
             // Guardar aceptacion + firma como imagen
-            const key='fyttsa_reglamento_aceptado';
             const firmaData=sigCanvas.toDataURL('image/png');
             const data={
                 version:'v1.0',
@@ -442,7 +448,7 @@
                 firma:firmaData,
                 fecha:new Date().toISOString()
             };
-            localStorage.setItem(key,JSON.stringify(data));
+            fyttsa_saveDataSync(REG_KEY,data);
             // Mostrar mensaje de exito y bloquear botones
             toast('Reglamento firmado y guardado correctamente.','success');
             document.getElementById('btn-accept').disabled=true;
@@ -456,6 +462,45 @@
                 window.location.href='index.html'
             }
         });
+
+        // =====================================================
+        // RESTAURAR FIRMA GUARDADA (al regresar a la pagina)
+        // =====================================================
+        async function restaurarFirmaGuardada(){
+            try{
+                const data=await fyttsa_loadData(REG_KEY);
+                if(data&&data.firma){
+                    // El usuario ya firmo anteriormente: restaurar la firma en el canvas
+                    setTimeout(()=>{
+                        const img=new Image();
+                        img.onload=()=>{
+                            const ctx=sigCanvas.getContext('2d');
+                            // Asegurar que el canvas este inicializado
+                            if(sigCanvas.width===0||sigCanvas.height===0){initSig()}
+                            ctx.drawImage(img,0,0,sigCanvas.clientWidth,sigCanvas.clientHeight);
+                            hasSignature=true;
+                            sigBox.classList.add('signed');
+                            clearSigBtn.disabled=false;
+                            // Marcar pasos como completados
+                            scrolledToBottom=true;
+                            markStepDone(step1Dot,step1Item);
+                            markEndRead(true);
+                            markStep2Done();
+                            // Bloquear botones
+                            document.getElementById('btn-accept').disabled=true;
+                            document.getElementById('btn-accept').innerHTML='<i data-lucide="check-circle-2"></i> Firmado y guardado';
+                            document.getElementById('btn-decline').disabled=true;
+                            // Ocultar el hint
+                            if(sigHint)sigHint.style.display='none';
+                            lucide.createIcons();
+                        };
+                        img.src=data.firma;
+                    },300);
+                }
+            }catch(e){console.warn('No se pudo restaurar la firma:',e)}
+        }
+        // Llamar despues de que el canvas este listo
+        window.addEventListener('load',()=>{setTimeout(restaurarFirmaGuardada,500)});
 
         lucide.createIcons();
     </script>
