@@ -8,8 +8,8 @@
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <style>
         :root {
-            --primary-blue: #152B71;
-            --light-blue: #eef2ff;
+            --primary-blue: #000000;
+            --light-blue: #e8e8e8;
             --bg-color: #f8fafc;
             --text-main: #1e293b;
             --text-muted: #64748b;
@@ -17,7 +17,7 @@
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
-            --info: #3b82f6;
+            --info: #404040;
             --purple: #8b5cf6;
             --green-soft: #d1fae5;
             --green-dark: #065f46;
@@ -146,7 +146,7 @@
         .form-control:focus {
             outline: none;
             border-color: var(--primary-blue);
-            box-shadow: 0 0 0 3px rgba(21, 43, 113, 0.1);
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
         }
         select.form-control {
             appearance: none;
@@ -241,7 +241,7 @@
             outline: none;
             background: white;
             border-color: var(--primary-blue);
-            box-shadow: 0 0 0 2px rgba(21, 43, 113, 0.1);
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
         }
         .table-input.amount {
             text-align: right;
@@ -426,9 +426,9 @@
             color: white;
         }
         .btn-primary:hover {
-            background: #1e40af;
+            background: #1a1a1a;
             transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(21, 43, 113, 0.25);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
         }
         .btn-secondary {
             background: white;
@@ -496,7 +496,7 @@
             background: var(--primary-blue);
             color: white;
             border-color: var(--primary-blue);
-            box-shadow: 0 4px 12px rgba(21, 43, 113, 0.25);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
         }
         .tab-btn i { width: 16px; height: 16px; }
         .tab-badge {
@@ -656,9 +656,9 @@
             gap: 24px;
             align-items: center;
             padding: 24px;
-            background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 100%);
+            background: linear-gradient(135deg, #e8e8e8 0%, #f8fafc 100%);
             border-radius: 16px;
-            border: 1px solid #c7d2fe;
+            border: 1px solid #cccccc;
         }
         @media (max-width: 768px) {
             .signature-section { grid-template-columns: 1fr; }
@@ -772,17 +772,22 @@
         .toast.error { background: var(--danger); }
         .toast i { width: 18px; height: 18px; }
     </style>
+
+    <!-- Firebase SDK + FYTTSA shared data helper -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="fyttsa-data.js"></script>
 </head>
 <body>
     <header class="header">
         <div class="header-left">
             <button class="menu-btn" id="toggle-menu"><i data-lucide="menu"></i></button>
-            <img src="https://i.ibb.co/fdMsnKTg/LOGO2.png" alt="Logo" height="35">
+            <img src="https://i.ibb.co/x8Bw8KR8/MARFIL-1.jpg" alt="Logo" height="35">
             <h1 class="header-title">FYTTSA - Comprobación de Gastos (Caja Chica)</h1>
         </div>
         <div class="header-right">
             <div class="user-initial" id="user-initial">U</div>
-            <img src="https://i.ibb.co/jv9mNxYr/LOGO1.png" alt="Logo" height="35" style="border-radius: 8px;">
+            <img src="https://i.ibb.co/x8Bw8KR8/MARFIL-1.jpg" alt="Logo" height="35" style="border-radius: 8px;">
         </div>
     </header>
 
@@ -972,46 +977,21 @@
                 </div>
             </div>
 
-            <!-- 5. ÚLTIMA SECCIÓN DEL TAB NUEVO: FIRMA -->
+            <!-- 5. ACCIONES -->
             <div class="card">
                 <h3 class="card-title">
-                    <i data-lucide="pen-tool"></i>
-                    Firma de Responsable
+                    <i data-lucide="check-circle-2"></i>
+                    Acciones
                 </h3>
-                <div class="signature-section">
-                    <div class="signature-user-info">
-                        <div class="signature-avatar" id="sig-avatar">U</div>
-                        <div class="signature-user-detail">
-                            <span class="signature-user-label">Firmando como:</span>
-                            <span class="signature-user-name" id="sig-user-name">Cargando usuario...</span>
-                            <span class="signature-user-role">Comprobó</span>
-                            <span class="signature-user-role" style="margin-top: 4px; font-size: 11px;" id="sig-date">—</span>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="signature-box" id="sig-box">
-                            <canvas id="signature-canvas"></canvas>
-                            <div class="signature-hint" id="sig-hint">
-                                <i data-lucide="edit-3"></i>Firma aquí con el mouse o el dedo
-                            </div>
-                        </div>
-                        <div class="signature-actions">
-                            <button type="button" class="btn-mini btn-mini-clear" id="btn-clear-sig" disabled>
-                                <i data-lucide="eraser"></i> Borrar firma
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="actions-bar" style="margin-top: 24px;">
+                <div class="actions-bar" style="margin-top: 10px;">
                     <button class="btn btn-danger" id="btn-cancel">
                         <i data-lucide="x"></i> Cancelar
                     </button>
                     <button class="btn btn-primary" id="btn-save">
                         <i data-lucide="save"></i> Guardar comprobación
                     </button>
-                    <button class="btn btn-success" id="btn-submit" disabled>
-                        <i data-lucide="check-circle-2"></i> Firmar y enviar
+                    <button class="btn btn-success" id="btn-submit">
+                        <i data-lucide="send"></i> Enviar a revisión
                     </button>
                 </div>
             </div>
@@ -1127,6 +1107,7 @@
             .then(html => {
                 document.getElementById('sidebar').innerHTML = html;
                 lucide.createIcons();
+                fyttsa_applyPrivilegeMenu();
                 const link = document.getElementById('link-cajachica') || document.getElementById('link-caja-chica');
                 if (link) link.classList.add('active');
             })
@@ -1145,18 +1126,12 @@
         function applyUserName() {
             const nombre = getUserName();
             if (nombre) {
-                document.getElementById('sig-user-name').textContent = nombre;
-                document.getElementById('sig-avatar').textContent = nombre.charAt(0).toUpperCase();
                 document.getElementById('user-initial').textContent = nombre.charAt(0).toUpperCase();
             } else {
                 setTimeout(applyUserName, 1500);
             }
         }
         applyUserName();
-        const today = new Date();
-        document.getElementById('sig-date').textContent = today.toLocaleDateString('es-MX', {
-            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-        });
 
         // =====================================================
         // 3. PERIODO AUTOMATICO
@@ -1481,10 +1456,11 @@
         let historial = [];
         let editingFolio = null; // folio que se está editando actualmente
 
-        function loadHistorial() {
+        const CAJACHICA_KEY = 'fyttsa_cajachica_historial';
+        async function loadHistorial() {
             try {
-                const data = localStorage.getItem('fyttsa_cajachica_historial');
-                historial = data ? JSON.parse(data) : [];
+                const data = await fyttsa_loadData(CAJACHICA_KEY);
+                historial = data || [];
                 // Migracion: si algun registro no tiene status, asignar 'guardado'
                 historial.forEach(h => {
                     if (!h.status) h.status = 'guardado';
@@ -1492,7 +1468,7 @@
             } catch (e) { historial = []; }
         }
         function saveHistorial() {
-            localStorage.setItem('fyttsa_cajachica_historial', JSON.stringify(historial));
+            fyttsa_saveDataSync(CAJACHICA_KEY, historial);
         }
         function generateFolio() {
             const year = new Date().getFullYear();
@@ -1714,120 +1690,14 @@
             btn.addEventListener('click', () => switchTab(btn.dataset.tab));
         });
 
-        loadHistorial();
-        renderTabsTables();
-        updateFolioInput();
+        (async function() {
+            await loadHistorial();
+            renderTabsTables();
+            updateFolioInput();
+        })();
 
         // =====================================================
-        // 7. FIRMA (CANVAS)
-        // =====================================================
-        const sigCanvas = document.getElementById('signature-canvas');
-        const sigHint = document.getElementById('sig-hint');
-        const sigBox = document.getElementById('sig-box');
-        const clearSigBtn = document.getElementById('btn-clear-sig');
-        let hasSignature = false;
-
-        function initSignatureCanvas() {
-            if (!sigCanvas) return;
-            const dpr = window.devicePixelRatio || 1;
-            const rect = sigCanvas.getBoundingClientRect();
-            if (rect.width === 0) {
-                setTimeout(initSignatureCanvas, 200);
-                return;
-            }
-            sigCanvas.width = Math.max(1, Math.floor(rect.width * dpr));
-            sigCanvas.height = Math.max(1, Math.floor(rect.height * dpr));
-            const ctx = sigCanvas.getContext('2d');
-            ctx.scale(dpr, dpr);
-            ctx.lineWidth = 2.2;
-            ctx.lineCap = 'round';
-            ctx.lineJoin = 'round';
-            ctx.strokeStyle = '#152B71';
-        }
-        function bindSignatureEvents() {
-            let drawing = false;
-            let lastX = 0, lastY = 0;
-            function getPos(e) {
-                const r = sigCanvas.getBoundingClientRect();
-                if (e.touches && e.touches.length > 0) {
-                    return { x: e.touches[0].clientX - r.left, y: e.touches[0].clientY - r.top };
-                }
-                return { x: e.clientX - r.left, y: e.clientY - r.top };
-            }
-            function startDraw(e) {
-                e.preventDefault();
-                drawing = true;
-                const p = getPos(e);
-                lastX = p.x; lastY = p.y;
-                if (sigHint) sigHint.style.display = 'none';
-                const ctx = sigCanvas.getContext('2d');
-                ctx.beginPath();
-                ctx.moveTo(p.x, p.y);
-                ctx.lineTo(p.x + 0.1, p.y + 0.1);
-                ctx.stroke();
-            }
-            function draw(e) {
-                if (!drawing) return;
-                e.preventDefault();
-                const ctx = sigCanvas.getContext('2d');
-                const p = getPos(e);
-                ctx.beginPath();
-                ctx.moveTo(lastX, lastY);
-                ctx.lineTo(p.x, p.y);
-                ctx.stroke();
-                lastX = p.x; lastY = p.y;
-                if (!hasSignature) {
-                    hasSignature = true;
-                    sigBox.classList.add('signed');
-                    clearSigBtn.disabled = false;
-                    checkSubmitReady();
-                }
-            }
-            function endDraw(e) {
-                if (drawing && e) e.preventDefault();
-                drawing = false;
-            }
-            sigCanvas.addEventListener('mousedown', startDraw);
-            sigCanvas.addEventListener('mousemove', draw);
-            sigCanvas.addEventListener('mouseup', endDraw);
-            sigCanvas.addEventListener('mouseleave', endDraw);
-            sigCanvas.addEventListener('touchstart', startDraw, { passive: false });
-            sigCanvas.addEventListener('touchmove', draw, { passive: false });
-            sigCanvas.addEventListener('touchend', endDraw, { passive: false });
-        }
-        function clearSignature() {
-            const ctx = sigCanvas.getContext('2d');
-            ctx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
-            hasSignature = false;
-            sigBox.classList.remove('signed');
-            if (sigHint) sigHint.style.display = '';
-            clearSigBtn.disabled = true;
-            checkSubmitReady();
-        }
-        clearSigBtn.addEventListener('click', clearSignature);
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                initSignatureCanvas();
-                bindSignatureEvents();
-            }, 100);
-        });
-        window.addEventListener('resize', () => {
-            if (sigCanvas.offsetWidth > 0) {
-                const oldData = hasSignature ? sigCanvas.toDataURL() : null;
-                initSignatureCanvas();
-                if (oldData) {
-                    const img = new Image();
-                    img.onload = () => {
-                        const ctx = sigCanvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, sigCanvas.clientWidth, sigCanvas.clientHeight);
-                    };
-                    img.src = oldData;
-                }
-            }
-        });
-
-        // =====================================================
-        // 8. VALIDAR Y GUARDAR
+        // 7. VALIDAR Y GUARDAR
         // =====================================================
         function validateForm() {
             const errors = [];
@@ -1848,11 +1718,7 @@
                 if (!item.concepto) errors.push(`Comprobante ${idx + 1}: falta el concepto.`);
                 if (!item.importe || item.importe <= 0) errors.push(`Comprobante ${idx + 1}: importe inválido.`);
             });
-            if (!hasSignature) errors.push('Debe firmar la comprobación.');
             return errors;
-        }
-        function checkSubmitReady() {
-            document.getElementById('btn-submit').disabled = !hasSignature;
         }
         function showToast(msg, type = 'success') {
             const toast = document.getElementById('toast');
@@ -1916,7 +1782,6 @@
             saveHistorial();
             renderTabsTables();
             showToast('Comprobación ' + folio + ' guardada correctamente.', 'success');
-            document.getElementById('btn-submit').disabled = !hasSignature;
         });
         document.getElementById('btn-submit').addEventListener('click', () => {
             const errors = validateForm();
@@ -1960,7 +1825,6 @@
             document.getElementById('input-periodo').value = '';
             document.getElementById('input-monto-recibido').value = '0';
             document.getElementById('input-metodo').value = 'Efectivo';
-            clearSignature();
             // Rehabilitar inputs (en caso de haber salido del modo vista)
             document.querySelectorAll('#content-nuevo [data-was-disabled]').forEach(el => {
                 el.disabled = false;
