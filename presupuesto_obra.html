@@ -8,9 +8,9 @@
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <style>
         :root {
-            --primary-blue: #152B71; --light-blue: #eef2ff; --bg-color: #f8fafc;
+            --primary-blue: #000000; --light-blue: #e8e8e8; --bg-color: #f8fafc;
             --text-main: #1e293b; --text-muted: #64748b; --border-color: #e2e8f0;
-            --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --info: #3b82f6; --purple: #8b5cf6;
+            --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --info: #404040; --purple: #8b5cf6;
         }
         *{box-sizing:border-box;margin:0;padding:0}
         body{font-family:'Inter',sans-serif;background:var(--bg-color);display:flex;flex-direction:column;height:100vh;overflow:hidden}
@@ -39,7 +39,7 @@
         .tabs-bar{display:flex;gap:8px;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--border-color);flex-wrap:wrap}
         .tab-btn{background:var(--bg-color);border:1.5px solid var(--border-color);color:var(--text-muted);padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;border-radius:10px;display:inline-flex;align-items:center;gap:8px;transition:.2s;font-family:'Inter',sans-serif}
         .tab-btn:hover{background:#fff;color:var(--text-main);border-color:var(--primary-blue)}
-        .tab-btn.active{background:var(--primary-blue);color:#fff;border-color:var(--primary-blue);box-shadow:0 4px 12px rgba(21,43,113,.25)}
+        .tab-btn.active{background:var(--primary-blue);color:#fff;border-color:var(--primary-blue);box-shadow:0 4px 12px rgba(0, 0, 0,.25)}
         .tab-btn i{width:16px;height:16px}
         .tab-content{display:none}
         .tab-content.active{display:block;animation:fadeIn .25s ease}
@@ -57,7 +57,7 @@
         .summary-icon{width:40px;height:40px;border-radius:12px;background:var(--light-blue);color:var(--primary-blue);display:flex;align-items:center;justify-content:center;flex-shrink:0}
         .summary-card.success .summary-icon{background:#dcfce7;color:var(--success)}
         .summary-card.warning .summary-icon{background:#fef3c7;color:var(--warning)}
-        .summary-card.info .summary-icon{background:#dbeafe;color:var(--info)}
+        .summary-card.info .summary-icon{background:#e0e0e0;color:var(--info)}
         .summary-card.purple .summary-icon{background:#ede9fe;color:var(--purple)}
         .summary-icon i{width:22px;height:22px}
         .summary-info{display:flex;flex-direction:column;min-width:0;flex:1}
@@ -67,9 +67,9 @@
         .filter-group{display:flex;flex-direction:column;gap:4px;flex:1;min-width:140px}
         .filter-label{font-size:10px;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px}
         .filter-input,.filter-select{padding:9px 12px;border:1.5px solid var(--border-color);border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;color:var(--text-main);background:#fff;transition:.2s;width:100%}
-        .filter-input:focus,.filter-select:focus{outline:none;border-color:var(--primary-blue);box-shadow:0 0 0 3px rgba(21,43,113,.1)}
+        .filter-input:focus,.filter-select:focus{outline:none;border-color:var(--primary-blue);box-shadow:0 0 0 3px rgba(0, 0, 0,.1)}
         .btn-filter{background:var(--primary-blue);color:#fff;border:none;padding:10px 18px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:.2s;font-family:'Inter',sans-serif;height:40px}
-        .btn-filter:hover{background:#1e40af}
+        .btn-filter:hover{background:#1a1a1a}
         .btn-filter i{width:14px;height:14px}
         .table-wrap{overflow-x:auto;border:1.5px solid var(--border-color);border-radius:14px;background:#fff}
         .expense-table{width:100%;border-collapse:collapse;font-size:12px;min-width:1320px}
@@ -88,7 +88,7 @@
         .btn{padding:11px 18px;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:8px;border:none;font-family:'Inter',sans-serif}
         .btn i{width:16px;height:16px}
         .btn-primary{background:var(--primary-blue);color:#fff}
-        .btn-primary:hover{background:#1e40af;transform:translateY(-1px)}
+        .btn-primary:hover{background:#1a1a1a;transform:translateY(-1px)}
         .btn-secondary{background:#fff;color:var(--primary-blue);border:1.5px solid var(--border-color)}
         .btn-secondary:hover{background:var(--light-blue);border-color:var(--primary-blue)}
         .btn-success{background:var(--success);color:#fff}
@@ -115,13 +115,13 @@
         .progress-mini-fill{height:100%;border-radius:3px;transition:width .5s}
         /* Avance (ejecutado) */
         .avance-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:4px;font-size:9px;font-weight:800;text-transform:uppercase}
-        .avance-badge.full{background:#dbeafe;color:#1e40af}
+        .avance-badge.full{background:#e0e0e0;color:#1a1a1a}
         .avance-badge.partial{background:#fef3c7;color:#92400e}
         .avance-badge.none{background:#f1f5f9;color:var(--text-muted)}
         .avance-input{width:55px;padding:3px 6px;border:1px solid var(--border-color);border-radius:6px;font-size:11px;text-align:right;font-weight:700;color:var(--primary-blue);font-family:'Inter',sans-serif}
         .avance-input:focus{outline:none;border-color:var(--primary-blue)}
         /* Boton fotos */
-        .btn-photos{background:#dbeafe;color:var(--info)}
+        .btn-photos{background:#e0e0e0;color:var(--info)}
         .btn-photos:hover{background:var(--info);color:#fff}
         /* Boton Evidencia (galería combinada FYTTSA + Proveedores) */
         .btn-evidencia{background:#dcfce7;color:var(--success);width:34px;height:34px;border-radius:8px;border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:.15s}
@@ -132,7 +132,7 @@
         .evidencia-count{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;color:var(--text-muted)}
         .evidencia-count strong{color:var(--success);font-weight:800}
         .evidencia-empty{font-size:10px;color:var(--text-muted);font-style:italic;text-align:center;padding:4px}
-        .photo-upload-mini{position:relative;display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border:1.5px solid var(--info);border-radius:8px;cursor:pointer;transition:.2s;font-size:11px;font-weight:700;color:var(--info);background:#dbeafe}
+        .photo-upload-mini{position:relative;display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border:1.5px solid var(--info);border-radius:8px;cursor:pointer;transition:.2s;font-size:11px;font-weight:700;color:var(--info);background:#e0e0e0}
         .photo-upload-mini:hover{background:var(--info);color:#fff}
         .photo-upload-mini input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
         .photo-upload-mini i{width:13px;height:13px}
@@ -143,9 +143,9 @@
         .prov-mini-sep{color:var(--text-muted);font-size:9px}
         .prov-mini-val{font-weight:700;color:var(--text-main);font-size:10px}
         .prov-mini-avance{width:36px;padding:2px 4px;border:1px solid var(--border-color);border-radius:4px;font-size:9px;text-align:center;font-weight:700;color:var(--primary-blue)}
-        .prov-mini-photo-btn{width:22px;height:22px;border:none;border-radius:5px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:.15s;flex-shrink:0}
+        .prov-mini-photo-btn{position:relative;width:22px;height:22px;border:none;border-radius:5px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:.15s;flex-shrink:0;overflow:hidden}
         .prov-mini-photo-btn i{width:11px;height:11px}
-        .prov-mini-upload{background:#dbeafe;color:var(--info)}
+        .prov-mini-upload{background:#e0e0e0;color:var(--info)}
         .prov-mini-upload:hover{background:var(--info);color:#fff}
         .prov-mini-view{background:#dcfce7;color:var(--success)}
         .prov-mini-view:hover{background:var(--success);color:#fff}
@@ -197,7 +197,7 @@
         .form-label{font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
         .form-label .req{color:var(--danger)}
         .form-control{padding:10px 12px;border:1.5px solid var(--border-color);border-radius:10px;font-size:13.5px;font-family:'Inter',sans-serif;color:var(--text-main);background:#fff;transition:.2s;width:100%}
-        .form-control:focus{outline:none;border-color:var(--primary-blue);box-shadow:0 0 0 3px rgba(21,43,113,.1)}
+        .form-control:focus{outline:none;border-color:var(--primary-blue);box-shadow:0 0 0 3px rgba(0, 0, 0,.1)}
         .file-upload-zone{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;border:2px dashed var(--border-color);border-radius:16px;background:var(--bg-color);cursor:pointer;transition:.2s;text-align:center;min-height:180px}
         .file-upload-zone:hover{border-color:var(--primary-blue);background:var(--light-blue)}
         .file-upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
@@ -210,7 +210,7 @@
         .asignado-cell{display:flex;flex-direction:column;gap:3px;align-items:stretch;min-width:120px}
         .asignado-cell.tipo-fytt .assign-prov-mini{display:none}
         .assign-tipo-mini,.assign-prov-mini{padding:3px 5px;border:1px solid var(--border-color);border-radius:5px;font-size:10px;font-weight:700;color:var(--primary-blue);background:#fff;cursor:pointer;font-family:'Inter',sans-serif;max-width:140px}
-        .assign-tipo-mini:focus,.assign-prov-mini:focus{outline:none;border-color:var(--primary-blue);box-shadow:0 0 0 2px rgba(21,43,113,.1)}
+        .assign-tipo-mini:focus,.assign-prov-mini:focus{outline:none;border-color:var(--primary-blue);box-shadow:0 0 0 2px rgba(0, 0, 0,.1)}
         #modal-assign .modal-box{max-width:860px}
         .assign-progress{margin-top:14px;padding:12px;background:var(--light-blue);border-radius:10px}
         .assign-progress-bar{height:10px;background:#fff;border-radius:5px;overflow:hidden;margin-top:6px}
@@ -224,17 +224,22 @@
         .data-table tbody tr:last-child td{border-bottom:none}
         .data-table tbody tr:hover{background:var(--bg-color)}
     </style>
+
+    <!-- Firebase SDK + FYTTSA shared data helper -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="fyttsa-data.js"></script>
 </head>
 <body>
     <header class="header">
         <div class="header-left">
             <button class="menu-btn" id="toggle-menu"><i data-lucide="menu"></i></button>
-            <img src="https://i.ibb.co/fdMsnKTg/LOGO2.png" alt="Logo" height="35">
+            <img src="https://i.ibb.co/x8Bw8KR8/MARFIL-1.jpg" alt="Logo" height="35">
             <h1 class="header-title">FYTTSA - Presupuesto de Obra</h1>
         </div>
         <div class="header-right">
             <div class="user-initial" id="user-initial">U</div>
-            <img src="https://i.ibb.co/jv9mNxYr/LOGO1.png" alt="Logo" height="35" style="border-radius:8px">
+            <img src="https://i.ibb.co/x8Bw8KR8/MARFIL-1.jpg" alt="Logo" height="35" style="border-radius:8px">
         </div>
     </header>
     <div class="main-layout">
@@ -401,7 +406,8 @@
 
     <script>
         // MENU
-        fetch('menu.html').then(r=>r.text()).then(h=>{document.getElementById('sidebar').innerHTML=h;lucide.createIcons();const l=document.getElementById('link-presupuesto');if(l)l.classList.add('active')}).catch(e=>console.error(e));
+        fetch('menu.html').then(r=>r.text()).then(h=>{document.getElementById('sidebar').innerHTML=h;lucide.createIcons();
+                fyttsa_applyPrivilegeMenu();const l=document.getElementById('link-presupuesto');if(l)l.classList.add('active')}).catch(e=>console.error(e));
         document.getElementById('toggle-menu').addEventListener('click',()=>document.getElementById('sidebar').classList.toggle('open'));
         (function(){const n=localStorage.getItem('nombre')||'';if(n)document.getElementById('user-initial').textContent=n.charAt(0).toUpperCase();else setTimeout(arguments.callee,1500)})();
 
@@ -423,9 +429,9 @@
         const BUDGET_KEY='fyttsa_presupuesto_items',PROV_KEY='fyttsa_proveedores';
         let items=[],proveedores=[],pendingImport=null,editItemId=-1;
 
-        function loadAll(){try{items=JSON.parse(localStorage.getItem(BUDGET_KEY)||'[]')}catch(e){items=[]}try{proveedores=JSON.parse(localStorage.getItem(PROV_KEY)||'[]')}catch(e){proveedores=[]}}
-        function saveItems(){localStorage.setItem(BUDGET_KEY,JSON.stringify(items))}
-        function saveProvs(){localStorage.setItem(PROV_KEY,JSON.stringify(proveedores))}
+        async function loadAll(){try{const d1=await fyttsa_loadData(BUDGET_KEY);items=d1||[]}catch(e){items=[]}try{const d2=await fyttsa_loadData(PROV_KEY);proveedores=d2||[]}catch(e){proveedores=[]}}
+        function saveItems(){fyttsa_saveDataSync(BUDGET_KEY,items)}
+        function saveProvs(){fyttsa_saveDataSync(PROV_KEY,proveedores)}
         function genProvId(){return 'p'+Date.now()+Math.floor(Math.random()*100)}
 
         // FILE
@@ -801,7 +807,7 @@
         document.querySelectorAll('.tab-btn').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
 
         function renderAll(){renderPresupuesto();renderProveedores();renderAsignaciones();updateUploadState()}
-        loadAll();renderAll();lucide.createIcons();
+        (async function(){await loadAll();renderAll();lucide.createIcons()})();
     </script>
 </body>
 </html>
