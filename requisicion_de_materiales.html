@@ -8,8 +8,8 @@
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <style>
         :root {
-            --primary-blue: #152B71;
-            --light-blue: #eef2ff;
+            --primary-blue: #000000;
+            --light-blue: #e8e8e8;
             --bg-color: #f8fafc;
             --text-main: #1e293b;
             --text-muted: #64748b;
@@ -17,7 +17,7 @@
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
-            --info: #3b82f6;
+            --info: #404040;
             --purple: #8b5cf6;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -48,7 +48,7 @@
         .tabs-bar { display: flex; gap: 8px; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 2px solid var(--border-color); flex-wrap: wrap; }
         .tab-btn { background: var(--bg-color); border: 1.5px solid var(--border-color); color: var(--text-muted); padding: 10px 20px; font-size: 13px; font-weight: 700; cursor: pointer; border-radius: 10px; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; font-family: 'Inter', sans-serif; }
         .tab-btn:hover { background: white; color: var(--text-main); border-color: var(--primary-blue); }
-        .tab-btn.active { background: var(--primary-blue); color: white; border-color: var(--primary-blue); box-shadow: 0 4px 12px rgba(21, 43, 113, 0.25); }
+        .tab-btn.active { background: var(--primary-blue); color: white; border-color: var(--primary-blue); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25); }
         .tab-btn i { width: 16px; height: 16px; }
         .tab-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 11px; font-size: 11px; font-weight: 800; background: white; color: var(--text-muted); border: 1px solid var(--border-color); }
         .tab-btn.active .tab-badge { background: white; color: var(--primary-blue); border-color: white; }
@@ -65,7 +65,7 @@
         .form-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 6px; }
         .form-label .req { color: var(--danger); }
         .form-control { padding: 10px 12px; border: 1.5px solid var(--border-color); border-radius: 10px; font-size: 13.5px; font-family: 'Inter', sans-serif; color: var(--text-main); background: white; transition: all 0.2s; width: 100%; }
-        .form-control:focus { outline: none; border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(21, 43, 113, 0.1); }
+        .form-control:focus { outline: none; border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1); }
         .form-control[readonly] { background: #e2e8f0; color: var(--text-muted); cursor: not-allowed; font-weight: bold; }
         .top-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
         @media (max-width: 900px) { .top-grid { grid-template-columns: 1fr; } }
@@ -108,7 +108,7 @@
         .col-actions { width: 50px; text-align: center; }
         .table-input { width: 100%; padding: 6px 8px; border: 1px solid transparent; border-radius: 6px; font-size: 12px; font-family: 'Inter', sans-serif; background: transparent; color: var(--text-main); transition: all 0.15s; }
         .table-input:hover { background: var(--bg-color); }
-        .table-input:focus { outline: none; background: white; border-color: var(--primary-blue); box-shadow: 0 0 0 2px rgba(21, 43, 113, 0.1); }
+        .table-input:focus { outline: none; background: white; border-color: var(--primary-blue); box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1); }
         .table-input.right { text-align: right; font-weight: 700; color: var(--primary-blue); }
         .table-input.readonly-field { background: #f1f5f9; color: var(--text-muted); font-weight: 600; cursor: not-allowed; }
         .autocomplete-wrapper { position: relative; }
@@ -125,7 +125,7 @@
         .btn { padding: 11px 18px; border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; border: none; font-family: 'Inter', sans-serif; }
         .btn i { width: 16px; height: 16px; }
         .btn-primary { background: var(--primary-blue); color: white; }
-        .btn-primary:hover { background: #1e40af; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(21, 43, 113, 0.25); }
+        .btn-primary:hover { background: #1a1a1a; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25); }
         .btn-secondary { background: white; color: var(--primary-blue); border: 1.5px solid var(--border-color); }
         .btn-secondary:hover { background: var(--light-blue); border-color: var(--primary-blue); }
         .btn-success { background: var(--success); color: white; }
@@ -145,7 +145,7 @@
         .folio-cell { font-family: 'Courier New', monospace; font-weight: 700; color: var(--primary-blue); }
         .amount-cell { font-weight: 800; text-align: right; color: var(--primary-blue); }
         .empty-row { text-align: center; color: var(--text-muted); font-style: italic; padding: 24px !important; }
-        .signature-section { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center; padding: 24px; background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 100%); border-radius: 16px; border: 1px solid #c7d2fe; }
+        .signature-section { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center; padding: 24px; background: linear-gradient(135deg, #e8e8e8 0%, #f8fafc 100%); border-radius: 16px; border: 1px solid #cccccc; }
         @media (max-width: 768px) { .signature-section { grid-template-columns: 1fr; } }
         .signature-user-info { display: flex; align-items: center; gap: 14px; }
         .signature-avatar { width: 56px; height: 56px; border-radius: 50%; background: var(--primary-blue); color: white; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800; flex-shrink: 0; }
@@ -178,17 +178,22 @@
         .empty-state h4 { font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; }
         .empty-state p { font-size: 12px; }
     </style>
+
+    <!-- Firebase SDK + FYTTSA shared data helper -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="fyttsa-data.js"></script>
 </head>
 <body>
     <header class="header">
         <div class="header-left">
             <button class="menu-btn" id="toggle-menu"><i data-lucide="menu"></i></button>
-            <img src="https://i.ibb.co/fdMsnKTg/LOGO2.png" alt="Logo" height="35">
+            <img src="https://i.ibb.co/x8Bw8KR8/MARFIL-1.jpg" alt="Logo" height="35">
             <h1 class="header-title">FYTTSA - Requisición de Materiales</h1>
         </div>
         <div class="header-right">
             <div class="user-initial" id="user-initial">U</div>
-            <img src="https://i.ibb.co/jv9mNxYr/LOGO1.png" alt="Logo" height="35" style="border-radius: 8px;">
+            <img src="https://i.ibb.co/x8Bw8KR8/MARFIL-1.jpg" alt="Logo" height="35" style="border-radius: 8px;">
         </div>
     </header>
 
@@ -301,40 +306,16 @@
                 </div>
 
                 <div class="card">
-                    <h3 class="card-title"><i data-lucide="pen-tool"></i> Firma de Solicitante</h3>
-                    <div class="signature-section">
-                        <div class="signature-user-info">
-                            <div class="signature-avatar" id="sig-avatar">U</div>
-                            <div class="signature-user-detail">
-                                <span class="signature-user-label">Solicita:</span>
-                                <span class="signature-user-name" id="sig-user-name">Cargando usuario...</span>
-                                <span class="signature-user-role">Responsable de la requisición</span>
-                                <span class="signature-user-role" style="margin-top: 4px; font-size: 11px;" id="sig-date">—</span>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="signature-box" id="sig-box">
-                                <canvas id="signature-canvas"></canvas>
-                                <div class="signature-hint" id="sig-hint">
-                                    <i data-lucide="edit-3"></i>Firma aquí con el mouse o el dedo
-                                </div>
-                            </div>
-                            <div class="signature-actions">
-                                <button type="button" class="btn-mini btn-mini-clear" id="btn-clear-sig" disabled>
-                                    <i data-lucide="eraser"></i> Borrar firma
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="actions-bar" style="margin-top: 24px;">
+                    <h3 class="card-title"><i data-lucide="send"></i> Acciones</h3>
+                    <div class="actions-bar" style="margin-top: 10px;">
                         <button class="btn btn-danger" id="btn-cancel">
                             <i data-lucide="x"></i> Cancelar
                         </button>
                         <button class="btn btn-primary" id="btn-save">
                             <i data-lucide="save"></i> Guardar requisición
                         </button>
-                        <button class="btn btn-success" id="btn-submit" disabled>
-                            <i data-lucide="check-circle-2"></i> Firmar y enviar
+                        <button class="btn btn-success" id="btn-submit">
+                            <i data-lucide="send"></i> Enviar a almacén
                         </button>
                     </div>
                 </div>
@@ -398,6 +379,7 @@
             .then(html => {
                 document.getElementById('sidebar').innerHTML = html;
                 lucide.createIcons();
+                fyttsa_applyPrivilegeMenu();
                 const link = document.getElementById('link-requisicion');
                 if (link) link.classList.add('active');
             })
@@ -413,14 +395,10 @@
         function applyUserName() {
             const nombre = getUserName();
             if (nombre) {
-                document.getElementById('sig-user-name').textContent = nombre;
-                document.getElementById('sig-avatar').textContent = nombre.charAt(0).toUpperCase();
                 document.getElementById('user-initial').textContent = nombre.charAt(0).toUpperCase();
             } else { setTimeout(applyUserName, 1500); }
         }
         applyUserName();
-        const today = new Date();
-        document.getElementById('sig-date').textContent = today.toLocaleDateString('es-MX', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
         document.getElementById('input-fecha-req').valueAsDate = new Date();
 
         // =====================================================
@@ -428,10 +406,10 @@
         // =====================================================
         const INV_KEY = 'fyttsa_almacen_inventario';
         let inventario = [];
-        function loadInventario() {
+        async function loadInventario() {
             try {
-                const data = localStorage.getItem(INV_KEY);
-                inventario = data ? JSON.parse(data) : [];
+                const data = await fyttsa_loadData(INV_KEY);
+                inventario = data || [];
             } catch (e) { inventario = []; }
         }
         function buscarEnInventario(query) {
@@ -615,14 +593,14 @@
         // =====================================================
         const HIST_KEY = 'fyttsa_requisiciones_historial';
         let historial = [];
-        function loadHistorial() {
+        async function loadHistorial() {
             try {
-                const data = localStorage.getItem(HIST_KEY);
-                historial = data ? JSON.parse(data) : [];
+                const data = await fyttsa_loadData(HIST_KEY);
+                historial = data || [];
                 historial.forEach(h => { if (!h.status) h.status = 'guardado'; });
             } catch (e) { historial = []; }
         }
-        function saveHistorial() { localStorage.setItem(HIST_KEY, JSON.stringify(historial)); }
+        function saveHistorial() { fyttsa_saveDataSync(HIST_KEY, historial); }
         function generateFolio() {
             const year = new Date().getFullYear();
             let maxNum = 0;
@@ -732,7 +710,6 @@
             document.getElementById('input-notas').value = h.notas || '';
             items = (h.items || []).map(i => ({...i, id: newItemId()}));
             renderItems();
-            clearSignature();
             window.scrollTo({ top: 0, behavior: 'smooth' });
             showToast('Requisición ' + folio + ' cargada para edición.', 'success');
         }
@@ -752,7 +729,6 @@
             document.getElementById('input-notas').value = h.notas || '';
             items = (h.items || []).map(i => ({...i, id: newItemId()}));
             renderItems();
-            clearSignature();
             document.querySelectorAll('#content-nuevo input, #content-nuevo select, #content-nuevo textarea, #content-nuevo button').forEach(el => {
                 if (el.id !== 'btn-cancel') { el.disabled = true; el.dataset.wasDisabled = 'true'; }
             });
@@ -787,86 +763,6 @@
         });
 
         // =====================================================
-        // FIRMA (CANVAS)
-        // =====================================================
-        const sigCanvas = document.getElementById('signature-canvas');
-        const sigHint = document.getElementById('sig-hint');
-        const sigBox = document.getElementById('sig-box');
-        const clearSigBtn = document.getElementById('btn-clear-sig');
-        let hasSignature = false;
-
-        function initSignatureCanvas() {
-            if (!sigCanvas) return;
-            const dpr = window.devicePixelRatio || 1;
-            const rect = sigCanvas.getBoundingClientRect();
-            if (rect.width === 0) { setTimeout(initSignatureCanvas, 200); return; }
-            sigCanvas.width = Math.max(1, Math.floor(rect.width * dpr));
-            sigCanvas.height = Math.max(1, Math.floor(rect.height * dpr));
-            const ctx = sigCanvas.getContext('2d');
-            ctx.scale(dpr, dpr);
-            ctx.lineWidth = 2.2; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#152B71';
-        }
-        function bindSignatureEvents() {
-            let drawing = false, lastX = 0, lastY = 0;
-            function getPos(e) {
-                const r = sigCanvas.getBoundingClientRect();
-                if (e.touches && e.touches.length > 0) return { x: e.touches[0].clientX - r.left, y: e.touches[0].clientY - r.top };
-                return { x: e.clientX - r.left, y: e.clientY - r.top };
-            }
-            function startDraw(e) {
-                e.preventDefault(); drawing = true;
-                const p = getPos(e); lastX = p.x; lastY = p.y;
-                if (sigHint) sigHint.style.display = 'none';
-                const ctx = sigCanvas.getContext('2d');
-                ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x + 0.1, p.y + 0.1); ctx.stroke();
-            }
-            function draw(e) {
-                if (!drawing) return;
-                e.preventDefault();
-                const ctx = sigCanvas.getContext('2d');
-                const p = getPos(e);
-                ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(p.x, p.y); ctx.stroke();
-                lastX = p.x; lastY = p.y;
-                if (!hasSignature) {
-                    hasSignature = true;
-                    sigBox.classList.add('signed');
-                    clearSigBtn.disabled = false;
-                    checkSubmitReady();
-                }
-            }
-            function endDraw(e) { if (drawing && e) e.preventDefault(); drawing = false; }
-            sigCanvas.addEventListener('mousedown', startDraw);
-            sigCanvas.addEventListener('mousemove', draw);
-            sigCanvas.addEventListener('mouseup', endDraw);
-            sigCanvas.addEventListener('mouseleave', endDraw);
-            sigCanvas.addEventListener('touchstart', startDraw, { passive: false });
-            sigCanvas.addEventListener('touchmove', draw, { passive: false });
-            sigCanvas.addEventListener('touchend', endDraw, { passive: false });
-        }
-        function clearSignature() {
-            const ctx = sigCanvas.getContext('2d');
-            ctx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
-            hasSignature = false;
-            sigBox.classList.remove('signed');
-            if (sigHint) sigHint.style.display = '';
-            clearSigBtn.disabled = true;
-            checkSubmitReady();
-        }
-        clearSigBtn.addEventListener('click', clearSignature);
-        window.addEventListener('load', () => { setTimeout(() => { initSignatureCanvas(); bindSignatureEvents(); }, 100); });
-        window.addEventListener('resize', () => {
-            if (sigCanvas.offsetWidth > 0) {
-                const oldData = hasSignature ? sigCanvas.toDataURL() : null;
-                initSignatureCanvas();
-                if (oldData) {
-                    const img = new Image();
-                    img.onload = () => { const ctx = sigCanvas.getContext('2d'); ctx.drawImage(img, 0, 0, sigCanvas.clientWidth, sigCanvas.clientHeight); };
-                    img.src = oldData;
-                }
-            }
-        });
-
-        // =====================================================
         // VALIDAR Y GUARDAR
         // =====================================================
         function validateForm() {
@@ -881,10 +777,8 @@
                 if (!item.descripcion) errors.push(`Material ${idx + 1}: falta la descripción.`);
                 if (!item.cantidad || item.cantidad <= 0) errors.push(`Material ${idx + 1}: cantidad inválida.`);
             });
-            if (!hasSignature) errors.push('Debe firmar la requisición.');
             return errors;
         }
-        function checkSubmitReady() { document.getElementById('btn-submit').disabled = !hasSignature; }
 
         document.getElementById('btn-save').addEventListener('click', () => {
             const errors = validateForm();
@@ -916,7 +810,6 @@
             saveHistorial();
             renderTabsTables();
             showToast('Requisición ' + folio + ' guardada correctamente.', 'success');
-            document.getElementById('btn-submit').disabled = !hasSignature;
         });
 
         document.getElementById('btn-submit').addEventListener('click', () => {
@@ -947,7 +840,6 @@
             document.getElementById('input-fecha-req').valueAsDate = new Date();
             document.getElementById('input-fecha-necesidad').value = '';
             document.getElementById('input-notas').value = '';
-            clearSignature();
             document.querySelectorAll('#content-nuevo [data-was-disabled]').forEach(el => { el.disabled = false; delete el.dataset.wasDisabled; });
             addItem();
             updateFolioInput();
@@ -956,11 +848,13 @@
         // =====================================================
         // INICIALIZAR
         // =====================================================
-        loadInventario();
-        loadHistorial();
-        renderTabsTables();
-        updateFolioInput();
-        lucide.createIcons();
+        (async function() {
+            await loadInventario();
+            await loadHistorial();
+            renderTabsTables();
+            updateFolioInput();
+            lucide.createIcons();
+        })();
     </script>
 </body>
 </html>
