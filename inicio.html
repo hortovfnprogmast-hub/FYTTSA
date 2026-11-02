@@ -11,8 +11,8 @@
 
     <style>
         :root {
-            --primary-blue: #152B71;
-            --light-blue: #eef2ff;
+            --primary-blue: #000000;
+            --light-blue: #e8e8e8;
             --bg-color: #f8fafc;
             --text-main: #1e293b;
             --text-muted: #64748b;
@@ -20,7 +20,7 @@
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
-            --info: #3b82f6;
+            --info: #404040;
             --purple: #8b5cf6;
         }
 
@@ -91,7 +91,7 @@
             padding: 40px;
             text-align: center;
             border: 1px solid var(--border-color);
-            box-shadow: 0 10px 30px rgba(21, 43, 113, 0.08);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
         }
         .welcome-box h1 { margin: 0 0 5px 0; font-size: 24px; color: var(--text-main); }
         .welcome-box h2 { margin: 0 0 20px 0; font-size: 32px; color: var(--primary-blue); text-transform: uppercase; }
@@ -140,7 +140,7 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.03);
             transition: transform 0.2s, box-shadow 0.2s;
         }
-        .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(21, 43, 113, 0.1); }
+        .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); }
         .kpi-icon {
             width: 44px; height: 44px; border-radius: 14px;
             background-color: var(--light-blue); color: var(--primary-blue);
@@ -236,7 +236,7 @@
         .badge.ok { background: #dcfce7; color: #166534; }
         .badge.warn { background: #fef3c7; color: #92400e; }
         .badge.bad { background: #fee2e2; color: #991b1b; }
-        .badge.info { background: #dbeafe; color: #1e40af; }
+        .badge.info { background: #e0e0e0; color: #1a1a1a; }
 
         /* Progress bar */
         .progress-row { margin-bottom: 12px; }
@@ -293,11 +293,11 @@
             width: 58px;
             height: 58px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #152B71 0%, #1e40af 100%);
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
             color: white;
             border: none;
             cursor: pointer;
-            box-shadow: 0 8px 22px rgba(21, 43, 113, 0.35);
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
             z-index: 90;
             display: flex;
             align-items: center;
@@ -306,7 +306,7 @@
         }
         .fab-privacy:hover {
             transform: scale(1.08) translateY(-2px);
-            box-shadow: 0 14px 30px rgba(21, 43, 113, 0.45);
+            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.45);
         }
         .fab-privacy i { width: 26px; height: 26px; }
         .fab-privacy .fab-pulse {
@@ -361,7 +361,7 @@
         }
 
         .privacy-header {
-            background: linear-gradient(135deg, #152B71 0%, #1e40af 100%);
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
             color: #fff;
             padding: 22px 28px 18px;
             flex-shrink: 0;
@@ -431,30 +431,30 @@
         .privacy-body::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
         .privacy-body h3 {
-            color: #152B71;
+            color: #000000;
             font-size: 14.5px;
             margin: 18px 0 8px 0;
             font-weight: 800;
             display: flex;
             align-items: center;
             gap: 8px;
-            border-left: 4px solid #152B71;
+            border-left: 4px solid #000000;
             padding-left: 10px;
         }
         .privacy-body h3:first-child { margin-top: 0; }
         .privacy-body p { margin: 0 0 10px 0; }
         .privacy-body ul { margin: 0 0 12px 0; padding-left: 22px; }
         .privacy-body ul li { margin-bottom: 5px; }
-        .privacy-body strong { color: #152B71; }
+        .privacy-body strong { color: #000000; }
         .privacy-body .pv-info-box {
-            background: #eef2ff;
-            border: 1px solid #c7d2fe;
+            background: #e8e8e8;
+            border: 1px solid #cccccc;
             border-radius: 12px;
             padding: 12px 14px;
             font-size: 12.5px;
             margin: 14px 0;
         }
-        .privacy-body .pv-info-box b { color: #152B71; }
+        .privacy-body .pv-info-box b { color: #000000; }
 
         .pv-end-marker {
             text-align: center;
@@ -541,7 +541,7 @@
             margin-bottom: 14px;
         }
         .pv-sig-canvas-wrap.signed {
-            border-color: #152B71;
+            border-color: #000000;
         }
         #pv-signature-canvas {
             display: block;
@@ -566,9 +566,9 @@
             display: flex;
             align-items: center;
             gap: 14px;
-            background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 100%);
-            border: 1px solid #c7d2fe;
-            border-left: 4px solid #152B71;
+            background: linear-gradient(135deg, #e8e8e8 0%, #f8fafc 100%);
+            border: 1px solid #cccccc;
+            border-left: 4px solid #000000;
             border-radius: 12px;
             padding: 12px 16px;
             margin-bottom: 14px;
@@ -577,7 +577,7 @@
             width: 38px;
             height: 38px;
             border-radius: 50%;
-            background: #152B71;
+            background: #000000;
             color: #fff;
             display: flex;
             align-items: center;
@@ -600,7 +600,7 @@
         }
         .pv-user-confirm-name {
             font-size: 15px;
-            color: #152B71;
+            color: #000000;
             font-weight: 800;
             margin-top: 2px;
             word-break: break-word;
@@ -632,7 +632,7 @@
         }
         .pv-btn i { width: 16px; height: 16px; }
         .pv-btn-accept {
-            background: #152B71;
+            background: #000000;
             color: #fff;
         }
         .pv-btn-accept:disabled {
@@ -641,9 +641,9 @@
             cursor: not-allowed;
         }
         .pv-btn-accept:not(:disabled):hover {
-            background: #1e40af;
+            background: #1a1a1a;
             transform: translateY(-2px);
-            box-shadow: 0 8px 18px rgba(21, 43, 113, 0.3);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
         }
         .pv-btn-decline {
             background: #fff;
@@ -710,7 +710,7 @@
             margin: 0 0 6px 0;
             font-size: 18px;
             font-weight: 800;
-            color: #152B71;
+            color: #000000;
         }
         .confirm-modal-header p {
             margin: 0;
@@ -795,18 +795,23 @@
         }
 
     </style>
+
+    <!-- Firebase SDK + FYTTSA shared data helper -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="fyttsa-data.js"></script>
 </head>
 <body>
     <header class="header">
         <div class="header-left">
             <button class="menu-btn" id="toggle-menu"><i data-lucide="menu"></i></button>
-            <img src="https://i.ibb.co/fdMsnKTg/LOGO2.png" alt="Logo" height="35">
+            <img src="https://i.ibb.co/x8Bw8KR8/MARFIL-1.jpg" alt="Logo" height="35">
             <h1 class="header-title">FYTTSA - Ingeniería, Construcción, Edificación y Remodelación</h1>
         </div>
         
         <div class="header-right">
             <div class="user-initial" id="user-initial">U</div>
-            <img src="https://i.ibb.co/jv9mNxYr/LOGO1.png" alt="Logo" height="35" style="border-radius: 8px;">
+            <img src="https://i.ibb.co/x8Bw8KR8/MARFIL-1.jpg" alt="Logo" height="35" style="border-radius: 8px;">
         </div>
     </header>
 
@@ -816,7 +821,7 @@
 
         <main class="content">
             <div class="welcome-box">
-                <img src="https://i.ibb.co/fdMsnKTg/LOGO2.png" alt="Logo" style="width: 120px; margin-bottom: 15px; border-radius: 16px;">
+                <img src="https://i.ibb.co/x8Bw8KR8/MARFIL-1.jpg" alt="Logo" style="width: 120px; margin-bottom: 15px; border-radius: 16px;">
                 <h1>Bienvenido</h1>
                 <h2 id="welcome-name">Cargando...</h2>
                 <p style="color: var(--text-muted);">Selecciona una opción del menú lateral para comenzar.</p>
@@ -858,7 +863,7 @@
                         </div>
                     </div>
                     <div class="kpi-card" style="border-left-color: var(--info);">
-                        <div class="kpi-icon" style="background-color: #dbeafe; color: var(--info);"><i data-lucide="clock"></i></div>
+                        <div class="kpi-icon" style="background-color: #e0e0e0; color: var(--info);"><i data-lucide="clock"></i></div>
                         <div class="kpi-info">
                             <span class="kpi-value">94%</span>
                             <span class="kpi-label">Asistencia Semana</span>
@@ -971,7 +976,7 @@
                                 </div>
                             </li>
                             <li class="activity-item">
-                                <div class="activity-dot" style="background:#dbeafe; color:var(--info);"><i data-lucide="fuel" style="width:16px;"></i></div>
+                                <div class="activity-dot" style="background:#e0e0e0; color:var(--info);"><i data-lucide="fuel" style="width:16px;"></i></div>
                                 <div class="activity-content">
                                     <p class="activity-title">Carga de gasolina registrada</p>
                                     <p class="activity-meta">Hace 1 h · Vehículo: Camión Ford-08</p>
@@ -1128,7 +1133,7 @@
                                 </div>
                             </li>
                             <li class="activity-item">
-                                <div class="activity-dot" style="background:#dbeafe; color:var(--info);"><i data-lucide="clipboard-check" style="width:16px;"></i></div>
+                                <div class="activity-dot" style="background:#e0e0e0; color:var(--info);"><i data-lucide="clipboard-check" style="width:16px;"></i></div>
                                 <div class="activity-content">
                                     <p class="activity-title">Bitácora al día</p>
                                     <p class="activity-meta">Última actualización: hoy 8:15 AM</p>
@@ -1141,7 +1146,6 @@
         </main>
 
     </div>
-
 
     <!-- Boton flotante de Aviso de Privacidad -->
     <button class="fab-privacy" id="fabPrivacy" title="Aviso de Privacidad">
@@ -1183,7 +1187,7 @@
                 </div>
 
                 <div class="pv-sig-label">
-                    <span><i data-lucide="pen-tool" style="width:14px;height:14px;vertical-align:-2px;color:#152B71;"></i> Firma electr&oacute;nica</span>
+                    <span><i data-lucide="pen-tool" style="width:14px;height:14px;vertical-align:-2px;color:#000000;"></i> Firma electr&oacute;nica</span>
                     <button type="button" class="pv-sig-clear" id="pvClearSig" disabled>
                         <i data-lucide="eraser"></i> Borrar firma
                     </button>
@@ -1247,7 +1251,8 @@
             .then(response => response.text())
             .then(html => {
                 document.getElementById('sidebar').innerHTML = html;
-                lucide.createIcons(); 
+                lucide.createIcons();
+                fyttsa_applyPrivilegeMenu(); 
                 const paginaActual = document.getElementById('link-inicio');
                 if(paginaActual) paginaActual.classList.add('active');
             })
@@ -1347,8 +1352,8 @@
                 return;
             }
 
-            const COLOR_PRIMARIO = '#152B71';
-            const COLOR_PRIMARIO_BG = 'rgba(21, 43, 113, 0.15)';
+            const COLOR_PRIMARIO = '#000000';
+            const COLOR_PRIMARIO_BG = 'rgba(0, 0, 0, 0.15)';
 
             Chart.defaults.font.family = "'Inter', sans-serif";
             Chart.defaults.color = '#64748b';
@@ -1362,7 +1367,7 @@
                 datasets: [{
                     label: 'Avance (%)',
                     data: [82, 65, 48, 90, 35],
-                    backgroundColor: ['#152B71', '#3b82f6', '#10b981', '#f59e0b', '#ef4444'],
+                    backgroundColor: ['#000000', '#404040', '#10b981', '#f59e0b', '#ef4444'],
                     borderRadius: 8, barThickness: 28
                 }]
             },
@@ -1409,7 +1414,7 @@
                 labels: ['Albañilería', 'Herrería', 'Electricidad', 'Plomería', 'Pintura', 'Supervisión'],
                 datasets: [{
                     data: [38, 22, 18, 14, 26, 24],
-                    backgroundColor: ['#152B71', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444'],
+                    backgroundColor: ['#000000', '#404040', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444'],
                     borderWidth: 2, borderColor: '#ffffff'
                 }]
             },
@@ -1429,7 +1434,7 @@
                 datasets: [{
                     label: 'Consumo',
                     data: [4820, 3150, 6240, 1280, 940],
-                    backgroundColor: ['#152B71', '#1e40af', '#2563eb', '#3b82f6', '#60a5fa'],
+                    backgroundColor: ['#000000', '#1a1a1a', '#303030', '#404040', '#606060'],
                     borderRadius: 8, barThickness: 22
                 }]
             },
@@ -1488,7 +1493,7 @@
                 datasets: [{
                     label: 'Reportes',
                     data: [12, 14, 11, 16, 15, 18, 17, 19],
-                    backgroundColor: 'rgba(21, 43, 113, 0.7)',
+                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
                     borderColor: COLOR_PRIMARIO,
                     borderWidth: 1,
                     borderRadius: 8,
@@ -1510,7 +1515,7 @@
                 datasets: [{
                     data: [180, 145, 95, 320, 210, 80],
                     backgroundColor: [
-                        'rgba(21, 43, 113, 0.7)',
+                        'rgba(0, 0, 0, 0.7)',
                         'rgba(59, 130, 246, 0.7)',
                         'rgba(16, 185, 129, 0.7)',
                         'rgba(245, 158, 11, 0.7)',
@@ -1537,7 +1542,7 @@
                         label: 'Obra Reforma',
                         data: [88, 95, 80, 75, 90, 85],
                         borderColor: COLOR_PRIMARIO,
-                        backgroundColor: 'rgba(21, 43, 113, 0.2)',
+                        backgroundColor: 'rgba(0, 0, 0, 0.2)',
                         borderWidth: 2,
                         pointBackgroundColor: COLOR_PRIMARIO,
                         pointRadius: 4
@@ -1572,7 +1577,6 @@
         } else {
             inicializarGraficas();
         }
-
 
         // =====================================================
         // AVISO DE PRIVACIDAD - logica completa
@@ -1870,7 +1874,7 @@
             pvCtx.lineWidth = 2.2;
             pvCtx.lineCap = 'round';
             pvCtx.lineJoin = 'round';
-            pvCtx.strokeStyle = '#152B71';
+            pvCtx.strokeStyle = '#000000';
 
             // Limpia listeners previos (por si se reinicializa)
             const newCanvas = pvCanvas.cloneNode(false);
@@ -1886,7 +1890,7 @@
             c2.lineWidth = 2.2;
             c2.lineCap = 'round';
             c2.lineJoin = 'round';
-            c2.strokeStyle = '#152B71';
+            c2.strokeStyle = '#000000';
             // guardamos referencia global
             window._pvCanvas = canvas;
             window._pvCtx = c2;
