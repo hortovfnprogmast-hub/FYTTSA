@@ -1,0 +1,23 @@
+{
+  "name": "LORETO",
+  "short_name": "LORETO",
+  "description": "Sistema de Gestión de Reportes LORETO",
+  "start_url": "https://hortovfnprogmast-hub.github.io/LORETO/",
+  "display": "standalone",
+  "background_color": "#058EA6",
+  "theme_color": "#058EA6",
+  "icons": [
+    {
+      "src": "https://i.ibb.co/Q7gpgrtS/chiquita.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://i.ibb.co/Q7gpgrtS/chiquita.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
