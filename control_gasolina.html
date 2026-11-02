@@ -8,14 +8,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" onerror="this.onerror=null;var s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js';document.head.appendChild(s);"></script>
-
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-
-    <style>
+<style>
         :root {
-            --primary-blue: #152B71;
-            --light-blue: #eef2ff;
+            --primary-blue: #000000;
+            --light-blue: #e8e8e8;
             --bg-color: #f8fafc;
             --text-main: #1e293b;
             --text-muted: #64748b;
@@ -23,7 +19,7 @@
             --danger: #dc2626;
             --success: #10b981;
             --warning: #f59e0b;
-            --info: #3b82f6;
+            --info: #404040;
             --purple: #8b5cf6;
         }
 
@@ -73,7 +69,7 @@
             font-family: inherit;
             display: inline-flex; align-items: center; gap: 6px;
         }
-        .period-tab.active { background: var(--primary-blue); color: white; box-shadow: 0 2px 8px rgba(21,43,113,0.3); }
+        .period-tab.active { background: var(--primary-blue); color: white; box-shadow: 0 2px 8px rgba(0, 0, 0,0.3); }
 
         .filters-card {
             background: white;
@@ -98,7 +94,7 @@
         }
         .filter-input:focus, .filter-select:focus { background: white; border-color: var(--primary-blue); }
         .btn-filter { background: var(--primary-blue); color: white; border: none; padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: 0.2s; }
-        .btn-filter:hover { background: #0d1a4a; transform: translateY(-1px); }
+        .btn-filter:hover { background: #000000; transform: translateY(-1px); }
         .btn-clear { background: white; color: var(--danger); border: 1px solid var(--danger); padding: 10px 14px; border-radius: 10px; font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: 0.2s; }
         .btn-clear:hover { background: var(--danger); color: white; }
 
@@ -111,7 +107,7 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.03);
             transition: transform 0.2s, box-shadow 0.2s;
         }
-        .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(21,43,113,0.1); }
+        .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0, 0, 0,0.1); }
         .kpi-icon { width: 44px; height: 44px; border-radius: 12px; background-color: var(--light-blue); color: var(--primary-blue); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .kpi-info { display: flex; flex-direction: column; }
         .kpi-value { font-size: 22px; font-weight: 800; color: var(--text-main); line-height: 1.1; }
@@ -152,7 +148,7 @@
         .badge.ok { background: #dcfce7; color: #166534; }
         .badge.warn { background: #fef3c7; color: #92400e; }
         .badge.bad { background: #fee2e2; color: #991b1b; }
-        .badge.info { background: #dbeafe; color: #1e40af; }
+        .badge.info { background: #e0e0e0; color: #1a1a1a; }
         .badge.purple { background: #ede9fe; color: #5b21b6; }
 
         .btn-action {
@@ -160,10 +156,10 @@
             cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
             border: none; transition: 0.2s; font-family: inherit;
         }
-        .btn-action.view { background: #dbeafe; color: #1e40af; }
-        .btn-action.view:hover { background: #bfdbfe; }
+        .btn-action.view { background: #e0e0e0; color: #1a1a1a; }
+        .btn-action.view:hover { background: #cccccc; }
         .btn-action.detail { background: var(--primary-blue); color: white; padding: 8px 14px; font-size: 12px; }
-        .btn-action.detail:hover { background: #0d1a4a; transform: translateY(-1px); }
+        .btn-action.detail:hover { background: #000000; transform: translateY(-1px); }
 
         .detail-section {
             display: none;
@@ -225,18 +221,23 @@
             .page-header h1 { font-size: 20px; }
         }
     </style>
+
+    <!-- Firebase SDK + FYTTSA shared data helper -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="fyttsa-data.js"></script>
 </head>
 <body>
 
     <header class="header">
         <div class="header-left">
             <button class="menu-btn" id="toggle-menu"><i data-lucide="menu"></i></button>
-            <img src="https://i.ibb.co/fdMsnKTg/LOGO2.png" alt="Logo" style="height: 35px; object-fit: contain; border-radius: 6px;">
+            <img src="https://i.ibb.co/x8Bw8KR8/MARFIL-1.jpg" alt="Logo" style="height: 35px; object-fit: contain; border-radius: 6px;">
             <h1 class="header-title">Control de Asistencia</h1>
         </div>
         <div class="header-right">
             <div class="user-initial" id="user-initial">U</div>
-            <img src="https://i.ibb.co/jv9mNxYr/LOGO1.png" alt="User" height="35" style="border-radius: 8px;">
+            <img src="https://i.ibb.co/x8Bw8KR8/MARFIL-1.jpg" alt="User" height="35" style="border-radius: 8px;">
         </div>
     </header>
 
@@ -481,6 +482,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             fetch('menu.html').then(res => res.text()).then(html => {
                 document.getElementById('sidebar').innerHTML = html; lucide.createIcons();
+                fyttsa_applyPrivilegeMenu();
                 const linkInicio = document.getElementById('link-inicio'); if(linkInicio) linkInicio.classList.remove('active');
                 const linkCtrl = document.getElementById('link-control-asistencia'); if(linkCtrl) linkCtrl.classList.add('active');
             });
@@ -698,7 +700,7 @@
                 porUsuario.set(nom, (porUsuario.get(nom) || 0) + 1);
             });
             const top = [...porUsuario.entries()].sort((a,b) => b[1] - a[1]).slice(0, 10);
-            const palette = ['#152B71', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4', '#84cc16', '#f97316', '#ec4899'];
+            const palette = ['#000000', '#404040', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4', '#84cc16', '#f97316', '#ec4899'];
 
             chartUsuarios = new Chart(document.getElementById('chartUsuarios'), {
                 type: 'bar',
