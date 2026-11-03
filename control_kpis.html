@@ -1,0 +1,1937 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de KPIs | FYTTSA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" onerror="this.onerror=null;var s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js';document.head.appendChild(s);"></script>
+
+    <style>
+        :root {
+            --primary-blue: #000000;
+            --light-blue: #e8e8e8;
+            --bg-color: #f8fafc;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #404040;
+            --purple: #8b5cf6;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            display: flex; flex-direction: column;
+            height: 100vh; overflow: hidden;
+        }
+        .header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 20px; background: white;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 50; flex-shrink: 0;
+        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .menu-btn { background: none; border: none; cursor: pointer; color: var(--text-main); padding: 5px; }
+        .header-title { margin: 0; font-size: 15px; font-weight: 700; color: var(--primary-blue); display: none; }
+        @media (min-width: 768px) { .header-title { display: block; } }
+        .header-right { display: flex; align-items: center; gap: 12px; }
+        .user-initial {
+            width: 35px; height: 35px; border-radius: 50%;
+            background-color: var(--primary-blue); color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 16px;
+        }
+        .main-layout { display: flex; flex: 1; overflow: hidden; }
+        .sidebar {
+            width: 260px; background: white;
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto; transition: transform 0.3s ease;
+            display: flex; flex-direction: column; flex-shrink: 0;
+        }
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; height: calc(100vh - 60px); transform: translateX(-100%); z-index: 40; }
+            .sidebar.open { transform: translateX(0); }
+            .header-title { display: none; }
+        }
+        .sidebar-nav { padding: 15px 10px; }
+        .sidebar-section { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
+        .sidebar-section:last-child { border-bottom: none; }
+        .sidebar .section-title { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin: 10px 15px; padding-bottom: 0; display: block; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 15px; color: var(--text-main); text-decoration: none; font-size: 14px; font-weight: 500; border-radius: 10px; margin-bottom: 2px; transition: all 0.2s; }
+        .nav-item:hover { background-color: var(--bg-color); }
+        .nav-item.active { background-color: #e8e8e8 !important; color: #000000 !important; font-weight: 700 !important; border-left: 4px solid #000000 !important; border-radius: 8px !important; }
+        .nav-item.active i { color: var(--primary-blue); }
+
+        .content { flex: 1; padding: 30px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        @media (max-width: 768px) { .content { padding: 20px; } }
+
+        .page-title { display: flex; align-items: center; gap: 12px; font-size: 22px; font-weight: 800; color: var(--primary-blue); margin-bottom: 8px; }
+        .page-title i { width: 28px; height: 28px; }
+        .page-subtitle { color: var(--text-muted); font-size: 13px; margin-bottom: 25px; }
+
+        /* Tabs */
+        .tabs-bar {
+            display: flex; gap: 8px; margin-bottom: 20px;
+            padding-bottom: 14px; border-bottom: 2px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            background: var(--bg-color); border: 1.5px solid var(--border-color);
+            color: var(--text-muted); padding: 10px 20px; font-size: 13px; font-weight: 700;
+            cursor: pointer; border-radius: 10px;
+            display: inline-flex; align-items: center; gap: 8px;
+            transition: all 0.2s; font-family: 'Inter', sans-serif;
+        }
+        .tab-btn:hover { background: white; color: var(--text-main); border-color: var(--primary-blue); }
+        .tab-btn.active {
+            background: var(--primary-blue); color: white;
+            border-color: var(--primary-blue);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        }
+        .tab-btn i { width: 16px; height: 16px; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.25s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .card {
+            background: white; border-radius: 20px; padding: 24px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            margin-bottom: 20px;
+        }
+        .card-title {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 15px; font-weight: 700; color: var(--text-main);
+            margin-bottom: 18px; padding-bottom: 12px;
+            border-bottom: 2px solid var(--light-blue);
+        }
+        .card-title i { color: var(--primary-blue); width: 20px; height: 20px; }
+
+        /* KPI grid */
+        .kpi-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px; margin-bottom: 20px;
+        }
+        .kpi-card {
+            background: white; border-radius: 16px; padding: 18px 20px;
+            border: 1px solid var(--border-color);
+            border-left: 5px solid var(--primary-blue);
+            display: flex; align-items: center; gap: 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+        .kpi-card.success { border-left-color: var(--success); }
+        .kpi-card.warning { border-left-color: var(--warning); }
+        .kpi-card.danger { border-left-color: var(--danger); }
+        .kpi-card.info { border-left-color: var(--info); }
+        .kpi-card.purple { border-left-color: var(--purple); }
+        .kpi-icon {
+            width: 44px; height: 44px; border-radius: 12px;
+            background: var(--light-blue); color: var(--primary-blue);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .kpi-card.success .kpi-icon { background: #dcfce7; color: var(--success); }
+        .kpi-card.warning .kpi-icon { background: #fef3c7; color: var(--warning); }
+        .kpi-card.danger .kpi-icon { background: #fee2e2; color: var(--danger); }
+        .kpi-card.info .kpi-icon { background: #e0e0e0; color: var(--info); }
+        .kpi-card.purple .kpi-icon { background: #ede9fe; color: var(--purple); }
+        .kpi-icon i { width: 22px; height: 22px; }
+        .kpi-info { display: flex; flex-direction: column; }
+        .kpi-value { font-size: 20px; font-weight: 800; color: var(--text-main); line-height: 1.1; white-space: nowrap; }
+        .kpi-label { font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; margin-top: 2px; }
+
+        /* Charts */
+        .charts-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;
+        }
+        @media (max-width: 900px) { .charts-grid { grid-template-columns: 1fr; } }
+        .chart-box {
+            background: white; border-radius: 16px; padding: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+        .chart-title {
+            font-size: 14px; font-weight: 700; color: var(--text-main);
+            margin-bottom: 14px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .chart-title i { width: 18px; height: 18px; color: var(--primary-blue); }
+        .chart-wrap { position: relative; height: 280px; }
+        .chart-hint { font-size: 10px; color: var(--text-muted); font-weight: 600; margin-left: auto; }
+
+        /* Tables */
+        .table-responsive {
+            width: 100%; overflow-x: auto;
+            border-radius: 14px; border: 1px solid var(--border-color);
+            background: white;
+        }
+        .data-table {
+            width: 100%; border-collapse: collapse;
+            min-width: 900px;
+        }
+        .data-table th {
+            background: var(--primary-blue); color: white;
+            text-transform: uppercase; font-size: 10.5px; font-weight: 800;
+            padding: 12px 10px; text-align: left;
+            border-right: 1px solid rgba(255,255,255,0.15);
+            letter-spacing: 0.4px; white-space: nowrap;
+        }
+        .data-table th:last-child { border-right: none; }
+        .data-table th.center { text-align: center; }
+        .data-table th.right { text-align: right; }
+        .data-table td {
+            padding: 11px 10px;
+            border-bottom: 1px solid var(--bg-color);
+            color: var(--text-main); font-size: 12.5px; font-weight: 500;
+            vertical-align: middle;
+        }
+        .data-table tbody tr:last-child td { border-bottom: none; }
+        .data-table tbody tr:hover { background: var(--bg-color); }
+        .num-cell { text-align: right; font-weight: 700; }
+        .center-cell { text-align: center; }
+        .empty-row { text-align: center; color: var(--text-muted); font-style: italic; padding: 30px !important; }
+
+        .status-badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 4px 10px; border-radius: 20px;
+            font-size: 10px; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .status-badge.good { background: #dcfce7; color: #166534; }
+        .status-badge.medium { background: #fef3c7; color: #92400e; }
+        .status-badge.bad { background: #fee2e2; color: #991b1b; }
+
+        .trend-arrow { display: inline-flex; align-items: center; gap: 3px; font-weight: 800; font-size: 11px; }
+        .trend-arrow.up { color: var(--success); }
+        .trend-arrow.down { color: var(--danger); }
+        .trend-arrow.flat { color: var(--text-muted); }
+        .trend-arrow i { width: 12px; height: 12px; }
+
+        /* Forms */
+        .form-group { margin-bottom: 14px; }
+        .form-label {
+            display: block; font-size: 11px; font-weight: 700; color: var(--text-muted);
+            text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.3px;
+        }
+        .form-input, .form-select, .form-textarea {
+            width: 100%; padding: 11px 14px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px; font-size: 13px;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-main); background: white;
+            transition: all 0.2s; box-sizing: border-box;
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none; border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+        }
+        .form-textarea { min-height: 80px; resize: vertical; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+
+        .filters-bar {
+            display: flex; gap: 12px; align-items: flex-end;
+            flex-wrap: wrap; margin-bottom: 18px; padding: 16px;
+            background: var(--bg-color); border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+        .filter-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 180px; }
+        .filter-label { font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
+
+        .filter-indicator {
+            display: none; align-items: center; gap: 8px;
+            padding: 8px 14px; background: #fef3c7; color: #92400e;
+            border-radius: 20px; font-size: 11px; font-weight: 700;
+            margin-bottom: 12px;
+        }
+        .filter-indicator.show { display: inline-flex; }
+        .filter-indicator i { width: 14px; height: 14px; }
+        .filter-indicator button {
+            background: none; border: none; color: #92400e;
+            cursor: pointer; text-decoration: underline; font-weight: 800;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: var(--primary-blue); color: white;
+            border: none; padding: 12px 20px; border-radius: 10px;
+            font-weight: 700; font-size: 13px; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 8px;
+            transition: all 0.2s; font-family: 'Inter', sans-serif;
+        }
+        .btn-primary:hover { background: #1a1a1a; transform: translateY(-1px); }
+        .btn-primary:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; }
+        .btn-primary i { width: 14px; height: 14px; }
+
+        .btn-secondary {
+            background: white; color: var(--text-main);
+            border: 1.5px solid var(--border-color);
+            padding: 12px 20px; border-radius: 10px;
+            font-weight: 700; font-size: 13px; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 8px;
+            transition: all 0.2s; font-family: 'Inter', sans-serif;
+        }
+        .btn-secondary:hover { background: var(--bg-color); }
+        .btn-secondary i { width: 14px; height: 14px; }
+
+        .btn-action {
+            padding: 7px 12px; border-radius: 8px;
+            font-weight: 700; font-size: 11px; cursor: pointer; border: none;
+            font-family: 'Inter', sans-serif;
+            display: inline-flex; align-items: center; gap: 4px;
+            transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.3px;
+        }
+        .btn-action i { width: 12px; height: 12px; }
+        .btn-view { background: white; color: var(--primary-blue); border: 1.5px solid var(--primary-blue); }
+        .btn-view:hover { background: var(--light-blue); }
+        .btn-edit { background: #dbeafe; color: #1d4ed8; }
+        .btn-edit:hover { background: #bfdbfe; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { background: #b91c1c; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #059669; }
+        .action-buttons-cell { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; }
+
+        .empty-state {
+            text-align: center; padding: 50px 20px;
+            color: var(--text-muted);
+        }
+        .empty-state i { width: 64px; height: 64px; color: var(--border-color); margin-bottom: 14px; }
+        .empty-state h3 { font-size: 18px; font-weight: 700; color: var(--text-main); margin-bottom: 6px; }
+        .empty-state p { font-size: 13px; margin-bottom: 18px; }
+
+        /* Modal */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(15, 23, 42, 0.82);
+            backdrop-filter: blur(6px);
+            z-index: 2000;
+            align-items: center; justify-content: center;
+            padding: 16px;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-box {
+            background: white; border-radius: 20px;
+            width: 100%; max-width: 860px; padding: 24px;
+            box-shadow: 0 30px 70px rgba(0,0,0,0.4);
+            animation: slideIn 0.3s cubic-bezier(.2,.8,.3,1);
+            max-height: 90vh; overflow-y: auto;
+        }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .modal-header {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 12px; margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--bg-color);
+        }
+        .modal-header-left { display: flex; align-items: center; gap: 12px; }
+        .modal-icon {
+            width: 44px; height: 44px; border-radius: 12px;
+            background: var(--light-blue); color: var(--primary-blue);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .modal-icon i { width: 24px; height: 24px; }
+        .modal-title { font-size: 16px; font-weight: 800; color: var(--text-main); }
+        .modal-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+        .modal-close {
+            background: none; border: none; cursor: pointer;
+            color: var(--text-muted); padding: 6px;
+        }
+        .modal-close i { width: 20px; height: 20px; }
+        .modal-close:hover { color: var(--danger); }
+        .modal-actions {
+            display: flex; gap: 10px; justify-content: flex-end;
+            margin-top: 18px;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed; top: 20px; right: 20px;
+            background: var(--text-main); color: white;
+            padding: 14px 20px; border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 9999;
+            display: flex; align-items: center; gap: 10px;
+            font-size: 13px; font-weight: 600;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.error { background: var(--danger); }
+        .toast.success { background: var(--success); }
+        .toast.info { background: var(--info); }
+        .toast i { width: 18px; height: 18px; }
+
+        .score-input {
+            width: 80px; padding: 6px 8px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 6px; font-size: 12px;
+            text-align: center; font-weight: 700;
+        }
+        .score-input:focus { outline: none; border-color: var(--primary-blue); }
+
+        .loading-row { text-align: center; color: var(--text-muted); padding: 32px !important; }
+        .loading-row i { width: 28px; height: 28px; animation: spin 1s linear infinite; display: inline-block; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        .indicator-row input[type="text"],
+        .indicator-row input[type="number"],
+        .indicator-row select {
+            width: 100%; padding: 7px 9px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 6px; font-size: 12px;
+            font-family: 'Inter', sans-serif; color: var(--text-main);
+            background: white;
+        }
+        .indicator-row input:focus,
+        .indicator-row select:focus {
+            outline: none; border-color: var(--primary-blue);
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08);
+        }
+    </style>
+
+    <!-- Firebase SDK + FYTTSA shared data helper -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script>
+// =====================================================
+// FYTTSA Shared Data Helper
+// Centralizes Firebase Firestore sync for cross-device data sharing.
+// All user-specific data is stored under: usuarios/{userId}/app_data/{key}
+// Falls back to localStorage if Firebase is unavailable or no user.
+// =====================================================
+
+const FYTTSA_FIREBASE_CONFIG = {
+    apiKey: "AIzaSyD9Ihkh0NaP5vVbKntobmVTb53T0yDAZjU",
+    authDomain: "fyttsa-ae508.firebaseapp.com",
+    projectId: "fyttsa-ae508",
+    storageBucket: "fyttsa-ae508.firebasestorage.app",
+    messagingSenderId: "860564632264",
+    appId: "1:860564632264:web:30edf5a8f837e284ab2bfd",
+    measurementId: "G-7PQ1R77YJ3"
+};
+
+// Initialize Firebase once
+let _fyttsaDb = null;
+let _fyttsaFirebaseReady = false;
+
+function _fyttsaInitFirebase() {
+    if (typeof firebase === 'undefined') return false;
+    if (!firebase.apps.length) {
+        firebase.initializeApp(FYTTSA_FIREBASE_CONFIG);
+    }
+    if (firebase.firestore) {
+        _fyttsaDb = firebase.firestore();
+        _fyttsaFirebaseReady = true;
+        return true;
+    }
+    return false;
+}
+
+// Try to init immediately if firebase is already loaded
+if (typeof firebase !== 'undefined') {
+    _fyttsaInitFirebase();
+}
+
+// Also try after window load (in case scripts load async)
+window.addEventListener('load', function() {
+    if (!_fyttsaFirebaseReady && typeof firebase !== 'undefined') {
+        _fyttsaInitFirebase();
+    }
+});
+
+/**
+ * Get the current user ID from localStorage.
+ */
+function fyttsa_getUserId() {
+    return localStorage.getItem('usuario') || null;
+}
+
+/**
+ * Load data for the current user from Firestore.
+ * Falls back to localStorage if Firestore is unavailable.
+ */
+async function fyttsa_loadData(key) {
+    const userId = fyttsa_getUserId();
+
+    if (userId) {
+        if (!_fyttsaFirebaseReady && typeof firebase !== 'undefined') {
+            _fyttsaInitFirebase();
+        }
+        if (_fyttsaFirebaseReady) {
+            try {
+                const doc = await _fyttsaDb.collection('usuarios')
+                    .doc(userId)
+                    .collection('app_data')
+                    .doc(key)
+                    .get();
+                if (doc.exists && doc.data().value !== undefined) {
+                    return doc.data().value;
+                }
+            } catch (e) {
+                console.warn('[FYTTSA] Firestore load failed, falling back to localStorage:', e);
+            }
+        }
+    }
+
+    // Fallback to localStorage
+    try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+        return null;
+    }
+}
+
+/**
+ * Save data for the current user to Firestore.
+ * Also saves to localStorage as a cache/fallback.
+ */
+async function fyttsa_saveData(key, value) {
+    const userId = fyttsa_getUserId();
+
+    try {
+        localStorage.setItem(key, JSON.stringify(value));
+    } catch (e) {
+        console.warn('[FYTTSA] localStorage save failed:', e);
+    }
+
+    if (userId) {
+        if (!_fyttsaFirebaseReady && typeof firebase !== 'undefined') {
+            _fyttsaInitFirebase();
+        }
+        if (_fyttsaFirebaseReady) {
+            try {
+                await _fyttsaDb.collection('usuarios')
+                    .doc(userId)
+                    .collection('app_data')
+                    .doc(key)
+                    .set({
+                        value: value,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+            } catch (e) {
+                console.warn('[FYTTSA] Firestore save failed:', e);
+            }
+        }
+    }
+}
+
+/**
+ * Save data synchronously to localStorage and fire async Firestore save.
+ */
+function fyttsa_saveDataSync(key, value) {
+    try {
+        localStorage.setItem(key, JSON.stringify(value));
+    } catch (e) {
+        console.warn('[FYTTSA] localStorage save failed:', e);
+    }
+    fyttsa_saveData(key, value);
+}
+
+// =====================================================
+// PRIVILEGE-BASED MENU VISIBILITY + ACTIVE MENU STYLING
+// =====================================================
+// Privilegio 1 = see ALL menu sections
+// Privilegio 2 = see ONLY Inicio + Trabajador section (hide Obra, Control, Almacén)
+// =====================================================
+
+function _fyttsa_applyMenuVisibility() {
+    var privilegio = String(localStorage.getItem('privilegio') || '1').trim();
+    var sidebar = document.getElementById('sidebar');
+    if (!sidebar) return;
+
+    if (privilegio === '2') {
+        var sections = sidebar.querySelectorAll('.sidebar-section');
+        sections.forEach(function(sec) {
+            var title = sec.querySelector('.section-title');
+            if (title) {
+                var titleText = title.textContent.trim();
+                if (titleText !== 'Trabajador') {
+                    sec.style.display = 'none';
+                }
+            }
+        });
+    }
+}
+
+function _fyttsa_applyActiveStyle() {
+    var activeItem = document.querySelector('.nav-item.active');
+    if (activeItem) {
+        activeItem.style.setProperty('background-color', '#e8e8e8', 'important');
+        activeItem.style.setProperty('color', '#000000', 'important');
+        activeItem.style.setProperty('font-weight', '700', 'important');
+        activeItem.style.setProperty('border-left', '4px solid #000000', 'important');
+        activeItem.style.setProperty('border-radius', '8px', 'important');
+        activeItem.style.setProperty('padding', '10px 15px', 'important');
+    }
+}
+
+// Public function that pages call after loading menu.html
+function fyttsa_applyPrivilegeMenu() {
+    _fyttsa_applyMenuVisibility();
+}
+
+// =====================================================
+// AUTO-SETUP: Runs automatically when the script loads.
+// Uses a MutationObserver to detect when the sidebar content
+// changes (i.e., when menu.html is loaded via fetch), then:
+//   1. Applies privilege-based menu visibility
+//   2. Starts an interval to apply active menu styling
+// =====================================================
+
+(function() {
+    var styleIntervalStarted = false;
+
+    function startActiveStyleInterval() {
+        if (styleIntervalStarted) return;
+        styleIntervalStarted = true;
+
+        _fyttsa_applyActiveStyle();
+
+        var intervalId = setInterval(function() {
+            _fyttsa_applyActiveStyle();
+        }, 200);
+
+        setTimeout(function() {
+            clearInterval(intervalId);
+        }, 20000);
+    }
+
+    function setupSidebarObserver() {
+        var sidebar = document.getElementById('sidebar');
+        if (!sidebar) {
+            setTimeout(setupSidebarObserver, 100);
+            return;
+        }
+
+        _fyttsa_applyMenuVisibility();
+        startActiveStyleInterval();
+
+        if (typeof MutationObserver !== 'undefined') {
+            var observer = new MutationObserver(function(mutations) {
+                _fyttsa_applyMenuVisibility();
+                _fyttsa_applyActiveStyle();
+            });
+            observer.observe(sidebar, {
+                childList: true,
+                subtree: true,
+                attributes: true,
+                attributeFilter: ['class']
+            });
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            setupSidebarObserver();
+            setTimeout(function() {
+                _fyttsa_applyMenuVisibility();
+                _fyttsa_applyActiveStyle();
+                startActiveStyleInterval();
+            }, 500);
+            setTimeout(function() {
+                _fyttsa_applyMenuVisibility();
+                _fyttsa_applyActiveStyle();
+            }, 1500);
+        });
+    } else {
+        setupSidebarObserver();
+        setTimeout(function() {
+            _fyttsa_applyMenuVisibility();
+            _fyttsa_applyActiveStyle();
+            startActiveStyleInterval();
+        }, 500);
+        setTimeout(function() {
+            _fyttsa_applyMenuVisibility();
+            _fyttsa_applyActiveStyle();
+        }, 1500);
+    }
+
+    window.addEventListener('load', function() {
+        _fyttsa_applyMenuVisibility();
+        _fyttsa_applyActiveStyle();
+        startActiveStyleInterval();
+    });
+})();
+    </script>
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <button class="menu-btn" id="toggle-menu"><i data-lucide="menu"></i></button>
+            <h1 class="header-title">FYTTSA</h1>
+        </div>
+        <div class="header-right">
+            <div class="user-initial" id="user-initial">U</div>
+            <img src="https://i.ibb.co/x8Bw8KR8/MARFIL-1.jpg" alt="Logo" height="35" style="border-radius: 8px;">
+        </div>
+    </header>
+
+    <div class="main-layout">
+        <aside class="sidebar" id="sidebar"></aside>
+
+        <main class="content">
+            <h1 class="page-title">
+                <i data-lucide="target"></i>
+                Control de KPIs
+            </h1>
+            <p class="page-subtitle">Gestiona indicadores de desempeño por colaborador, configura definiciones y registra evaluaciones semanales.</p>
+
+            <div class="tabs-bar">
+                <button class="tab-btn active" data-tab="dashboard">
+                    <i data-lucide="bar-chart-3"></i> Dashboard
+                </button>
+                <button class="tab-btn" data-tab="config">
+                    <i data-lucide="settings-2"></i> Configuración
+                </button>
+                <button class="tab-btn" data-tab="evaluacion">
+                    <i data-lucide="clipboard-check"></i> Evaluación
+                </button>
+            </div>
+
+            <!-- =================== TAB: DASHBOARD =================== -->
+            <div class="tab-content active" id="content-dashboard">
+                <div class="kpi-grid" id="kpi-grid-dashboard">
+                    <div class="kpi-card info">
+                        <div class="kpi-icon"><i data-lucide="users"></i></div>
+                        <div class="kpi-info">
+                            <div class="kpi-value" id="kpi-promedio-equipo">—</div>
+                            <div class="kpi-label">Promedio General del Equipo</div>
+                        </div>
+                    </div>
+                    <div class="kpi-card purple">
+                        <div class="kpi-icon"><i data-lucide="user-check"></i></div>
+                        <div class="kpi-info">
+                            <div class="kpi-value" id="kpi-evaluados">—</div>
+                            <div class="kpi-label">Trabajadores Evaluados</div>
+                        </div>
+                    </div>
+                    <div class="kpi-card success">
+                        <div class="kpi-icon"><i data-lucide="award"></i></div>
+                        <div class="kpi-info">
+                            <div class="kpi-value" id="kpi-mejor-desempeno">—</div>
+                            <div class="kpi-label">Mejor Desempeño</div>
+                        </div>
+                    </div>
+                    <div class="kpi-card danger">
+                        <div class="kpi-icon"><i data-lucide="trending-down"></i></div>
+                        <div class="kpi-info">
+                            <div class="kpi-value" id="kpi-peor-desempeno">—</div>
+                            <div class="kpi-label">Peor Desempeño</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="charts-grid">
+                    <div class="chart-box">
+                        <div class="chart-title"><i data-lucide="bar-chart-2"></i> Promedio por Trabajador <span class="chart-hint">Click para filtrar</span></div>
+                        <div class="chart-wrap"><canvas id="chartBarWorkers"></canvas></div>
+                    </div>
+                    <div class="chart-box">
+                        <div class="chart-title"><i data-lucide="line-chart"></i> Tendencia del Equipo</div>
+                        <div class="chart-wrap"><canvas id="chartLineTeam"></canvas></div>
+                    </div>
+                </div>
+
+                <div class="chart-box" style="margin-bottom: 20px;">
+                    <div class="chart-title"><i data-lucide="layers"></i> Comparativa por Indicador (stacked)</div>
+                    <div class="chart-wrap" style="height: 320px;"><canvas id="chartStacked"></canvas></div>
+                </div>
+
+                <div class="card">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 2px solid var(--light-blue);">
+                        <h3 class="card-title" style="margin: 0; border: none; padding: 0;">
+                            <i data-lucide="table"></i> Resumen por Trabajador
+                        </h3>
+                        <div class="filter-indicator" id="filter-indicator-dashboard">
+                            <i data-lucide="filter"></i>
+                            <span id="filter-text-dashboard"></span>
+                            <button onclick="clearDashboardFilter()">Limpiar</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table" id="table-resumen">
+                            <thead>
+                                <tr>
+                                    <th>Trabajador</th>
+                                    <th>Puesto</th>
+                                    <th class="center">Indicadores</th>
+                                    <th class="center">Evaluaciones</th>
+                                    <th class="right">Promedio</th>
+                                    <th class="center">Tendencia</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-resumen">
+                                <tr><td colspan="6" class="empty-row">Cargando resumen...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- =================== TAB: CONFIGURACIÓN =================== -->
+            <div class="tab-content" id="content-config">
+                <div class="card">
+                    <h3 class="card-title"><i data-lucide="user-cog"></i> Seleccionar Trabajador</h3>
+                    <div class="form-group">
+                        <label class="form-label">Trabajador</label>
+                        <select class="form-select" id="config-worker-select">
+                            <option value="">— Selecciona un trabajador —</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="card" id="config-worker-card" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 2px solid var(--light-blue);">
+                        <h3 class="card-title" style="margin: 0; border: none; padding: 0;">
+                            <i data-lucide="sliders-horizontal"></i> Configuración de KPIs
+                        </h3>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn-secondary" onclick="addIndicatorRow()"><i data-lucide="plus"></i> Agregar indicador</button>
+                            <button class="btn-primary" id="btn-save-config" onclick="saveConfig()"><i data-lucide="save"></i> Guardar</button>
+                        </div>
+                    </div>
+
+                    <div class="form-row" style="margin-bottom: 18px;">
+                        <div class="form-group">
+                            <label class="form-label">Nombre del Trabajador</label>
+                            <input type="text" class="form-input" id="config-worker-name" placeholder="Nombre completo">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Puesto</label>
+                            <input type="text" class="form-input" id="config-worker-position" placeholder="Puesto / Cargo">
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Indicador</th>
+                                    <th class="center">Peso (%)</th>
+                                    <th>Entrega</th>
+                                    <th>Destinatarios</th>
+                                    <th>Plazo</th>
+                                    <th class="center">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-config-indicators">
+                                <tr><td colspan="6" class="empty-row">Sin indicadores. Agrega uno con el botón superior.</td></tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td style="text-align: right; font-weight: 800; color: var(--primary-blue);">Total</td>
+                                    <td class="center-cell" id="config-total-weight" style="font-weight: 800; color: var(--primary-blue);">0%</td>
+                                    <td colspan="4"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card" id="config-empty-card" style="display: none;">
+                    <div class="empty-state">
+                        <i data-lucide="inbox"></i>
+                        <h3>Sin configuración</h3>
+                        <p>Este trabajador no tiene indicadores configurados.</p>
+                        <button class="btn-primary" onclick="createConfig()"><i data-lucide="plus-circle"></i> Crear configuración</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- =================== TAB: EVALUACIÓN =================== -->
+            <div class="tab-content" id="content-evaluacion">
+                <div class="card">
+                    <h3 class="card-title"><i data-lucide="filter"></i> Filtros de Evaluación</h3>
+                    <div class="filters-bar">
+                        <div class="filter-group">
+                            <label class="filter-label">Semana</label>
+                            <select class="form-select" id="eval-week-select"><option value="">— Semana —</option></select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Trabajador</label>
+                            <select class="form-select" id="eval-worker-select"><option value="">— Trabajador —</option></select>
+                        </div>
+                        <button class="btn-secondary" onclick="loadEvalForm()"><i data-lucide="search"></i> Cargar</button>
+                        <button class="btn-secondary" onclick="openHistorial()"><i data-lucide="history"></i> Ver historial</button>
+                    </div>
+                </div>
+
+                <div class="card" id="eval-form-card" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 2px solid var(--light-blue);">
+                        <h3 class="card-title" style="margin: 0; border: none; padding: 0;">
+                            <i data-lucide="clipboard-edit"></i> <span id="eval-form-title">Evaluación</span>
+                        </h3>
+                        <button class="btn-primary" id="btn-save-eval" onclick="saveEval()"><i data-lucide="save"></i> Guardar evaluación</button>
+                    </div>
+
+                    <div class="form-row" style="margin-bottom: 18px;">
+                        <div class="form-group">
+                            <label class="form-label">Trabajador</label>
+                            <input type="text" class="form-input" id="eval-worker-name" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Semana</label>
+                            <input type="text" class="form-input" id="eval-week-display" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Periodo</label>
+                            <input type="text" class="form-input" id="eval-weekrange" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Mes</label>
+                            <input type="text" class="form-input" id="eval-month" readonly>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Indicador</th>
+                                    <th class="center">Peso</th>
+                                    <th class="center">Score (0-100%)</th>
+                                    <th class="right">Aporte</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-eval-scores">
+                                <tr><td colspan="4" class="empty-row">Selecciona un trabajador para cargar sus indicadores.</td></tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="2" style="text-align: right; font-weight: 800; color: var(--primary-blue);">Promedio Semanal</td>
+                                    <td class="center-cell" id="eval-promedio" style="font-weight: 800; color: var(--primary-blue); font-size: 14px;">0.0%</td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 18px;">
+                        <label class="form-label">Observación del Supervisor</label>
+                        <textarea class="form-textarea" id="eval-observation" placeholder="Notas, comentarios y acciones de mejora..."></textarea>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 2px solid var(--light-blue);">
+                        <h3 class="card-title" style="margin: 0; border: none; padding: 0;">
+                            <i data-lucide="list"></i> Evaluaciones de la Semana
+                        </h3>
+                        <div class="filter-indicator" id="filter-indicator-eval">
+                            <i data-lucide="filter"></i>
+                            <span id="filter-text-eval"></span>
+                            <button onclick="clearEvalFilter()">Limpiar</button>
+                        </div>
+                    </div>
+                    <div class="filters-bar" style="margin-bottom: 14px;">
+                        <div class="filter-group">
+                            <label class="filter-label">Filtrar por semana</label>
+                            <select class="form-select" id="eval-table-week-filter"><option value="">Todas las semanas</option></select>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Trabajador</th>
+                                    <th>Puesto</th>
+                                    <th class="center">Semana</th>
+                                    <th class="right">Promedio</th>
+                                    <th class="center">Estatus</th>
+                                    <th>Observación</th>
+                                    <th class="center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-eval-list">
+                                <tr><td colspan="7" class="empty-row">Cargando evaluaciones...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal historial -->
+    <div class="modal-overlay" id="modal-historial">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div class="modal-header-left">
+                    <div class="modal-icon"><i data-lucide="history"></i></div>
+                    <div>
+                        <div class="modal-title" id="historial-title">Historial de Evaluaciones</div>
+                        <div class="modal-subtitle" id="historial-subtitle">—</div>
+                    </div>
+                </div>
+                <button class="modal-close" onclick="cerrarHistorial()"><i data-lucide="x"></i></button>
+            </div>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th class="center">Semana</th>
+                            <th>Periodo</th>
+                            <th class="right">Promedio</th>
+                            <th class="center">Estatus</th>
+                            <th class="center">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-historial">
+                        <tr><td colspan="5" class="empty-row">Sin evaluaciones.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="cerrarHistorial()"><i data-lucide="x"></i> Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal confirmar eliminación -->
+    <div class="modal-overlay" id="modal-delete">
+        <div class="modal-box" style="max-width: 420px;">
+            <div class="modal-header">
+                <div class="modal-header-left">
+                    <div class="modal-icon" style="background: #fee2e2; color: var(--danger);"><i data-lucide="trash-2"></i></div>
+                    <div>
+                        <div class="modal-title">Eliminar Evaluación</div>
+                        <div class="modal-subtitle">Esta acción no se puede deshacer.</div>
+                    </div>
+                </div>
+                <button class="modal-close" onclick="cerrarModalDelete()"><i data-lucide="x"></i></button>
+            </div>
+            <p style="font-size: 14px; color: var(--text-main); margin-bottom: 18px;" id="delete-msg">¿Seguro que deseas eliminar esta evaluación?</p>
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="cerrarModalDelete()">Cancelar</button>
+                <button class="btn-primary" id="btn-confirm-delete" style="background: var(--danger);"><i data-lucide="trash-2"></i> Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"><i data-lucide="info"></i><span id="toast-msg"></span></div>
+
+    <script>
+        // =====================================================
+        // Firebase init
+        // =====================================================
+        if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+            firebase.initializeApp(FYTTSA_FIREBASE_CONFIG);
+        }
+        const db = firebase.firestore();
+        const ADMIN_USER = localStorage.getItem('nombre') || localStorage.getItem('usuario') || 'Admin';
+
+        // =====================================================
+        // State
+        // =====================================================
+        let stateConfigs = {};        // { workerId: configDoc }
+        let stateEvals = [];          // array of eval docs
+        let stateWorkers = [];        // list of workers (from configs + extra)
+
+        // Charts
+        let chartBarWorkers = null, chartLineTeam = null, chartStacked = null;
+
+        // Config tab state
+        let configEditingWorkerId = null;
+
+        // Eval tab state
+        let evalSelectedConfig = null;
+        let evalSelectedWeekNum = null;
+        let evalFilterWeek = '';
+        let deleteTargetId = null;
+
+        // Dashboard filter
+        let dashboardFilterWorkerId = null;
+
+        // Color palette for workers
+        const WORKER_PALETTE = ['#000000', '#404040', '#606060', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4', '#ec4899', '#84cc16', '#f97316', '#6366f1'];
+        function workerColor(id) {
+            const list = Object.keys(stateConfigs).sort();
+            const idx = list.indexOf(id);
+            return WORKER_PALETTE[(idx >= 0 ? idx : 0) % WORKER_PALETTE.length];
+        }
+
+        const COLOR_PRIMARIO = '#000000';
+        const COLOR_PRIMARIO_BG = 'rgba(0, 0, 0, 0.15)';
+
+        // =====================================================
+        // Helpers
+        // =====================================================
+        function showToast(msg, type) {
+            const t = document.getElementById('toast');
+            t.className = 'toast ' + (type || '');
+            document.getElementById('toast-msg').textContent = msg;
+            const iconEl = t.querySelector('i');
+            iconEl.setAttribute('data-lucide', type === 'error' ? 'alert-triangle' : (type === 'success' ? 'check-circle' : 'info'));
+            lucide.createIcons();
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3500);
+        }
+
+        function escapeHtml(s) {
+            if (s === null || s === undefined) return '';
+            return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        }
+
+        function statusFor(avg) {
+            if (avg >= 75) return { cls: 'good', text: 'Bueno' };
+            if (avg >= 50) return { cls: 'medium', text: 'Regular' };
+            return { cls: 'bad', text: 'Bajo' };
+        }
+
+        function truncate(s, n) {
+            if (!s) return '—';
+            s = String(s);
+            return s.length > n ? s.substring(0, n) + '…' : s;
+        }
+
+        // Week range calc (NS sheet base = Dec 29, 2025)
+        function getWeekRange(weekNum) {
+            const startOfWeek1 = new Date(2025, 11, 29); // Dec 29, 2025
+            const startDate = new Date(startOfWeek1);
+            startDate.setDate(startOfWeek1.getDate() + (weekNum - 1) * 7);
+            const endDate = new Date(startDate);
+            endDate.setDate(startDate.getDate() + 6);
+            const months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+            const month = months[endDate.getMonth()];
+            const fmt = d => d.toLocaleDateString('en-GB'); // DD/MM/YYYY
+            return { start: fmt(startDate), end: fmt(endDate), month };
+        }
+
+        // =====================================================
+        // Data load
+        // =====================================================
+        async function loadAllData() {
+            try {
+                const [cfgSnap, evalSnap] = await Promise.all([
+                    db.collection('kpis_config').get(),
+                    db.collection('kpis_eval').get()
+                ]);
+
+                stateConfigs = {};
+                cfgSnap.forEach(doc => {
+                    stateConfigs[doc.id] = doc.data();
+                });
+
+                stateEvals = [];
+                evalSnap.forEach(doc => {
+                    const d = doc.data();
+                    d._docId = doc.id;
+                    stateEvals.push(d);
+                });
+                stateEvals.sort((a, b) => (a.workerName || '').localeCompare(b.workerName || '') || (a.week || 0) - (b.week || 0));
+
+                // Build workers list from configs
+                stateWorkers = Object.keys(stateConfigs).map(id => ({
+                    id,
+                    name: stateConfigs[id].workerName || id,
+                    position: stateConfigs[id].position || '—'
+                }));
+
+                renderAll();
+                populateWorkerSelectors();
+            } catch (e) {
+                console.error('[Control KPIs] Error al cargar:', e);
+                showToast('Error al cargar datos: ' + e.message, 'error');
+            }
+        }
+
+        // =====================================================
+        // Render (Dashboard)
+        // =====================================================
+        function renderAll() {
+            renderDashboardKpis();
+            renderDashboardCharts();
+            renderResumenTable();
+            renderEvalListTable();
+            populateWeekFilters();
+            lucide.createIcons();
+        }
+
+        function computeWorkerStats(workerId) {
+            const evs = stateEvals.filter(e => e.workerId === workerId);
+            const avgs = evs.map(e => Number(e.weeklyAverage)).filter(v => !isNaN(v));
+            const overall = avgs.length ? (avgs.reduce((a, b) => a + b, 0) / avgs.length) : null;
+            const last = evs.length ? evs[evs.length - 1] : null;
+            const prev = evs.length > 1 ? evs[evs.length - 2] : null;
+            let trend = 'flat';
+            if (last && prev) {
+                const l = Number(last.weeklyAverage) || 0;
+                const p = Number(prev.weeklyAverage) || 0;
+                if (l > p + 0.5) trend = 'up';
+                else if (l < p - 0.5) trend = 'down';
+            }
+            return { evals: evs, count: evs.length, avgCount: avgs.length, overall, last, prev, trend };
+        }
+
+        function renderDashboardKpis() {
+            const workerIds = Object.keys(stateConfigs);
+            const allAvgs = stateEvals.map(e => Number(e.weeklyAverage)).filter(v => !isNaN(v));
+            const teamAvg = allAvgs.length ? (allAvgs.reduce((a, b) => a + b, 0) / allAvgs.length) : null;
+            const evaluatedCount = new Set(stateEvals.map(e => e.workerId)).size;
+
+            // Best / worst worker by overall average
+            let best = null, worst = null;
+            workerIds.forEach(wid => {
+                const s = computeWorkerStats(wid);
+                if (s.overall === null) return;
+                if (!best || s.overall > best.avg) best = { id: wid, name: stateConfigs[wid].workerName || wid, avg: s.overall };
+                if (!worst || s.overall < worst.avg) worst = { id: wid, name: stateConfigs[wid].workerName || wid, avg: s.overall };
+            });
+
+            document.getElementById('kpi-promedio-equipo').textContent = teamAvg !== null ? teamAvg.toFixed(1) + '%' : '—';
+            document.getElementById('kpi-evaluados').textContent = evaluatedCount;
+            document.getElementById('kpi-mejor-desempeno').textContent = best ? best.name + ' (' + best.avg.toFixed(0) + '%)' : '—';
+            document.getElementById('kpi-peor-desempeno').textContent = worst ? worst.name + ' (' + worst.avg.toFixed(0) + '%)' : '—';
+        }
+
+        function initChartLib() {
+            if (typeof Chart === 'undefined') {
+                setTimeout(() => {
+                    renderDashboardCharts();
+                }, 200);
+                return false;
+            }
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            Chart.defaults.color = '#64748b';
+            Chart.defaults.font.size = 11;
+            return true;
+        }
+
+        function renderDashboardCharts() {
+            if (!initChartLib()) return;
+            if (chartBarWorkers) { chartBarWorkers.destroy(); chartBarWorkers = null; }
+            if (chartLineTeam) { chartLineTeam.destroy(); chartLineTeam = null; }
+            if (chartStacked) { chartStacked.destroy(); chartStacked = null; }
+
+            // Bar - avg by worker (clickable)
+            const workerIds = Object.keys(stateConfigs).sort();
+            const labels = workerIds.map(wid => stateConfigs[wid].workerName || wid);
+            const data = workerIds.map(wid => {
+                const s = computeWorkerStats(wid);
+                return s.overall !== null ? Number(s.overall.toFixed(1)) : 0;
+            });
+            const colors = workerIds.map(wid => workerColor(wid));
+
+            const ctx1 = document.getElementById('chartBarWorkers');
+            if (ctx1) {
+                chartBarWorkers = new Chart(ctx1, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Promedio',
+                            data: data,
+                            backgroundColor: colors,
+                            borderRadius: 8, barThickness: 32
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { callbacks: { label: ctx => ctx.parsed.y.toFixed(1) + '%' } }
+                        },
+                        scales: { y: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%' } } },
+                        onClick: (evt, elements) => {
+                            if (elements && elements.length) {
+                                const idx = elements[0].index;
+                                const wid = workerIds[idx];
+                                applyDashboardFilter(wid);
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Line - team trend by week
+            const allWeeks = [...new Set(stateEvals.map(e => e.week))].sort((a, b) => (a || 0) - (b || 0));
+            const teamTrend = allWeeks.map(w => {
+                const evs = stateEvals.filter(e => e.week === w);
+                const avgs = evs.map(e => Number(e.weeklyAverage)).filter(v => !isNaN(v));
+                if (!avgs.length) return 0;
+                return Number((avgs.reduce((a, b) => a + b, 0) / avgs.length).toFixed(1));
+            });
+            const ctx2 = document.getElementById('chartLineTeam');
+            if (ctx2) {
+                chartLineTeam = new Chart(ctx2, {
+                    type: 'line',
+                    data: {
+                        labels: allWeeks.map(w => 'S' + w),
+                        datasets: [{
+                            label: 'Promedio del Equipo',
+                            data: teamTrend,
+                            borderColor: COLOR_PRIMARIO,
+                            backgroundColor: COLOR_PRIMARIO_BG,
+                            fill: true, tension: 0.35,
+                            pointBackgroundColor: COLOR_PRIMARIO,
+                            pointRadius: 4, pointHoverRadius: 6,
+                            borderWidth: 3
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { callbacks: { label: ctx => 'Promedio: ' + ctx.parsed.y.toFixed(1) + '%' } }
+                        },
+                        scales: { y: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%' } } },
+                        onClick: (evt, elements) => {
+                            if (elements && elements.length) {
+                                const idx = elements[0].index;
+                                const wk = allWeeks[idx];
+                                evalFilterWeek = String(wk);
+                                const sel = document.getElementById('eval-table-week-filter');
+                                if (sel) sel.value = String(wk);
+                                renderEvalListTable();
+                                switchTab('evaluacion');
+                                showToast('Filtro por Semana ' + wk + ' aplicado en Evaluación', 'info');
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Stacked bar - per worker per indicator
+            const indicatorSet = [];
+            workerIds.forEach(wid => {
+                const inds = stateConfigs[wid].indicators || [];
+                inds.forEach(i => { if (!indicatorSet.includes(i.name)) indicatorSet.push(i.name); });
+            });
+            const datasets = indicatorSet.map(indName => ({
+                label: indName,
+                data: workerIds.map(wid => {
+                    const evs = stateEvals.filter(e => e.workerId === wid);
+                    const scores = evs.map(e => {
+                        const s = (e.scores || []).find(x => x.indicatorName === indName);
+                        return s ? Number(s.score) : null;
+                    }).filter(v => v !== null && !isNaN(v));
+                    if (!scores.length) return 0;
+                    return Number((scores.reduce((a, b) => a + b, 0) / scores.length * 100).toFixed(1));
+                }),
+                backgroundColor: indColor(indName, indicatorSet),
+                borderWidth: 1, borderColor: 'white'
+            }));
+            const ctx3 = document.getElementById('chartStacked');
+            if (ctx3) {
+                chartStacked = new Chart(ctx3, {
+                    type: 'bar',
+                    data: { labels: labels, datasets: datasets },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom', labels: { font: { size: 10 }, boxWidth: 12, padding: 8 } },
+                            tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(1) + '%' } }
+                        },
+                        scales: {
+                            x: { stacked: true, ticks: { font: { size: 10 } } },
+                            y: { stacked: true, beginAtZero: true, max: 100, ticks: { callback: v => v + '%' } }
+                        },
+                        onClick: (evt, elements) => {
+                            if (elements && elements.length) {
+                                const idx = elements[0].index;
+                                const wid = workerIds[idx];
+                                applyDashboardFilter(wid);
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function indColor(name, list) {
+            const idx = list.indexOf(name);
+            return WORKER_PALETTE[idx % WORKER_PALETTE.length];
+        }
+
+        function renderResumenTable() {
+            const tbody = document.getElementById('tbody-resumen');
+            const workerIds = Object.keys(stateConfigs).sort((a, b) => (stateConfigs[a].workerName || a).localeCompare(stateConfigs[b].workerName || b));
+            if (!workerIds.length) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-row">No hay trabajadores configurados.</td></tr>';
+                return;
+            }
+            const filtered = dashboardFilterWorkerId ? workerIds.filter(w => w === dashboardFilterWorkerId) : workerIds;
+            if (!filtered.length) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-row">Sin resultados para el filtro.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = filtered.map(wid => {
+                const cfg = stateConfigs[wid];
+                const s = computeWorkerStats(wid);
+                const avg = s.overall !== null ? s.overall.toFixed(1) + '%' : '—';
+                const trendIcon = s.trend === 'up' ? '<i data-lucide="trending-up"></i> Sube' :
+                                  s.trend === 'down' ? '<i data-lucide="trending-down"></i> Baja' :
+                                  '<i data-lucide="minus"></i> Igual';
+                return `<tr>
+                    <td><strong>${escapeHtml(cfg.workerName || wid)}</strong><div style="font-size:10px; color:var(--text-muted);">${escapeHtml(wid)}</div></td>
+                    <td>${escapeHtml(cfg.position || '—')}</td>
+                    <td class="center-cell">${(cfg.indicators || []).length}</td>
+                    <td class="center-cell">${s.count}</td>
+                    <td class="num-cell">${avg}</td>
+                    <td class="center-cell"><span class="trend-arrow ${s.trend}">${trendIcon}</span></td>
+                </tr>`;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function applyDashboardFilter(workerId) {
+            dashboardFilterWorkerId = workerId;
+            const name = stateConfigs[workerId]?.workerName || workerId;
+            const fi = document.getElementById('filter-indicator-dashboard');
+            document.getElementById('filter-text-dashboard').textContent = 'Filtrado por: ' + name;
+            fi.classList.add('show');
+            renderResumenTable();
+            lucide.createIcons();
+        }
+
+        function clearDashboardFilter() {
+            dashboardFilterWorkerId = null;
+            document.getElementById('filter-indicator-dashboard').classList.remove('show');
+            renderResumenTable();
+        }
+
+        // =====================================================
+        // Tab switching
+        // =====================================================
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            const btn = document.querySelector('.tab-btn[data-tab="' + tabName + '"]');
+            if (btn) btn.classList.add('active');
+            const ct = document.getElementById('content-' + tabName);
+            if (ct) ct.classList.add('active');
+            lucide.createIcons();
+        }
+
+        // =====================================================
+        // Worker selectors
+        // =====================================================
+        function populateWorkerSelectors() {
+            const sorted = stateWorkers.slice().sort((a, b) => a.name.localeCompare(b.name));
+            const opts = '<option value="">— Selecciona un trabajador —</option>' +
+                sorted.map(w => `<option value="${escapeHtml(w.id)}">${escapeHtml(w.name)} (${escapeHtml(w.id)})</option>`).join('');
+            const sel1 = document.getElementById('config-worker-select');
+            const sel2 = document.getElementById('eval-worker-select');
+            if (sel1) sel1.innerHTML = opts;
+            if (sel2) sel2.innerHTML = opts;
+        }
+
+        function populateWeekFilters() {
+            // Generate week options 1..53
+            const weeks = [];
+            for (let i = 1; i <= 53; i++) weeks.push(i);
+            const optHtml = weeks.map(w => {
+                const r = getWeekRange(w);
+                return `<option value="${w}">Semana ${w} — ${r.start} al ${r.end} (${r.month})</option>`;
+            }).join('');
+            const selWeek = document.getElementById('eval-week-select');
+            if (selWeek) {
+                const cur = selWeek.value;
+                selWeek.innerHTML = '<option value="">— Semana —</option>' + optHtml;
+                if (cur) selWeek.value = cur;
+            }
+
+            // Filter dropdown - only weeks that have evals
+            const presentWeeks = [...new Set(stateEvals.map(e => e.week))].sort((a, b) => (a || 0) - (b || 0));
+            const selFilter = document.getElementById('eval-table-week-filter');
+            if (selFilter) {
+                selFilter.innerHTML = '<option value="">Todas las semanas</option>' +
+                    presentWeeks.map(w => `<option value="${w}">Semana ${w}</option>`).join('');
+                if (evalFilterWeek) selFilter.value = evalFilterWeek;
+            }
+        }
+
+        // =====================================================
+        // TAB: Configuración
+        // =====================================================
+        function onConfigWorkerChange() {
+            const wid = document.getElementById('config-worker-select').value;
+            configEditingWorkerId = wid;
+            if (!wid) {
+                document.getElementById('config-worker-card').style.display = 'none';
+                document.getElementById('config-empty-card').style.display = 'none';
+                return;
+            }
+            const cfg = stateConfigs[wid];
+            if (cfg) {
+                document.getElementById('config-empty-card').style.display = 'none';
+                document.getElementById('config-worker-card').style.display = 'block';
+                document.getElementById('config-worker-name').value = cfg.workerName || wid;
+                document.getElementById('config-worker-position').value = cfg.position || '';
+                renderConfigIndicators(cfg.indicators || []);
+            } else {
+                document.getElementById('config-worker-card').style.display = 'none';
+                document.getElementById('config-empty-card').style.display = 'block';
+            }
+            lucide.createIcons();
+        }
+
+        function createConfig() {
+            const wid = configEditingWorkerId;
+            if (!wid) return;
+            document.getElementById('config-empty-card').style.display = 'none';
+            document.getElementById('config-worker-card').style.display = 'block';
+            document.getElementById('config-worker-name').value = wid;
+            document.getElementById('config-worker-position').value = '';
+            renderConfigIndicators([]);
+            lucide.createIcons();
+        }
+
+        function renderConfigIndicators(indicators) {
+            const tbody = document.getElementById('tbody-config-indicators');
+            if (!indicators.length) {
+                tbody.innerHTML = '<tr class="indicator-row" data-empty="1"><td colspan="6" class="empty-row">Sin indicadores. Agrega uno con el botón superior.</td></tr>';
+            } else {
+                tbody.innerHTML = indicators.map((ind, idx) => indicatorRowHtml(ind, idx)).join('');
+            }
+            updateTotalWeight();
+        }
+
+        function indicatorRowHtml(ind, idx) {
+            const name = escapeHtml(ind.name || '');
+            const weight = ind.weight || '';
+            const method = escapeHtml(ind.deliveryMethod || '');
+            const recip = escapeHtml(ind.recipients || '');
+            const deadline = escapeHtml(ind.deadline || '');
+            return `<tr class="indicator-row" data-idx="${idx}">
+                <td><input type="text" class="ind-name" value="${name}" placeholder="Nombre del indicador"></td>
+                <td><input type="number" class="ind-weight" min="0" max="100" step="1" value="${weight}" style="text-align:center;"></td>
+                <td><select class="ind-method">
+                    ${['Correo','WhatsApp','App','Reporte físico','Reunión','Otro'].map(m => `<option ${method === m ? 'selected' : ''}>${m}</option>`).join('')}
+                </select></td>
+                <td><input type="text" class="ind-recipients" value="${recip}" placeholder="Destinatarios"></td>
+                <td><input type="text" class="ind-deadline" value="${deadline}" placeholder="Ej: Viernes 3pm"></td>
+                <td class="center-cell"><button class="btn-action btn-danger" onclick="removeIndicatorRow(this)"><i data-lucide="trash-2"></i></button></td>
+            </tr>`;
+        }
+
+        function addIndicatorRow() {
+            const tbody = document.getElementById('tbody-config-indicators');
+            const emptyRow = tbody.querySelector('tr[data-empty="1"]');
+            if (emptyRow) emptyRow.remove();
+            const idx = tbody.querySelectorAll('tr.indicator-row').length;
+            const tr = document.createElement('tr');
+            tr.className = 'indicator-row';
+            tr.dataset.idx = idx;
+            tr.innerHTML = indicatorRowHtml({}, idx);
+            tbody.appendChild(tr);
+            lucide.createIcons();
+            tr.querySelector('.ind-name').focus();
+            updateTotalWeight();
+        }
+
+        function removeIndicatorRow(btn) {
+            const tr = btn.closest('tr');
+            tr.remove();
+            const tbody = document.getElementById('tbody-config-indicators');
+            if (!tbody.querySelectorAll('tr.indicator-row').length) {
+                tbody.innerHTML = '<tr class="indicator-row" data-empty="1"><td colspan="6" class="empty-row">Sin indicadores. Agrega uno con el botón superior.</td></tr>';
+            }
+            updateTotalWeight();
+        }
+
+        function updateTotalWeight() {
+            const rows = document.querySelectorAll('#tbody-config-indicators tr.indicator-row:not([data-empty])');
+            let total = 0;
+            rows.forEach(r => {
+                const v = Number(r.querySelector('.ind-weight')?.value || 0);
+                if (!isNaN(v)) total += v;
+            });
+            const el = document.getElementById('config-total-weight');
+            if (el) {
+                el.textContent = total + '%';
+                el.style.color = total === 100 ? 'var(--success)' : (total > 100 ? 'var(--danger)' : 'var(--warning)');
+            }
+        }
+
+        async function saveConfig() {
+            const wid = configEditingWorkerId;
+            if (!wid) { showToast('Selecciona un trabajador', 'error'); return; }
+            const name = document.getElementById('config-worker-name').value.trim();
+            const position = document.getElementById('config-worker-position').value.trim();
+            if (!name) { showToast('El nombre es obligatorio', 'error'); return; }
+
+            const rows = document.querySelectorAll('#tbody-config-indicators tr.indicator-row:not([data-empty])');
+            const indicators = [];
+            let totalWeight = 0;
+            rows.forEach(r => {
+                const n = r.querySelector('.ind-name').value.trim();
+                const w = Number(r.querySelector('.ind-weight').value || 0);
+                const m = r.querySelector('.ind-method').value;
+                const rec = r.querySelector('.ind-recipients').value.trim();
+                const dl = r.querySelector('.ind-deadline').value.trim();
+                if (n) {
+                    indicators.push({ name: n, weight: w, deliveryMethod: m, recipients: rec, deadline: dl });
+                    totalWeight += w;
+                }
+            });
+            if (totalWeight !== 100) {
+                if (!confirm('El peso total es ' + totalWeight + '%, no 100%. ¿Guardar de todas formas?')) return;
+            }
+
+            const btn = document.getElementById('btn-save-config');
+            btn.disabled = true; const oldHtml = btn.innerHTML;
+            btn.innerHTML = '<i data-lucide="loader-2"></i> Guardando...';
+            lucide.createIcons();
+
+            try {
+                const payload = {
+                    workerId: wid,
+                    workerName: name,
+                    position: position,
+                    indicators: indicators,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedBy: ADMIN_USER
+                };
+                if (!stateConfigs[wid] || !stateConfigs[wid].createdAt) {
+                    payload.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                }
+                await db.collection('kpis_config').doc(wid).set(payload, { merge: true });
+                stateConfigs[wid] = { ...stateConfigs[wid], ...payload };
+                // Update workers list
+                const existing = stateWorkers.find(w => w.id === wid);
+                if (existing) { existing.name = name; existing.position = position; }
+                else stateWorkers.push({ id: wid, name, position });
+                populateWorkerSelectors();
+                document.getElementById('config-worker-select').value = wid;
+                showToast('Configuración guardada correctamente', 'success');
+                renderAll();
+            } catch (e) {
+                console.error(e);
+                showToast('Error al guardar: ' + e.message, 'error');
+            } finally {
+                btn.disabled = false; btn.innerHTML = oldHtml; lucide.createIcons();
+            }
+        }
+
+        // =====================================================
+        // TAB: Evaluación
+        // =====================================================
+        function loadEvalForm() {
+            const wid = document.getElementById('eval-worker-select').value;
+            const wkVal = document.getElementById('eval-week-select').value;
+            if (!wid || !wkVal) { showToast('Selecciona semana y trabajador', 'error'); return; }
+            const wk = Number(wkVal);
+            const cfg = stateConfigs[wid];
+            if (!cfg) { showToast('El trabajador no tiene configuración de KPIs. Configúralo primero.', 'error'); return; }
+
+            evalSelectedConfig = cfg;
+            evalSelectedWeekNum = wk;
+            const range = getWeekRange(wk);
+
+            document.getElementById('eval-form-card').style.display = 'block';
+            document.getElementById('eval-form-title').textContent = 'Evaluación • ' + (cfg.workerName || wid);
+            document.getElementById('eval-worker-name').value = cfg.workerName || wid;
+            document.getElementById('eval-week-display').value = 'Semana ' + wk;
+            document.getElementById('eval-weekrange').value = range.start + ' al ' + range.end;
+            document.getElementById('eval-month').value = range.month;
+
+            // Check if eval already exists - prefill
+            const existing = stateEvals.find(e => e.workerId === wid && e.week === wk);
+            const scores = (cfg.indicators || []).map(ind => {
+                const ex = existing ? (existing.scores || []).find(s => s.indicatorName === ind.name) : null;
+                return {
+                    name: ind.name,
+                    weight: Number(ind.weight) || 0,
+                    score: ex ? Number(ex.score) : null
+                };
+            });
+            renderEvalScores(scores);
+            document.getElementById('eval-observation').value = existing?.observation || '';
+            if (existing) showToast('Evaluación existente cargada para edición', 'info');
+            lucide.createIcons();
+        }
+
+        function renderEvalScores(scores) {
+            const tbody = document.getElementById('tbody-eval-scores');
+            if (!scores.length) {
+                tbody.innerHTML = '<tr><td colspan="4" class="empty-row">El trabajador no tiene indicadores configurados.</td></tr>';
+                updateEvalPromedio();
+                return;
+            }
+            tbody.innerHTML = scores.map((s, i) => {
+                const val = s.score === null ? '' : Math.round(s.score * 100);
+                return `<tr data-idx="${i}">
+                    <td><strong>${escapeHtml(s.name)}</strong></td>
+                    <td class="center-cell">${s.weight}%</td>
+                    <td class="center-cell"><input type="number" class="score-input" min="0" max="100" step="1" value="${val}" placeholder="0-100" oninput="updateEvalPromedio()"></td>
+                    <td class="num-cell aporte-cell">0.0</td>
+                </tr>`;
+            }).join('');
+            updateEvalPromedio();
+        }
+
+        function updateEvalPromedio() {
+            const rows = document.querySelectorAll('#tbody-eval-scores tr[data-idx]');
+            let total = 0;
+            let weightSum = 0;
+            rows.forEach(r => {
+                const weight = Number(r.querySelector('td:nth-child(2)').textContent.replace('%', '')) || 0;
+                const inp = r.querySelector('.score-input');
+                let v = Number(inp.value);
+                if (isNaN(v) || inp.value === '') v = 0;
+                if (v < 0) v = 0; if (v > 100) v = 100;
+                const aporte = weight * (v / 100);
+                total += aporte;
+                weightSum += weight;
+                const cell = r.querySelector('.aporte-cell');
+                if (cell) cell.textContent = aporte.toFixed(1);
+            });
+            const promedio = weightSum > 0 ? (total / weightSum * 100) : total;
+            // Actually weeklyAverage = sum(weight*score) where score in [0,1]
+            // So total already = sum(weight*score) = weeklyAverage in 0..100 if weights sum to 100
+            const el = document.getElementById('eval-promedio');
+            if (el) el.textContent = total.toFixed(1) + '%';
+        }
+
+        async function saveEval() {
+            const cfg = evalSelectedConfig;
+            const wk = evalSelectedWeekNum;
+            if (!cfg || !wk) { showToast('Carga primero el formulario', 'error'); return; }
+
+            const rows = document.querySelectorAll('#tbody-eval-scores tr[data-idx]');
+            if (!rows.length) { showToast('No hay indicadores para evaluar', 'error'); return; }
+
+            const scores = [];
+            rows.forEach(r => {
+                const name = r.querySelector('td strong').textContent;
+                const weight = Number(r.querySelector('td:nth-child(2)').textContent.replace('%', '')) || 0;
+                const inp = r.querySelector('.score-input');
+                let v = Number(inp.value);
+                if (isNaN(v) || inp.value === '') v = 0;
+                if (v < 0) v = 0; if (v > 100) v = 100;
+                scores.push({ indicatorName: name, weight: weight, score: v / 100 });
+            });
+
+            let weeklyAverage = 0;
+            scores.forEach(s => { weeklyAverage += s.weight * s.score; });
+            weeklyAverage = Number(weeklyAverage.toFixed(2));
+
+            const observation = document.getElementById('eval-observation').value.trim();
+            const range = getWeekRange(wk);
+
+            const btn = document.getElementById('btn-save-eval');
+            btn.disabled = true; const oldHtml = btn.innerHTML;
+            btn.innerHTML = '<i data-lucide="loader-2"></i> Guardando...';
+            lucide.createIcons();
+
+            try {
+                const docId = cfg.workerId + '_week' + wk;
+                const payload = {
+                    workerId: cfg.workerId,
+                    workerName: cfg.workerName || cfg.workerId,
+                    position: cfg.position || '',
+                    week: wk,
+                    weekRange: range.start + ' al ' + range.end,
+                    month: range.month,
+                    scores: scores,
+                    weeklyAverage: weeklyAverage,
+                    observation: observation,
+                    evaluatedBy: ADMIN_USER,
+                    evaluatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                await db.collection('kpis_eval').doc(docId).set(payload, { merge: true });
+                payload._docId = docId;
+                // Update local state
+                const existingIdx = stateEvals.findIndex(e => e._docId === docId);
+                if (existingIdx >= 0) stateEvals[existingIdx] = payload;
+                else stateEvals.push(payload);
+                stateEvals.sort((a, b) => (a.workerName || '').localeCompare(b.workerName || '') || (a.week || 0) - (b.week || 0));
+
+                showToast('Evaluación guardada correctamente (promedio: ' + weeklyAverage.toFixed(1) + '%)', 'success');
+                renderAll();
+            } catch (e) {
+                console.error(e);
+                showToast('Error al guardar: ' + e.message, 'error');
+            } finally {
+                btn.disabled = false; btn.innerHTML = oldHtml; lucide.createIcons();
+            }
+        }
+
+        function renderEvalListTable() {
+            const tbody = document.getElementById('tbody-eval-list');
+            if (!stateEvals.length) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-row">No hay evaluaciones registradas.</td></tr>';
+                return;
+            }
+            const wk = evalFilterWeek;
+            const filtered = wk ? stateEvals.filter(e => String(e.week) === String(wk)) : stateEvals;
+            if (!filtered.length) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-row">Sin evaluaciones para la semana seleccionada.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = filtered.map(ev => {
+                const avg = Number(ev.weeklyAverage) || 0;
+                const st = statusFor(avg);
+                return `<tr>
+                    <td><strong>${escapeHtml(ev.workerName || ev.workerId)}</strong><div style="font-size:10px; color:var(--text-muted);">${escapeHtml(ev.workerId)}</div></td>
+                    <td>${escapeHtml(ev.position || '—')}</td>
+                    <td class="center-cell">S${ev.week || '?'}<div style="font-size:10px; color:var(--text-muted);">${escapeHtml(ev.weekRange || '')}</div></td>
+                    <td class="num-cell">${avg.toFixed(1)}%</td>
+                    <td class="center-cell"><span class="status-badge ${st.cls}">${st.text}</span></td>
+                    <td style="font-size: 11px; color: var(--text-muted); max-width: 240px;">${escapeHtml(truncate(ev.observation, 80))}</td>
+                    <td class="center-cell">
+                        <div class="action-buttons-cell">
+                            <button class="btn-action btn-edit" onclick="editEval('${escapeHtml(ev._docId)}')"><i data-lucide="pencil"></i> Editar</button>
+                            <button class="btn-action btn-danger" onclick="confirmDeleteEval('${escapeHtml(ev._docId)}')"><i data-lucide="trash-2"></i></button>
+                        </div>
+                    </td>
+                </tr>`;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function editEval(docId) {
+            const ev = stateEvals.find(e => e._docId === docId);
+            if (!ev) return;
+            document.getElementById('eval-worker-select').value = ev.workerId;
+            document.getElementById('eval-week-select').value = String(ev.week);
+            loadEvalForm();
+            document.getElementById('eval-form-card').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function confirmDeleteEval(docId) {
+            deleteTargetId = docId;
+            const ev = stateEvals.find(e => e._docId === docId);
+            const msg = ev ? `¿Eliminar evaluación de ${ev.workerName} (Semana ${ev.week})?` : '¿Eliminar evaluación?';
+            document.getElementById('delete-msg').textContent = msg;
+            document.getElementById('modal-delete').classList.add('show');
+            lucide.createIcons();
+        }
+
+        function cerrarModalDelete() {
+            document.getElementById('modal-delete').classList.remove('show');
+            deleteTargetId = null;
+        }
+
+        async function doDeleteEval() {
+            if (!deleteTargetId) return;
+            const btn = document.getElementById('btn-confirm-delete');
+            btn.disabled = true; const oldHtml = btn.innerHTML;
+            btn.innerHTML = '<i data-lucide="loader-2"></i> Eliminando...';
+            lucide.createIcons();
+            try {
+                await db.collection('kpis_eval').doc(deleteTargetId).delete();
+                stateEvals = stateEvals.filter(e => e._docId !== deleteTargetId);
+                showToast('Evaluación eliminada', 'success');
+                cerrarModalDelete();
+                renderAll();
+            } catch (e) {
+                console.error(e);
+                showToast('Error al eliminar: ' + e.message, 'error');
+            } finally {
+                btn.disabled = false; btn.innerHTML = oldHtml; lucide.createIcons();
+            }
+        }
+
+        function clearEvalFilter() {
+            evalFilterWeek = '';
+            const sel = document.getElementById('eval-table-week-filter');
+            if (sel) sel.value = '';
+            document.getElementById('filter-indicator-eval').classList.remove('show');
+            renderEvalListTable();
+        }
+
+        // Filter dropdown change
+        function onEvalWeekFilterChange() {
+            const sel = document.getElementById('eval-table-week-filter');
+            evalFilterWeek = sel.value;
+            const fi = document.getElementById('filter-indicator-eval');
+            if (evalFilterWeek) {
+                document.getElementById('filter-text-eval').textContent = 'Filtrado por: Semana ' + evalFilterWeek;
+                fi.classList.add('show');
+            } else {
+                fi.classList.remove('show');
+            }
+            renderEvalListTable();
+        }
+
+        // =====================================================
+        // Historial modal
+        // =====================================================
+        function openHistorial() {
+            const wid = document.getElementById('eval-worker-select').value;
+            if (!wid) { showToast('Selecciona un trabajador', 'error'); return; }
+            const evs = stateEvals.filter(e => e.workerId === wid).sort((a, b) => (b.week || 0) - (a.week || 0));
+            const cfg = stateConfigs[wid];
+            document.getElementById('historial-title').textContent = 'Historial de ' + (cfg?.workerName || wid);
+            document.getElementById('historial-subtitle').textContent = evs.length + ' evaluaciones registradas';
+            const tbody = document.getElementById('tbody-historial');
+            if (!evs.length) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-row">Sin evaluaciones.</td></tr>';
+            } else {
+                tbody.innerHTML = evs.map(ev => {
+                    const avg = Number(ev.weeklyAverage) || 0;
+                    const st = statusFor(avg);
+                    return `<tr>
+                        <td class="center-cell"><strong>S${ev.week}</strong></td>
+                        <td>${escapeHtml(ev.weekRange || '—')}</td>
+                        <td class="num-cell">${avg.toFixed(1)}%</td>
+                        <td class="center-cell"><span class="status-badge ${st.cls}">${st.text}</span></td>
+                        <td class="center-cell"><button class="btn-action btn-view" onclick="editEval('${escapeHtml(ev._docId)}'); cerrarHistorial();"><i data-lucide="pencil"></i> Cargar</button></td>
+                    </tr>`;
+                }).join('');
+            }
+            document.getElementById('modal-historial').classList.add('show');
+            lucide.createIcons();
+        }
+
+        function cerrarHistorial() {
+            document.getElementById('modal-historial').classList.remove('show');
+        }
+
+        // =====================================================
+        // Init
+        // =====================================================
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('user-initial').innerText = (ADMIN_USER.charAt(0) || 'U').toUpperCase();
+
+            fetch('menu.html').then(res => res.text()).then(html => {
+                document.getElementById('sidebar').innerHTML = html;
+                lucide.createIcons();
+                fyttsa_applyPrivilegeMenu();
+                const linkInicio = document.getElementById('link-inicio'); if (linkInicio) linkInicio.classList.remove('active');
+                const linkCtrl = document.getElementById('link-control-kpis'); if (linkCtrl) linkCtrl.classList.add('active');
+            });
+
+            document.getElementById('toggle-menu').addEventListener('click', () => {
+                document.getElementById('sidebar').classList.toggle('open');
+            });
+
+            // Tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+            });
+
+            // Config worker change
+            document.getElementById('config-worker-select').addEventListener('change', onConfigWorkerChange);
+
+            // Eval worker/week load
+            // (load button has onclick)
+            document.getElementById('eval-table-week-filter').addEventListener('change', onEvalWeekFilterChange);
+
+            // Delete confirm
+            document.getElementById('btn-confirm-delete').addEventListener('click', doDeleteEval);
+
+            // Modal overlay click to close
+            document.getElementById('modal-historial').addEventListener('click', function(e) {
+                if (e.target === this) cerrarHistorial();
+            });
+            document.getElementById('modal-delete').addEventListener('click', function(e) {
+                if (e.target === this) cerrarModalDelete();
+            });
+
+            loadAllData();
+        });
+    </script>
+</body>
+</html>
