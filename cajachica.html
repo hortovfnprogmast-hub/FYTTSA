@@ -684,7 +684,7 @@
                 display: flex;
                 flex-direction: column;
                 border: none;
-                border-bottom: 1px solid #f1f5f9;
+                border-bottom: none;
                 padding: 6px 0;
                 text-align: left;
                 gap: 4px;
@@ -724,15 +724,18 @@
             .col-tipo .tipo-toggle { width: 100%; display: flex; gap: 0; }
             .tipo-btn { font-size: 13px; padding: 10px 12px; flex: 1; border-radius: 8px 0 0 8px; }
             .tipo-btn:last-child { border-radius: 0 8px 8px 0; }
-            /* Adjuntos: botones PDF y XML del mismo ancho */
+            /* Adjuntos: botones PDF y XML del mismo ancho y alto */
             .attach-cell { display: flex; flex-direction: column; gap: 8px; width: 100%; }
-            .attach-btn { width: 100%; justify-content: center; padding: 10px 12px; font-size: 13px; border-radius: 8px; border: 1.5px solid var(--info); box-sizing: border-box; }
-            .attach-btn .file-name { max-width: none; flex: 1; text-align: center; }
+            .attach-btn { width: 100%; justify-content: center; align-items: center; padding: 12px; font-size: 14px; border-radius: 8px; border: 1.5px solid var(--info); box-sizing: border-box; min-height: 48px; display: flex; }
+            .attach-btn i { width: 18px; height: 18px; flex-shrink: 0; }
+            .attach-btn .file-name { max-width: none; flex: 1; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+            .attach-btn.has-file { background: #dcfce7; color: #166534; border-color: var(--success); border-style: solid; }
+            .attach-btn .remove-attach { font-size: 16px; padding: 0 4px; }
             .col-observ, .col-adjuntos { display: flex; }
             .expense-table thead th.col-observ, .expense-table thead th.col-adjuntos { display: none; }
             .subtotal-row td { display: none; }
             .subtotal-row td.subtotal-label, .subtotal-row td.subtotal-amount {
-                display: flex; padding: 8px 0; font-size: 12px;
+                display: flex; padding: 8px 0; font-size: 14px; font-weight: 800;
             }
             .form-grid { grid-template-columns: 1fr !important; }
             .top-grid { grid-template-columns: 1fr !important; }
