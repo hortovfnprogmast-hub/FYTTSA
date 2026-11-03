@@ -571,6 +571,199 @@
             margin-left: auto;
         }
         .detail-file-item a:hover { text-decoration: underline; }
+
+        /* ====== Formulario (tab Agregar Gasto) ====== */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+        }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group.full { grid-column: 1 / -1; }
+        .form-label {
+            font-size: 11px; font-weight: 800; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: 0.4px;
+        }
+        .form-label .req { color: var(--danger); }
+        .form-input, .form-select, .form-textarea {
+            padding: 10px 12px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-main);
+            background: white;
+            transition: all 0.2s;
+            width: 100%;
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+        }
+        .form-textarea { min-height: 80px; resize: vertical; }
+        .form-select { cursor: pointer; }
+        .file-input-wrapper { display: flex; flex-direction: column; gap: 6px; }
+        .file-input-hidden { position: absolute; width: 0; height: 0; opacity: 0; overflow: hidden; z-index: -1; }
+        .btn-upload-file {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 18px;
+            background: #000000; color: #ffffff;
+            border: none; border-radius: 10px;
+            font-size: 13px; font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer; transition: all 0.2s;
+            width: 100%; justify-content: center;
+        }
+        .btn-upload-file:hover {
+            background: #1a1a1a;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .btn-upload-file i { width: 18px; height: 18px; }
+        .file-info {
+            font-size: 11px; color: var(--text-muted);
+            display: flex; align-items: center; gap: 6px;
+            background: var(--light-blue);
+            padding: 6px 10px;
+            border-radius: 8px;
+        }
+        .file-info i { width: 14px; height: 14px; color: var(--primary-blue); }
+        .form-actions {
+            display: flex; gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+            padding-top: 18px;
+            border-top: 2px solid var(--light-blue);
+            flex-wrap: wrap;
+        }
+        .btn-primary {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 11px 22px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        .btn-primary:hover { background: #1a1a1a; transform: translateY(-1px); }
+        .btn-primary:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; }
+        .btn-primary i { width: 16px; height: 16px; }
+        .btn-secondary {
+            background: white;
+            color: var(--primary-blue);
+            border: 1.5px solid var(--primary-blue);
+            padding: 11px 22px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        .btn-secondary:hover { background: var(--light-blue); }
+        .btn-secondary i { width: 16px; height: 16px; }
+
+        /* ====== Fila expandable en Concentrado por Obra ====== */
+        .btn-action.btn-eye {
+            background: white;
+            color: var(--primary-blue);
+            border: 1.5px solid var(--primary-blue);
+        }
+        .btn-action.btn-eye:hover { background: var(--light-blue); }
+        .obra-detalle-row td {
+            padding: 0 !important;
+            border-bottom: 1px solid var(--border-color) !important;
+            background: var(--bg-color);
+        }
+        .obra-detalle-content {
+            padding: 16px 20px;
+        }
+        .obra-detalle-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--primary-blue);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 10px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .obra-detalle-title i { width: 16px; height: 16px; }
+        .obra-detalle-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            font-size: 11.5px;
+        }
+        .obra-detalle-table th {
+            background: #f1f5f9;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 9.5px;
+            font-weight: 800;
+            padding: 9px 8px;
+            text-align: left;
+            border-right: 1px solid var(--border-color);
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+        .obra-detalle-table th:last-child { border-right: none; }
+        .obra-detalle-table th.right { text-align: right; }
+        .obra-detalle-table th.center { text-align: center; }
+        .obra-detalle-table td {
+            padding: 9px 8px;
+            border-bottom: 1px solid var(--bg-color);
+            color: var(--text-main);
+            font-size: 11.5px;
+            vertical-align: middle;
+        }
+        .obra-detalle-table tbody tr:last-child td { border-bottom: none; }
+        .obra-detalle-table tbody tr:hover { background: var(--bg-color); }
+        .obra-detalle-actions {
+            margin-top: 14px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .btn-add-gasto-obra {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 9px 16px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .btn-add-gasto-obra:hover { background: #1a1a1a; transform: translateY(-1px); }
+        .btn-add-gasto-obra i { width: 14px; height: 14px; }
+        .obra-detalle-empty {
+            padding: 18px;
+            text-align: center;
+            color: var(--text-muted);
+            font-style: italic;
+            font-size: 12px;
+        }
     </style>
 
     <!-- Firebase SDK + FYTTSA shared data helper -->
@@ -869,6 +1062,9 @@ function fyttsa_applyPrivilegeMenu() {
                 <button class="tab-btn" data-tab="revision">
                     <i data-lucide="search-check"></i> Revisión
                 </button>
+                <button class="tab-btn" data-tab="agregar">
+                    <i data-lucide="plus-circle"></i> Agregar Gasto
+                </button>
             </div>
 
             <!-- ============ TAB REPORTE ============ -->
@@ -929,10 +1125,11 @@ function fyttsa_applyPrivilegeMenu() {
                                     <th class="center">Pagado (#)</th>
                                     <th class="right">Pagado ($)</th>
                                     <th class="right">Total</th>
+                                    <th class="center">Acción</th>
                                 </tr>
                             </thead>
                             <tbody id="tbody-reporte">
-                                <tr><td colspan="9" class="empty-row">No hay datos para mostrar.</td></tr>
+                                <tr><td colspan="10" class="empty-row">No hay datos para mostrar.</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -1020,6 +1217,100 @@ function fyttsa_applyPrivilegeMenu() {
                                 <tr><td colspan="11" class="empty-row">No hay gastos para revisar.</td></tr>
                             </tbody>
                         </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============ TAB AGREGAR GASTO ============ -->
+            <div class="tab-content" id="content-agregar">
+                <div class="card">
+                    <h3 class="card-title">
+                        <i data-lucide="file-plus-2"></i>
+                        Agregar Gasto
+                    </h3>
+                    <p style="color:var(--text-muted); font-size:12px; margin-bottom:18px;">
+                        Completa los campos y guarda el gasto. Presiona <strong>Guardar y enviar</strong> cuando la factura esté lista para revisión administrativa.
+                    </p>
+
+                    <div class="form-grid">
+                        <div class="form-group full">
+                            <label class="form-label">Proveedor <span class="req">*</span></label>
+                            <select class="form-select" id="ag-proveedor">
+                                <option value="">— Selecciona un proveedor —</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Obra <span class="req">*</span></label>
+                            <select class="form-select" id="ag-obras">
+                                <option value="">— Selecciona una obra —</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Familia / Categoría <span class="req">*</span></label>
+                            <select class="form-select" id="ag-familia">
+                                <option value="">— Selecciona una familia —</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Fecha <span class="req">*</span></label>
+                            <input type="date" class="form-input" id="ag-fecha">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">No. Factura</label>
+                            <input type="text" class="form-input" id="ag-noFactura" placeholder="Ej. F-12345">
+                        </div>
+                        <div class="form-group full">
+                            <label class="form-label">Descripción <span class="req">*</span></label>
+                            <input type="text" class="form-input" id="ag-descripcion" placeholder="Ej. Cemento, acero, mano de obra...">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Importe <span class="req">*</span></label>
+                            <input type="number" step="0.01" min="0" class="form-input" id="ag-importe" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">IVA (16%)</label>
+                            <input type="number" step="0.01" min="0" class="form-input" id="ag-iva" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Total</label>
+                            <input type="number" step="0.01" class="form-input" id="ag-total" readonly style="background:var(--bg-color);font-weight:800;color:var(--primary-blue);">
+                        </div>
+                        <div class="form-group full">
+                            <label class="form-label">Observaciones</label>
+                            <textarea class="form-textarea" id="ag-observaciones" placeholder="Notas internas o aclaraciones..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Factura PDF (opcional)</label>
+                            <div class="file-input-wrapper">
+                                <input type="file" accept="application/pdf" class="file-input-hidden" id="ag-file-pdf">
+                                <button type="button" class="btn-upload-file" onclick="document.getElementById('ag-file-pdf').click()">
+                                    <i data-lucide="file-text"></i> Seleccionar PDF
+                                </button>
+                                <div class="file-info" id="ag-file-pdf-info" style="display:none;"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">XML (opcional)</label>
+                            <div class="file-input-wrapper">
+                                <input type="file" accept="text/xml,application/xml" class="file-input-hidden" id="ag-file-xml">
+                                <button type="button" class="btn-upload-file" onclick="document.getElementById('ag-file-xml').click()">
+                                    <i data-lucide="file-code"></i> Seleccionar XML
+                                </button>
+                                <div class="file-info" id="ag-file-xml-info" style="display:none;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button class="btn-secondary" id="ag-btn-limpiar">
+                            <i data-lucide="eraser"></i> Limpiar
+                        </button>
+                        <button class="btn-secondary" id="ag-btn-guardar">
+                            <i data-lucide="save"></i> Guardar
+                        </button>
+                        <button class="btn-primary" id="ag-btn-enviar">
+                            <i data-lucide="send"></i> Guardar y enviar
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1489,10 +1780,11 @@ function fyttsa_applyPrivilegeMenu() {
             const porObra = {};
             registros.forEach(g => {
                 if (!porObra[g.obra]) {
-                    porObra[g.obra] = { count: 0, pendiente: { n: 0, m: 0 }, facturado: { n: 0, m: 0 }, pagado: { n: 0, m: 0 }, total: 0 };
+                    porObra[g.obra] = { count: 0, pendiente: { n: 0, m: 0 }, facturado: { n: 0, m: 0 }, pagado: { n: 0, m: 0 }, total: 0, gastos: [] };
                 }
                 porObra[g.obra].count += 1;
                 porObra[g.obra].total += (g.total || 0);
+                porObra[g.obra].gastos.push(g);
                 if (g.estado === 'pendiente') { porObra[g.obra].pendiente.n += 1; porObra[g.obra].pendiente.m += (g.total || 0); }
                 else if (g.estado === 'facturado') { porObra[g.obra].facturado.n += 1; porObra[g.obra].facturado.m += (g.total || 0); }
                 else if (g.estado === 'pagado') { porObra[g.obra].pagado.n += 1; porObra[g.obra].pagado.m += (g.total || 0); }
@@ -1501,7 +1793,7 @@ function fyttsa_applyPrivilegeMenu() {
             const tbody = document.getElementById('tbody-reporte');
             const obras = Object.keys(porObra).sort();
             if (obras.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="9" class="empty-row">No hay datos para mostrar.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="10" class="empty-row">No hay datos para mostrar.</td></tr>';
                 return;
             }
             let totalGeneral = { count: 0, pendiente: { n: 0, m: 0 }, facturado: { n: 0, m: 0 }, pagado: { n: 0, m: 0 }, total: 0 };
@@ -1512,9 +1804,11 @@ function fyttsa_applyPrivilegeMenu() {
                 totalGeneral.facturado.n += o.facturado.n; totalGeneral.facturado.m += o.facturado.m;
                 totalGeneral.pagado.n += o.pagado.n; totalGeneral.pagado.m += o.pagado.m;
                 totalGeneral.total += o.total;
+                const obraJs = escapeJsString(obra);
+                const obraAttr = escapeHtml(obra);
                 return `
-                    <tr>
-                        <td style="font-weight:700;">${escapeHtml(obra)}</td>
+                    <tr id="obra-row-${obraAttr.replace(/[^a-zA-Z0-9]/g, '_')}">
+                        <td style="font-weight:700;">${obraAttr}</td>
                         <td class="amount-cell" style="text-align:center;color:var(--text-main);">${o.count}</td>
                         <td style="text-align:center;color:#92400e;font-weight:700;">${o.pendiente.n}</td>
                         <td class="amount-cell" style="color:#92400e;">${formatCurrency(o.pendiente.m)}</td>
@@ -1523,6 +1817,18 @@ function fyttsa_applyPrivilegeMenu() {
                         <td style="text-align:center;color:#166534;font-weight:700;">${o.pagado.n}</td>
                         <td class="amount-cell" style="color:#166534;">${formatCurrency(o.pagado.m)}</td>
                         <td class="amount-cell" style="font-size:13px;">${formatCurrency(o.total)}</td>
+                        <td style="text-align:center;">
+                            <button class="btn-action btn-eye" onclick="toggleObraDetalle('${obraJs}')">
+                                <i data-lucide="eye"></i> Ver detalle
+                            </button>
+                        </td>
+                    </tr>
+                    <tr class="obra-detalle-row" id="obra-detalle-${obraAttr.replace(/[^a-zA-Z0-9]/g, '_')}" style="display:none;">
+                        <td colspan="10">
+                            <div class="obra-detalle-content" id="obra-detalle-content-${obraAttr.replace(/[^a-zA-Z0-9]/g, '_')}">
+                                ${renderObraDetalleContent(obra, o.gastos, obraJs)}
+                            </div>
+                        </td>
                     </tr>
                 `;
             }).join('') + `
@@ -1536,9 +1842,116 @@ function fyttsa_applyPrivilegeMenu() {
                     <td style="text-align:center;color:var(--primary-blue);">${totalGeneral.pagado.n}</td>
                     <td class="amount-cell" style="color:var(--primary-blue);">${formatCurrency(totalGeneral.pagado.m)}</td>
                     <td class="amount-cell" style="color:var(--primary-blue); font-size:14px;">${formatCurrency(totalGeneral.total)}</td>
+                    <td></td>
                 </tr>
             `;
+            lucide.createIcons();
         }
+
+        function renderObraDetalleContent(obra, gastos, obraJs) {
+            if (!gastos || gastos.length === 0) {
+                return '<div class="obra-detalle-empty">No hay gastos individuales para esta obra.</div>';
+            }
+            const rowsHtml = gastos.map(g => {
+                return `
+                    <tr>
+                        <td style="font-size:10.5px;">${formatDateShort(g.fecha)}</td>
+                        <td style="font-family:'Courier New',monospace;font-weight:700;color:var(--primary-blue);">${escapeHtml(g.folio)}</td>
+                        <td style="font-size:10.5px;">${escapeHtml(g.proveedor)}</td>
+                        <td>${escapeHtml(g.descripcion)}</td>
+                        <td><span style="font-size:9px;background:var(--light-blue);padding:2px 6px;border-radius:4px;font-weight:700;color:var(--primary-blue);">${escapeHtml(g.familia)}</span></td>
+                        <td class="amount-cell">${formatCurrency(g.importe)}</td>
+                        <td class="amount-cell" style="color:var(--text-muted);">${formatCurrency(g.iva)}</td>
+                        <td class="amount-cell">${formatCurrency(g.total)}</td>
+                        <td style="text-align:center;">${statusBadge(g.estado)}</td>
+                    </tr>
+                `;
+            }).join('');
+            return `
+                <div class="obra-detalle-title">
+                    <i data-lucide="list"></i> Detalle de gastos — ${escapeHtml(obra)} (${gastos.length})
+                </div>
+                <table class="obra-detalle-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Folio</th>
+                            <th>Proveedor</th>
+                            <th>Descripción</th>
+                            <th>Familia</th>
+                            <th class="right">Importe</th>
+                            <th class="right">IVA</th>
+                            <th class="right">Total</th>
+                            <th class="center">Estatus</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rowsHtml}</tbody>
+                </table>
+                <div class="obra-detalle-actions">
+                    <button class="btn-add-gasto-obra" onclick="agregarGastoToObra('${obraJs}')">
+                        <i data-lucide="plus-circle"></i> Agregar gasto a esta obra
+                    </button>
+                </div>
+            `;
+        }
+
+        function escapeJsString(s) {
+            if (s === null || s === undefined) return '';
+            return String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\n/g, '\\n').replace(/\r/g, '\\r');
+        }
+
+        function toggleObraDetalle(obraName) {
+            const safeName = String(obraName).replace(/[^a-zA-Z0-9]/g, '_');
+            const detailRow = document.getElementById('obra-detalle-' + safeName);
+            if (!detailRow) return;
+            const isVisible = detailRow.style.display !== 'none';
+            if (isVisible) {
+                detailRow.style.display = 'none';
+            } else {
+                // Re-render content applying the SAME report filter as the table,
+                // so the detail matches the counts shown in the row.
+                let registros = allGastos.slice();
+                if (reporteFilter.type === 'obra') {
+                    registros = registros.filter(g => g.obra === reporteFilter.value);
+                } else if (reporteFilter.type === 'proveedor') {
+                    registros = registros.filter(g => g.proveedor === reporteFilter.value);
+                } else if (reporteFilter.type === 'estatus') {
+                    registros = registros.filter(g => g.estado === reporteFilter.value);
+                }
+                const gastosObra = registros.filter(g => g.obra === obraName);
+                const contentEl = document.getElementById('obra-detalle-content-' + safeName);
+                if (contentEl) {
+                    contentEl.innerHTML = renderObraDetalleContent(obraName, gastosObra, escapeJsString(obraName));
+                }
+                detailRow.style.display = 'table-row';
+                lucide.createIcons();
+            }
+        }
+
+        function agregarGastoToObra(obraName) {
+            switchTab('agregar');
+            // Pre-select the obra dropdown after a tick to ensure tab content is shown
+            setTimeout(function() {
+                const sel = document.getElementById('ag-obras');
+                if (sel) {
+                    // If option exists, select it; else create and select
+                    let found = false;
+                    for (let i = 0; i < sel.options.length; i++) {
+                        if (sel.options[i].value === obraName) { sel.value = obraName; found = true; break; }
+                    }
+                    if (!found) {
+                        const opt = document.createElement('option');
+                        opt.value = obraName;
+                        opt.textContent = obraName;
+                        sel.appendChild(opt);
+                        sel.value = obraName;
+                    }
+                }
+                showToast('Obra "' + obraName + '" preseleccionada. Completa los demás campos.', 'info');
+            }, 50);
+        }
+        window.toggleObraDetalle = toggleObraDetalle;
+        window.agregarGastoToObra = agregarGastoToObra;
 
         function renderReporte() {
             renderReporteKpis();
@@ -1820,6 +2233,7 @@ function fyttsa_applyPrivilegeMenu() {
         // =====================================================
         // 10. TABS
         // =====================================================
+        let agregarFormInitialized = false;
         function switchTab(tabName) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
@@ -1829,6 +2243,7 @@ function fyttsa_applyPrivilegeMenu() {
             if (content) content.classList.add('active');
             if (tabName === 'reporte') renderReporte();
             else if (tabName === 'revision') renderRevision();
+            else if (tabName === 'agregar') initAgregarForm();
         }
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', () => switchTab(btn.dataset.tab));
@@ -1847,12 +2262,229 @@ function fyttsa_applyPrivilegeMenu() {
         document.getElementById('filter-fecha-fin').addEventListener('change', renderRevision);
 
         // =====================================================
+        // 12. TAB AGREGAR GASTO - FORMULARIO
+        // =====================================================
+        let ag_selectedPdfFile = null;
+        let ag_selectedXmlFile = null;
+
+        function fillAgregarSelect(selectEl, options, placeholderText) {
+            if (!selectEl) return;
+            const current = selectEl.value;
+            let html = `<option value="">${placeholderText}</option>`;
+            options.forEach(o => { html += `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`; });
+            selectEl.innerHTML = html;
+            selectEl.value = current;
+        }
+
+        function initAgregarForm() {
+            // Populate selects (idempotent - safe to call multiple times)
+            fillAgregarSelect(document.getElementById('ag-proveedor'), PROVEEDORES, '— Selecciona un proveedor —');
+            fillAgregarSelect(document.getElementById('ag-obras'), OBRAS, '— Selecciona una obra —');
+            fillAgregarSelect(document.getElementById('ag-familia'), FAMILIAS, '— Selecciona una familia —');
+            // Default date = today
+            const fechaInput = document.getElementById('ag-fecha');
+            if (fechaInput && !fechaInput.value) {
+                fechaInput.value = new Date().toISOString().split('T')[0];
+            }
+            // Only attach listeners once
+            if (agregarFormInitialized) return;
+            agregarFormInitialized = true;
+
+            function ag_recalcIva() {
+                const importe = parseFloat(document.getElementById('ag-importe').value) || 0;
+                const ivaField = document.getElementById('ag-iva');
+                if (!ivaField.dataset.manual) {
+                    ivaField.value = (importe * 0.16).toFixed(2);
+                }
+                ag_recalcTotal();
+            }
+            function ag_recalcTotal() {
+                const importe = parseFloat(document.getElementById('ag-importe').value) || 0;
+                const iva = parseFloat(document.getElementById('ag-iva').value) || 0;
+                document.getElementById('ag-total').value = (importe + iva).toFixed(2);
+            }
+            window._ag_recalcIva = ag_recalcIva;
+            window._ag_recalcTotal = ag_recalcTotal;
+
+            document.getElementById('ag-importe').addEventListener('input', ag_recalcIva);
+            document.getElementById('ag-iva').addEventListener('input', () => {
+                document.getElementById('ag-iva').dataset.manual = '1';
+                ag_recalcTotal();
+            });
+
+            // File inputs
+            document.getElementById('ag-file-pdf').addEventListener('change', function() {
+                ag_selectedPdfFile = this.files[0] || null;
+                const info = document.getElementById('ag-file-pdf-info');
+                if (ag_selectedPdfFile) {
+                    info.style.display = 'flex';
+                    info.innerHTML = `<i data-lucide="file-text"></i> ${escapeHtml(ag_selectedPdfFile.name)} (${(ag_selectedPdfFile.size/1024).toFixed(1)} KB)`;
+                } else {
+                    info.style.display = 'none';
+                }
+                lucide.createIcons();
+            });
+            document.getElementById('ag-file-xml').addEventListener('change', function() {
+                ag_selectedXmlFile = this.files[0] || null;
+                const info = document.getElementById('ag-file-xml-info');
+                if (ag_selectedXmlFile) {
+                    info.style.display = 'flex';
+                    info.innerHTML = `<i data-lucide="file-code"></i> ${escapeHtml(ag_selectedXmlFile.name)} (${(ag_selectedXmlFile.size/1024).toFixed(1)} KB)`;
+                } else {
+                    info.style.display = 'none';
+                }
+                lucide.createIcons();
+            });
+
+            // Buttons
+            document.getElementById('ag-btn-limpiar').addEventListener('click', clearAgregarForm);
+            document.getElementById('ag-btn-guardar').addEventListener('click', () => saveGastoAgregar('pendiente'));
+            document.getElementById('ag-btn-enviar').addEventListener('click', () => saveGastoAgregar('pendiente'));
+        }
+
+        function readFileAsDataURL_ag(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function clearAgregarForm() {
+            document.getElementById('ag-proveedor').value = '';
+            document.getElementById('ag-obras').value = '';
+            document.getElementById('ag-familia').value = '';
+            document.getElementById('ag-noFactura').value = '';
+            document.getElementById('ag-descripcion').value = '';
+            document.getElementById('ag-importe').value = '';
+            const ivaField = document.getElementById('ag-iva');
+            ivaField.value = '';
+            ivaField.removeAttribute('data-manual');
+            document.getElementById('ag-total').value = '';
+            document.getElementById('ag-observaciones').value = '';
+            document.getElementById('ag-file-pdf').value = '';
+            document.getElementById('ag-file-xml').value = '';
+            document.getElementById('ag-file-pdf-info').style.display = 'none';
+            document.getElementById('ag-file-xml-info').style.display = 'none';
+            ag_selectedPdfFile = null;
+            ag_selectedXmlFile = null;
+            document.getElementById('ag-fecha').value = new Date().toISOString().split('T')[0];
+        }
+
+        function validateAgregarForm() {
+            const proveedor = document.getElementById('ag-proveedor').value;
+            const obra = document.getElementById('ag-obras').value;
+            const familia = document.getElementById('ag-familia').value;
+            const fecha = document.getElementById('ag-fecha').value;
+            const descripcion = document.getElementById('ag-descripcion').value.trim();
+            const importe = parseFloat(document.getElementById('ag-importe').value) || 0;
+            if (!proveedor) { showToast('Selecciona un proveedor.', 'error'); return false; }
+            if (!obra) { showToast('Selecciona una obra.', 'error'); return false; }
+            if (!familia) { showToast('Selecciona una familia.', 'error'); return false; }
+            if (!fecha) { showToast('Selecciona una fecha.', 'error'); return false; }
+            if (!descripcion) { showToast('Escribe una descripción.', 'error'); return false; }
+            if (importe <= 0) { showToast('El importe debe ser mayor a 0.', 'error'); return false; }
+            return true;
+        }
+
+        async function generateFolioAgregar() {
+            const year = new Date().getFullYear();
+            const prefix = `GAS-${year}-`;
+            let maxNum = 0;
+            allGastos.forEach(g => {
+                if (g.folio && String(g.folio).startsWith(prefix)) {
+                    const num = parseInt(String(g.folio).substring(prefix.length), 10);
+                    if (!isNaN(num) && num > maxNum) maxNum = num;
+                }
+            });
+            const nextNum = maxNum + 1;
+            return `${prefix}${String(nextNum).padStart(4, '0')}`;
+        }
+
+        async function saveGastoAgregar(estado) {
+            if (!validateAgregarForm()) return;
+            const database = getDb();
+            if (!database) { showToast('Firebase no disponible.', 'error'); return; }
+
+            const btnGuardar = document.getElementById('ag-btn-guardar');
+            const btnEnviar = document.getElementById('ag-btn-enviar');
+            const originalGuardar = btnGuardar.disabled;
+            const originalEnviar = btnEnviar.disabled;
+            btnGuardar.disabled = true;
+            btnEnviar.disabled = true;
+
+            try {
+                const importe = parseFloat(document.getElementById('ag-importe').value) || 0;
+                const iva = parseFloat(document.getElementById('ag-iva').value) || 0;
+                const state = {
+                    proveedor: document.getElementById('ag-proveedor').value,
+                    obra: document.getElementById('ag-obras').value,
+                    familia: document.getElementById('ag-familia').value,
+                    fecha: document.getElementById('ag-fecha').value,
+                    noFactura: document.getElementById('ag-noFactura').value.trim(),
+                    descripcion: document.getElementById('ag-descripcion').value.trim(),
+                    importe: importe,
+                    iva: iva,
+                    total: importe + iva,
+                    observaciones: document.getElementById('ag-observaciones').value.trim()
+                };
+                const folio = await generateFolioAgregar();
+                const usuario = localStorage.getItem('usuario') || 'desconocido';
+                const nombreUsuario = localStorage.getItem('nombre') || usuario;
+
+                let pdfFile = null;
+                let xmlFile = null;
+                if (ag_selectedPdfFile && ag_selectedPdfFile.size < 500 * 1024) {
+                    const dataUrl = await readFileAsDataURL_ag(ag_selectedPdfFile);
+                    pdfFile = { name: ag_selectedPdfFile.name, size: ag_selectedPdfFile.size, type: ag_selectedPdfFile.type, dataUrl: dataUrl };
+                } else if (ag_selectedPdfFile) {
+                    pdfFile = { name: ag_selectedPdfFile.name, size: ag_selectedPdfFile.size, type: ag_selectedPdfFile.type, tooLarge: true };
+                }
+                if (ag_selectedXmlFile && ag_selectedXmlFile.size < 500 * 1024) {
+                    const dataUrl = await readFileAsDataURL_ag(ag_selectedXmlFile);
+                    xmlFile = { name: ag_selectedXmlFile.name, size: ag_selectedXmlFile.size, type: ag_selectedXmlFile.type, dataUrl: dataUrl };
+                } else if (ag_selectedXmlFile) {
+                    xmlFile = { name: ag_selectedXmlFile.name, size: ag_selectedXmlFile.size, type: ag_selectedXmlFile.type, tooLarge: true };
+                }
+
+                const docData = Object.assign({}, state, {
+                    folio: folio,
+                    estado: estado,
+                    fechaRegistro: new Date().toISOString(),
+                    uploadedBy: usuario,
+                    uploadedByName: nombreUsuario,
+                    pdfFile: pdfFile,
+                    xmlFile: xmlFile,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                await database.collection('gastos').add(docData);
+                showToast(`Gasto ${folio} guardado correctamente. Mostrando en Revisión...`, 'success');
+                clearAgregarForm();
+                await loadAllGastos();
+                renderReporte();
+                renderRevision();
+                // Switch to Revisión tab so the supervisor sees the new gasto
+                switchTab('revision');
+            } catch (e) {
+                console.error('Error guardando gasto:', e);
+                showToast('Error al guardar: ' + e.message, 'error');
+            } finally {
+                btnGuardar.disabled = originalGuardar;
+                btnEnviar.disabled = originalEnviar;
+            }
+        }
+        window.saveGastoAgregar = saveGastoAgregar;
+
+        // =====================================================
         // INICIALIZAR
         // =====================================================
         (async function() {
             await loadAllGastos();
             renderReporte();
             renderRevision();
+            initAgregarForm();
             lucide.createIcons();
         })();
     </script>
