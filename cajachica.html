@@ -662,6 +662,10 @@
         }
         @media (max-width: 768px) {
             .signature-section { grid-template-columns: 1fr; }
+            /* Tabs en grid 2x2 */
+            .tabs-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; border-bottom: none; padding-bottom: 0; }
+            .tab-btn { width: 100%; justify-content: center; padding: 10px 8px; font-size: 12px; }
+            .tab-badge { min-width: 18px; height: 18px; font-size: 10px; }
             /* Tabla vertical en movil - estilo formulario con etiqueta arriba y recuadro abajo */
             .table-wrap { border: none; border-radius: 0; overflow: visible; }
             .expense-table { min-width: 0 !important; width: 100%; }
@@ -699,6 +703,7 @@
             .expense-table tbody td.col-actions .btn-remove-row { width: 36px; height: 36px; }
             .expense-table tbody td.col-actions .btn-remove-row i { width: 16px; height: 16px; }
             .row-num { width: auto; background: transparent; font-size: 13px; font-weight: 800; }
+            /* Todos los inputs al mismo ancho */
             .table-input, .table-select {
                 font-size: 14px;
                 padding: 10px 12px;
@@ -713,9 +718,14 @@
                 box-shadow: 0 0 0 2px rgba(0,0,0,0.08);
             }
             .table-input.right { font-size: 14px; text-align: left; }
-            .tipo-btn { font-size: 12px; padding: 8px 16px; }
-            .attach-btn { font-size: 12px; padding: 8px 12px; }
-            .attach-btn .file-name { max-width: 150px; }
+            /* Tipo toggle: mismo ancho que los inputs */
+            .col-tipo .tipo-toggle { width: 100%; display: flex; gap: 0; }
+            .tipo-btn { font-size: 13px; padding: 10px 12px; flex: 1; border-radius: 8px 0 0 8px; }
+            .tipo-btn:last-child { border-radius: 0 8px 8px 0; }
+            /* Adjuntos: botones PDF y XML del mismo ancho */
+            .attach-cell { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+            .attach-btn { width: 100%; justify-content: center; padding: 10px 12px; font-size: 13px; border-radius: 8px; border: 1.5px solid var(--info); box-sizing: border-box; }
+            .attach-btn .file-name { max-width: none; flex: 1; text-align: center; }
             .col-observ, .col-adjuntos { display: flex; }
             .expense-table thead th.col-observ, .expense-table thead th.col-adjuntos { display: none; }
             .subtotal-row td { display: none; }
