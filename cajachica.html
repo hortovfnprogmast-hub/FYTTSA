@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Caja Chica | FYTTSA</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
@@ -1689,7 +1689,7 @@ function fyttsa_applyPrivilegeMenu() {
             }
         }
 
-        function addItem() {
+        function addItem(scroll) {
             const newItem = {
                 id: newItemId(),
                 tipo: 'Factura',
@@ -1705,14 +1705,14 @@ function fyttsa_applyPrivilegeMenu() {
             };
             items.push(newItem);
             renderItems();
-            setTimeout(() => {
+            if (scroll) setTimeout(() => {
                 const last = document.querySelector('#expense-tbody tr:last-child');
                 if (last) last.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }, 50);
         }
 
-        document.getElementById('btn-add-item').addEventListener('click', addItem);
-        addItem();
+        document.getElementById('btn-add-item').addEventListener('click', () => addItem(true));
+        addItem(false);
 
         // =====================================================
         // 5. SUMATORIAS
@@ -2127,7 +2127,7 @@ function fyttsa_applyPrivilegeMenu() {
                 el.disabled = false;
                 delete el.dataset.wasDisabled;
             });
-            addItem();
+            addItem(false);
             updateSummary();
             updateFolioInput();
         }
