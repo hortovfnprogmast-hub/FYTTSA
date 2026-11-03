@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Requisición de Materiales | FYTTSA</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
@@ -872,7 +872,7 @@ function fyttsa_applyPrivilegeMenu() {
             }
         }
 
-        function addItem() {
+        function addItem(scroll) {
             const newItem = {
                 id: newItemId(),
                 descripcion: '', unidad: '', cantidad: 0, codigo: '',
@@ -880,13 +880,13 @@ function fyttsa_applyPrivilegeMenu() {
             };
             items.push(newItem);
             renderItems();
-            setTimeout(() => {
+            if (scroll) setTimeout(() => {
                 const last = document.querySelector('#expense-tbody tr:last-child');
                 if (last) last.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }, 50);
         }
-        document.getElementById('btn-add-item').addEventListener('click', addItem);
-        addItem();
+        document.getElementById('btn-add-item').addEventListener('click', () => addItem(true));
+        addItem(false);
 
         // =====================================================
         // HISTORIAL CON STATUS
@@ -1141,7 +1141,7 @@ function fyttsa_applyPrivilegeMenu() {
             document.getElementById('input-fecha-necesidad').value = '';
             document.getElementById('input-notas').value = '';
             document.querySelectorAll('#content-nuevo [data-was-disabled]').forEach(el => { el.disabled = false; delete el.dataset.wasDisabled; });
-            addItem();
+            addItem(false);
             updateFolioInput();
         }
 
