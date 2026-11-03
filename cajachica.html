@@ -703,6 +703,8 @@
             .expense-table tbody td.col-actions .btn-remove-row { width: 36px; height: 36px; }
             .expense-table tbody td.col-actions .btn-remove-row i { width: 16px; height: 16px; }
             .row-num { width: auto; background: transparent; font-size: 13px; font-weight: 800; }
+            /* Override fixed column widths para que todos los inputs tengan el mismo ancho */
+            .col-tipo, .col-folio, .col-fecha, .col-proveedor, .col-concepto, .col-importe, .col-observ, .col-adjuntos, .col-actions { width: auto !important; min-width: 0 !important; }
             /* Todos los inputs al mismo ancho */
             .table-input, .table-select {
                 font-size: 14px;
