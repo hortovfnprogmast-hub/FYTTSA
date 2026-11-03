@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis KPIs | FYTTSA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" onerror="this.onerror=null;var s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js';document.head.appendChild(s);"></script>
+
+    <style>
+        :root {
+            --primary-blue: #000000;
+            --light-blue: #e8e8e8;
+            --bg-color: #f8fafc;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #404040;
+            --purple: #8b5cf6;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            display: flex; flex-direction: column;
+            height: 100vh; overflow: hidden;
+        }
+        .header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 20px; background: white;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 50; flex-shrink: 0;
+        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .menu-btn { background: none; border: none; cursor: pointer; color: var(--text-main); padding: 5px; }
+        .header-title { margin: 0; font-size: 15px; font-weight: 700; color: var(--primary-blue); display: none; }
+        @media (min-width: 768px) { .header-title { display: block; } }
+        .header-right { display: flex; align-items: center; gap: 12px; }
+        .user-initial {
+            width: 35px; height: 35px; border-radius: 50%;
+            background-color: var(--primary-blue); color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 16px;
+        }
+        .main-layout { display: flex; flex: 1; overflow: hidden; }
+        .sidebar {
+            width: 260px; background: white;
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto; transition: transform 0.3s ease;
+            display: flex; flex-direction: column; flex-shrink: 0;
+        }
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; height: calc(100vh - 60px); transform: translateX(-100%); z-index: 40; }
+            .sidebar.open { transform: translateX(0); }
+            .header-title { display: none; }
+        }
+        .sidebar-nav { padding: 15px 10px; }
+        .sidebar-section { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
+        .sidebar-section:last-child { border-bottom: none; }
+        .sidebar .section-title { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin: 10px 15px; padding-bottom: 0; display: block; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 15px; color: var(--text-main); text-decoration: none; font-size: 14px; font-weight: 500; border-radius: 10px; margin-bottom: 2px; transition: all 0.2s; }
+        .nav-item:hover { background-color: var(--bg-color); }
+        .nav-item.active { background-color: #e8e8e8 !important; color: #000000 !important; font-weight: 700 !important; border-left: 4px solid #000000 !important; border-radius: 8px !important; }
+        .nav-item.active i { color: var(--primary-blue); }
+
+        .content { flex: 1; padding: 30px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        @media (max-width: 768px) { .content { padding: 20px; } }
+
+        .page-title { display: flex; align-items: center; gap: 12px; font-size: 22px; font-weight: 800; color: var(--primary-blue); margin-bottom: 8px; }
+        .page-title i { width: 28px; height: 28px; }
+        .page-subtitle { color: var(--text-muted); font-size: 13px; margin-bottom: 25px; }
+
+        .card {
+            background: white; border-radius: 20px; padding: 24px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            margin-bottom: 20px;
+        }
+        .card-title {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 15px; font-weight: 700; color: var(--text-main);
+            margin-bottom: 18px; padding-bottom: 12px;
+            border-bottom: 2px solid var(--light-blue);
+        }
+        .card-title i { color: var(--primary-blue); width: 20px; height: 20px; }
+
+        /* Header worker card */
+        .worker-card {
+            display: flex; align-items: center; gap: 20px;
+            flex-wrap: wrap;
+        }
+        .worker-avatar {
+            width: 70px; height: 70px; border-radius: 50%;
+            background: var(--primary-blue); color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px; font-weight: 800;
+            flex-shrink: 0;
+        }
+        .worker-info { flex: 1; min-width: 200px; }
+        .worker-name { font-size: 22px; font-weight: 800; color: var(--text-main); }
+        .worker-position { font-size: 13px; color: var(--text-muted); font-weight: 600; margin-top: 4px; }
+        .worker-id { font-size: 11px; color: var(--text-muted); margin-top: 2px; font-family: 'Courier New', monospace; }
+        .worker-avg {
+            text-align: center; padding: 12px 24px;
+            background: var(--bg-color); border-radius: 14px;
+            border: 1px solid var(--border-color);
+            min-width: 140px;
+        }
+        .worker-avg-value { font-size: 32px; font-weight: 800; color: var(--primary-blue); line-height: 1; }
+        .worker-avg-label { font-size: 10px; color: var(--text-muted); font-weight: 800; text-transform: uppercase; margin-top: 6px; letter-spacing: 0.4px; }
+
+        /* KPI grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px; margin-bottom: 20px;
+        }
+        .kpi-card {
+            background: white; border-radius: 16px; padding: 18px 20px;
+            border: 1px solid var(--border-color);
+            border-left: 5px solid var(--primary-blue);
+            display: flex; align-items: center; gap: 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+        .kpi-card.success { border-left-color: var(--success); }
+        .kpi-card.warning { border-left-color: var(--warning); }
+        .kpi-card.danger { border-left-color: var(--danger); }
+        .kpi-card.info { border-left-color: var(--info); }
+        .kpi-card.purple { border-left-color: var(--purple); }
+        .kpi-icon {
+            width: 44px; height: 44px; border-radius: 12px;
+            background: var(--light-blue); color: var(--primary-blue);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .kpi-card.success .kpi-icon { background: #dcfce7; color: var(--success); }
+        .kpi-card.warning .kpi-icon { background: #fef3c7; color: var(--warning); }
+        .kpi-card.danger .kpi-icon { background: #fee2e2; color: var(--danger); }
+        .kpi-card.info .kpi-icon { background: #e0e0e0; color: var(--info); }
+        .kpi-card.purple .kpi-icon { background: #ede9fe; color: var(--purple); }
+        .kpi-icon i { width: 22px; height: 22px; }
+        .kpi-info { display: flex; flex-direction: column; }
+        .kpi-value { font-size: 20px; font-weight: 800; color: var(--text-main); line-height: 1.1; white-space: nowrap; }
+        .kpi-label { font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; margin-top: 2px; }
+
+        /* Charts */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 900px) { .charts-grid { grid-template-columns: 1fr; } }
+        .chart-box {
+            background: white; border-radius: 16px; padding: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+        .chart-title {
+            font-size: 14px; font-weight: 700; color: var(--text-main);
+            margin-bottom: 14px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .chart-title i { width: 18px; height: 18px; color: var(--primary-blue); }
+        .chart-wrap { position: relative; height: 280px; }
+
+        /* Tables */
+        .table-responsive {
+            width: 100%; overflow-x: auto;
+            border-radius: 14px; border: 1px solid var(--border-color);
+            background: white;
+        }
+        .data-table {
+            width: 100%; border-collapse: collapse;
+            min-width: 800px;
+        }
+        .data-table th {
+            background: var(--primary-blue); color: white;
+            text-transform: uppercase; font-size: 10.5px; font-weight: 800;
+            padding: 12px 10px; text-align: left;
+            border-right: 1px solid rgba(255,255,255,0.15);
+            letter-spacing: 0.4px; white-space: nowrap;
+        }
+        .data-table th:last-child { border-right: none; }
+        .data-table th.center { text-align: center; }
+        .data-table th.right { text-align: right; }
+        .data-table td {
+            padding: 11px 10px;
+            border-bottom: 1px solid var(--bg-color);
+            color: var(--text-main); font-size: 12.5px; font-weight: 500;
+            vertical-align: middle;
+        }
+        .data-table tbody tr:last-child td { border-bottom: none; }
+        .data-table tbody tr:hover { background: var(--bg-color); }
+        .num-cell { text-align: right; font-weight: 700; }
+        .center-cell { text-align: center; }
+        .empty-row { text-align: center; color: var(--text-muted); font-style: italic; padding: 30px !important; }
+
+        .status-badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 4px 10px; border-radius: 20px;
+            font-size: 10px; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .status-badge.good { background: #dcfce7; color: #166534; }
+        .status-badge.medium { background: #fef3c7; color: #92400e; }
+        .status-badge.bad { background: #fee2e2; color: #991b1b; }
+
+        .btn-action {
+            padding: 7px 12px; border-radius: 8px;
+            font-weight: 700; font-size: 11px; cursor: pointer; border: none;
+            font-family: 'Inter', sans-serif;
+            display: inline-flex; align-items: center; gap: 4px;
+            transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.3px;
+        }
+        .btn-action i { width: 12px; height: 12px; }
+        .btn-view { background: white; color: var(--primary-blue); border: 1.5px solid var(--primary-blue); }
+        .btn-view:hover { background: var(--light-blue); }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center; padding: 60px 20px;
+            color: var(--text-muted);
+        }
+        .empty-state i { width: 64px; height: 64px; color: var(--border-color); margin-bottom: 14px; }
+        .empty-state h3 { font-size: 18px; font-weight: 700; color: var(--text-main); margin-bottom: 6px; }
+        .empty-state p { font-size: 13px; }
+
+        /* Modal */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(15, 23, 42, 0.82);
+            backdrop-filter: blur(6px);
+            z-index: 2000;
+            align-items: center; justify-content: center;
+            padding: 16px;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-box {
+            background: white; border-radius: 20px;
+            width: 100%; max-width: 760px; padding: 24px;
+            box-shadow: 0 30px 70px rgba(0,0,0,0.4);
+            animation: slideIn 0.3s cubic-bezier(.2,.8,.3,1);
+            max-height: 90vh; overflow-y: auto;
+        }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .modal-header {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 12px; margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--bg-color);
+        }
+        .modal-header-left { display: flex; align-items: center; gap: 12px; }
+        .modal-icon {
+            width: 44px; height: 44px; border-radius: 12px;
+            background: var(--light-blue); color: var(--primary-blue);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .modal-icon i { width: 24px; height: 24px; }
+        .modal-title { font-size: 16px; font-weight: 800; color: var(--text-main); }
+        .modal-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+        .modal-close {
+            background: none; border: none; cursor: pointer;
+            color: var(--text-muted); padding: 6px;
+        }
+        .modal-close i { width: 20px; height: 20px; }
+        .modal-close:hover { color: var(--danger); }
+
+        .modal-stat-row {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+            margin-bottom: 18px;
+        }
+        @media (max-width: 600px) { .modal-stat-row { grid-template-columns: 1fr; } }
+        .modal-stat {
+            background: var(--bg-color); border-radius: 12px;
+            padding: 12px 14px; border: 1px solid var(--border-color);
+        }
+        .modal-stat-label { font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
+        .modal-stat-value { font-size: 16px; font-weight: 800; color: var(--primary-blue); margin-top: 4px; }
+
+        .observation-box {
+            background: #fffbeb; border: 1px solid #fef3c7;
+            border-radius: 12px; padding: 14px 16px;
+            margin-top: 18px;
+        }
+        .observation-box-title {
+            font-size: 11px; font-weight: 800; color: #92400e;
+            text-transform: uppercase; letter-spacing: 0.4px;
+            margin-bottom: 6px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .observation-box-title i { width: 14px; height: 14px; }
+        .observation-box-text { font-size: 13px; color: #4d2b00; font-weight: 500; line-height: 1.5; }
+
+        /* Toast */
+        .toast {
+            position: fixed; top: 20px; right: 20px;
+            background: var(--text-main); color: white;
+            padding: 14px 20px; border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 9999;
+            display: flex; align-items: center; gap: 10px;
+            font-size: 13px; font-weight: 600;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.error { background: var(--danger); }
+        .toast.info { background: var(--info); }
+        .toast i { width: 18px; height: 18px; }
+
+        .loading-row { text-align: center; color: var(--text-muted); padding: 32px !important; }
+        .loading-row i { width: 28px; height: 28px; animation: spin 1s linear infinite; display: inline-block; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    </style>
+
+    <!-- Firebase SDK + FYTTSA shared data helper -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script>
+// =====================================================
+// FYTTSA Shared Data Helper
+// Centralizes Firebase Firestore sync for cross-device data sharing.
+// All user-specific data is stored under: usuarios/{userId}/app_data/{key}
+// Falls back to localStorage if Firebase is unavailable or no user.
+// =====================================================
+
+const FYTTSA_FIREBASE_CONFIG = {
+    apiKey: "AIzaSyD9Ihkh0NaP5vVbKntobmVTb53T0yDAZjU",
+    authDomain: "fyttsa-ae508.firebaseapp.com",
+    projectId: "fyttsa-ae508",
+    storageBucket: "fyttsa-ae508.firebasestorage.app",
+    messagingSenderId: "860564632264",
+    appId: "1:860564632264:web:30edf5a8f837e284ab2bfd",
+    measurementId: "G-7PQ1R77YJ3"
+};
+
+// Initialize Firebase once
+let _fyttsaDb = null;
+let _fyttsaFirebaseReady = false;
+
+function _fyttsaInitFirebase() {
+    if (typeof firebase === 'undefined') return false;
+    if (!firebase.apps.length) {
+        firebase.initializeApp(FYTTSA_FIREBASE_CONFIG);
+    }
+    if (firebase.firestore) {
+        _fyttsaDb = firebase.firestore();
+        _fyttsaFirebaseReady = true;
+        return true;
+    }
+    return false;
+}
+
+// Try to init immediately if firebase is already loaded
+if (typeof firebase !== 'undefined') {
+    _fyttsaInitFirebase();
+}
+
+// Also try after window load (in case scripts load async)
+window.addEventListener('load', function() {
+    if (!_fyttsaFirebaseReady && typeof firebase !== 'undefined') {
+        _fyttsaInitFirebase();
+    }
+});
+
+/**
+ * Get the current user ID from localStorage.
+ */
+function fyttsa_getUserId() {
+    return localStorage.getItem('usuario') || null;
+}
+
+/**
+ * Load data for the current user from Firestore.
+ * Falls back to localStorage if Firestore is unavailable.
+ */
+async function fyttsa_loadData(key) {
+    const userId = fyttsa_getUserId();
+
+    if (userId) {
+        if (!_fyttsaFirebaseReady && typeof firebase !== 'undefined') {
+            _fyttsaInitFirebase();
+        }
+        if (_fyttsaFirebaseReady) {
+            try {
+                const doc = await _fyttsaDb.collection('usuarios')
+                    .doc(userId)
+                    .collection('app_data')
+                    .doc(key)
+                    .get();
+                if (doc.exists && doc.data().value !== undefined) {
+                    return doc.data().value;
+                }
+            } catch (e) {
+                console.warn('[FYTTSA] Firestore load failed, falling back to localStorage:', e);
+            }
+        }
+    }
+
+    // Fallback to localStorage
+    try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+        return null;
+    }
+}
+
+/**
+ * Save data for the current user to Firestore.
+ * Also saves to localStorage as a cache/fallback.
+ */
+async function fyttsa_saveData(key, value) {
+    const userId = fyttsa_getUserId();
+
+    try {
+        localStorage.setItem(key, JSON.stringify(value));
+    } catch (e) {
+        console.warn('[FYTTSA] localStorage save failed:', e);
+    }
+
+    if (userId) {
+        if (!_fyttsaFirebaseReady && typeof firebase !== 'undefined') {
+            _fyttsaInitFirebase();
+        }
+        if (_fyttsaFirebaseReady) {
+            try {
+                await _fyttsaDb.collection('usuarios')
+                    .doc(userId)
+                    .collection('app_data')
+                    .doc(key)
+                    .set({
+                        value: value,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+            } catch (e) {
+                console.warn('[FYTTSA] Firestore save failed:', e);
+            }
+        }
+    }
+}
+
+/**
+ * Save data synchronously to localStorage and fire async Firestore save.
+ */
+function fyttsa_saveDataSync(key, value) {
+    try {
+        localStorage.setItem(key, JSON.stringify(value));
+    } catch (e) {
+        console.warn('[FYTTSA] localStorage save failed:', e);
+    }
+    fyttsa_saveData(key, value);
+}
+
+// =====================================================
+// PRIVILEGE-BASED MENU VISIBILITY + ACTIVE MENU STYLING
+// =====================================================
+// Privilegio 1 = see ALL menu sections
+// Privilegio 2 = see ONLY Inicio + Trabajador section (hide Obra, Control, Almacén)
+// =====================================================
+
+function _fyttsa_applyMenuVisibility() {
+    var privilegio = String(localStorage.getItem('privilegio') || '1').trim();
+    var sidebar = document.getElementById('sidebar');
+    if (!sidebar) return;
+
+    if (privilegio === '2') {
+        var sections = sidebar.querySelectorAll('.sidebar-section');
+        sections.forEach(function(sec) {
+            var title = sec.querySelector('.section-title');
+            if (title) {
+                var titleText = title.textContent.trim();
+                if (titleText !== 'Trabajador') {
+                    sec.style.display = 'none';
+                }
+            }
+        });
+    }
+}
+
+function _fyttsa_applyActiveStyle() {
+    var activeItem = document.querySelector('.nav-item.active');
+    if (activeItem) {
+        activeItem.style.setProperty('background-color', '#e8e8e8', 'important');
+        activeItem.style.setProperty('color', '#000000', 'important');
+        activeItem.style.setProperty('font-weight', '700', 'important');
+        activeItem.style.setProperty('border-left', '4px solid #000000', 'important');
+        activeItem.style.setProperty('border-radius', '8px', 'important');
+        activeItem.style.setProperty('padding', '10px 15px', 'important');
+    }
+}
+
+// Public function that pages call after loading menu.html
+function fyttsa_applyPrivilegeMenu() {
+    _fyttsa_applyMenuVisibility();
+}
+
+// =====================================================
+// AUTO-SETUP: Runs automatically when the script loads.
+// Uses a MutationObserver to detect when the sidebar content
+// changes (i.e., when menu.html is loaded via fetch), then:
+//   1. Applies privilege-based menu visibility
+//   2. Starts an interval to apply active menu styling
+// =====================================================
+
+(function() {
+    var styleIntervalStarted = false;
+
+    function startActiveStyleInterval() {
+        if (styleIntervalStarted) return;
+        styleIntervalStarted = true;
+
+        _fyttsa_applyActiveStyle();
+
+        var intervalId = setInterval(function() {
+            _fyttsa_applyActiveStyle();
+        }, 200);
+
+        setTimeout(function() {
+            clearInterval(intervalId);
+        }, 20000);
+    }
+
+    function setupSidebarObserver() {
+        var sidebar = document.getElementById('sidebar');
+        if (!sidebar) {
+            setTimeout(setupSidebarObserver, 100);
+            return;
+        }
+
+        _fyttsa_applyMenuVisibility();
+        startActiveStyleInterval();
+
+        if (typeof MutationObserver !== 'undefined') {
+            var observer = new MutationObserver(function(mutations) {
+                _fyttsa_applyMenuVisibility();
+                _fyttsa_applyActiveStyle();
+            });
+            observer.observe(sidebar, {
+                childList: true,
+                subtree: true,
+                attributes: true,
+                attributeFilter: ['class']
+            });
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            setupSidebarObserver();
+            setTimeout(function() {
+                _fyttsa_applyMenuVisibility();
+                _fyttsa_applyActiveStyle();
+                startActiveStyleInterval();
+            }, 500);
+            setTimeout(function() {
+                _fyttsa_applyMenuVisibility();
+                _fyttsa_applyActiveStyle();
+            }, 1500);
+        });
+    } else {
+        setupSidebarObserver();
+        setTimeout(function() {
+            _fyttsa_applyMenuVisibility();
+            _fyttsa_applyActiveStyle();
+            startActiveStyleInterval();
+        }, 500);
+        setTimeout(function() {
+            _fyttsa_applyMenuVisibility();
+            _fyttsa_applyActiveStyle();
+        }, 1500);
+    }
+
+    window.addEventListener('load', function() {
+        _fyttsa_applyMenuVisibility();
+        _fyttsa_applyActiveStyle();
+        startActiveStyleInterval();
+    });
+})();
+    </script>
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <button class="menu-btn" id="toggle-menu"><i data-lucide="menu"></i></button>
+            <h1 class="header-title">FYTTSA</h1>
+        </div>
+        <div class="header-right">
+            <div class="user-initial" id="user-initial">U</div>
+            <img src="https://i.ibb.co/x8Bw8KR8/MARFIL-1.jpg" alt="Logo" height="35" style="border-radius: 8px;">
+        </div>
+    </header>
+
+    <div class="main-layout">
+        <aside class="sidebar" id="sidebar"></aside>
+
+        <main class="content">
+            <h1 class="page-title">
+                <i data-lucide="target"></i>
+                Mis KPIs
+            </h1>
+            <p class="page-subtitle">Seguimiento de tus indicadores de desempeño, evaluaciones semanales y observaciones del supervisor.</p>
+
+            <!-- Header worker card -->
+            <div class="card" id="worker-header-card">
+                <div class="worker-card">
+                    <div class="worker-avatar" id="worker-avatar">?</div>
+                    <div class="worker-info">
+                        <div class="worker-name" id="worker-name">Cargando...</div>
+                        <div class="worker-position" id="worker-position">—</div>
+                        <div class="worker-id" id="worker-id">—</div>
+                    </div>
+                    <div class="worker-avg">
+                        <div class="worker-avg-value" id="worker-avg-value">—</div>
+                        <div class="worker-avg-label">Promedio General</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KPI Cards -->
+            <div class="kpi-grid" id="kpi-grid">
+                <div class="kpi-card info">
+                    <div class="kpi-icon"><i data-lucide="trending-up"></i></div>
+                    <div class="kpi-info">
+                        <div class="kpi-value" id="kpi-trimestral">—</div>
+                        <div class="kpi-label">Promedio Trimestral</div>
+                    </div>
+                </div>
+                <div class="kpi-card success">
+                    <div class="kpi-icon"><i data-lucide="award"></i></div>
+                    <div class="kpi-info">
+                        <div class="kpi-value" id="kpi-mejor">—</div>
+                        <div class="kpi-label">Mejor Semana</div>
+                    </div>
+                </div>
+                <div class="kpi-card danger">
+                    <div class="kpi-icon"><i data-lucide="trending-down"></i></div>
+                    <div class="kpi-info">
+                        <div class="kpi-value" id="kpi-peor">—</div>
+                        <div class="kpi-label">Peor Semana</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-grid">
+                <div class="chart-box">
+                    <div class="chart-title"><i data-lucide="line-chart"></i> Tendencia Semanal</div>
+                    <div class="chart-wrap"><canvas id="chartTendencia"></canvas></div>
+                </div>
+                <div class="chart-box">
+                    <div class="chart-title"><i data-lucide="radar"></i> Desempeño por Indicador</div>
+                    <div class="chart-wrap"><canvas id="chartRadar"></canvas></div>
+                </div>
+            </div>
+
+            <!-- Detailed table -->
+            <div class="card">
+                <h3 class="card-title">
+                    <i data-lucide="table"></i> Historial de Evaluaciones
+                </h3>
+                <div class="table-responsive">
+                    <table class="data-table" id="table-historial">
+                        <thead>
+                            <tr>
+                                <th class="center">Semana</th>
+                                <th>Periodo</th>
+                                <th>Mes</th>
+                                <th class="right">Promedio</th>
+                                <th class="center">Estatus</th>
+                                <th class="center">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-historial">
+                            <tr><td colspan="6" class="empty-row">Cargando evaluaciones...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Indicator definitions -->
+            <div class="card">
+                <h3 class="card-title">
+                    <i data-lucide="list-checks"></i> Definición de Indicadores
+                </h3>
+                <div class="table-responsive">
+                    <table class="data-table" id="table-defs">
+                        <thead>
+                            <tr>
+                                <th>Indicador</th>
+                                <th class="center">Peso (%)</th>
+                                <th>Entrega</th>
+                                <th>Destinatarios</th>
+                                <th>Plazo</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-defs">
+                            <tr><td colspan="5" class="empty-row">Cargando indicadores...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal detalle -->
+    <div class="modal-overlay" id="modal-detalle">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div class="modal-header-left">
+                    <div class="modal-icon"><i data-lucide="clipboard-list"></i></div>
+                    <div>
+                        <div class="modal-title" id="modal-detalle-title">Detalle de Evaluación</div>
+                        <div class="modal-subtitle" id="modal-detalle-subtitle">—</div>
+                    </div>
+                </div>
+                <button class="modal-close" onclick="cerrarModalDetalle()"><i data-lucide="x"></i></button>
+            </div>
+
+            <div class="modal-stat-row">
+                <div class="modal-stat">
+                    <div class="modal-stat-label">Semana</div>
+                    <div class="modal-stat-value" id="modal-stat-semana">—</div>
+                </div>
+                <div class="modal-stat">
+                    <div class="modal-stat-label">Periodo</div>
+                    <div class="modal-stat-value" id="modal-stat-periodo">—</div>
+                </div>
+                <div class="modal-stat">
+                    <div class="modal-stat-label">Promedio</div>
+                    <div class="modal-stat-value" id="modal-stat-promedio">—</div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="data-table" id="table-detalle">
+                    <thead>
+                        <tr>
+                            <th>Indicador</th>
+                            <th class="center">Peso</th>
+                            <th class="center">Score</th>
+                            <th class="right">Aporte</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-detalle"></tbody>
+                </table>
+            </div>
+
+            <div class="observation-box">
+                <div class="observation-box-title"><i data-lucide="message-square"></i> Observación del Supervisor</div>
+                <div class="observation-box-text" id="modal-observacion">—</div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; margin-top: 18px;">
+                <button class="btn-action btn-view" onclick="cerrarModalDetalle()"><i data-lucide="x"></i> Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"><i data-lucide="info"></i><span id="toast-msg"></span></div>
+
+    <script>
+        // =====================================================
+        // Firebase init
+        // =====================================================
+        if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+            firebase.initializeApp(FYTTSA_FIREBASE_CONFIG);
+        }
+        const db = firebase.firestore();
+
+        // =====================================================
+        // State
+        // =====================================================
+        const WORKER_ID = localStorage.getItem('usuario') || 'SinID';
+        const WORKER_NAME = localStorage.getItem('nombre') || 'Trabajador';
+
+        let stateConfig = null;       // kpis_config doc
+        let stateEvals = [];          // kpis_eval docs array
+        let trendChart = null;
+        let radarChart = null;
+
+        const COLOR_PRIMARIO = '#000000';
+        const COLOR_PRIMARIO_BG = 'rgba(0, 0, 0, 0.15)';
+
+        // =====================================================
+        // Helpers
+        // =====================================================
+        function showToast(msg, type) {
+            const t = document.getElementById('toast');
+            t.className = 'toast ' + (type || '');
+            document.getElementById('toast-msg').textContent = msg;
+            const iconEl = t.querySelector('i');
+            iconEl.setAttribute('data-lucide', type === 'error' ? 'alert-triangle' : (type === 'success' ? 'check-circle' : 'info'));
+            lucide.createIcons();
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        function formatPct(v) {
+            if (v === null || v === undefined || isNaN(v)) return '—';
+            return Number(v).toFixed(1) + '%';
+        }
+
+        function statusFor(avg) {
+            if (avg >= 75) return { cls: 'good', text: 'Bueno' };
+            if (avg >= 50) return { cls: 'medium', text: 'Regular' };
+            return { cls: 'bad', text: 'Bajo' };
+        }
+
+        function escapeHtml(s) {
+            if (s === null || s === undefined) return '';
+            return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        }
+
+        // =====================================================
+        // Data load
+        // =====================================================
+        async function loadAll() {
+            try {
+                const [configSnap, evalSnap] = await Promise.all([
+                    db.collection('kpis_config').doc(WORKER_ID).get(),
+                    db.collection('kpis_eval').where('workerId', '==', WORKER_ID).get()
+                ]);
+
+                stateConfig = configSnap.exists ? configSnap.data() : null;
+
+                stateEvals = [];
+                evalSnap.forEach(doc => stateEvals.push(doc.data()));
+                stateEvals.sort((a, b) => (a.week || 0) - (b.week || 0));
+
+                renderAll();
+            } catch (e) {
+                console.error('[KPIs] Error al cargar:', e);
+                showToast('Error al cargar KPIs: ' + e.message, 'error');
+                renderEmptyStates();
+            }
+        }
+
+        // =====================================================
+        // Render
+        // =====================================================
+        function renderAll() {
+            renderHeader();
+            renderKpis();
+            renderCharts();
+            renderHistorial();
+            renderDefs();
+            lucide.createIcons();
+        }
+
+        function renderHeader() {
+            const name = stateConfig?.workerName || WORKER_NAME;
+            const pos = stateConfig?.position || 'Sin puesto asignado';
+            document.getElementById('worker-avatar').textContent = (name.charAt(0) || 'U').toUpperCase();
+            document.getElementById('worker-name').textContent = name;
+            document.getElementById('worker-position').textContent = pos;
+            document.getElementById('worker-id').textContent = 'ID: ' + WORKER_ID;
+
+            const allAvgs = stateEvals.map(e => Number(e.weeklyAverage)).filter(v => !isNaN(v));
+            const overallAvg = allAvgs.length ? (allAvgs.reduce((a, b) => a + b, 0) / allAvgs.length) : null;
+            document.getElementById('worker-avg-value').textContent = overallAvg !== null ? overallAvg.toFixed(1) + '%' : '—';
+        }
+
+        function renderKpis() {
+            const avgs = stateEvals.map(e => Number(e.weeklyAverage)).filter(v => !isNaN(v));
+            const trimestral = avgs.length ? (avgs.slice(-12).reduce((a, b) => a + b, 0) / Math.min(12, avgs.length)) : null;
+            const mejor = avgs.length ? Math.max(...avgs) : null;
+            const peor = avgs.length ? Math.min(...avgs) : null;
+
+            document.getElementById('kpi-trimestral').textContent = trimestral !== null ? trimestral.toFixed(1) + '%' : '—';
+            document.getElementById('kpi-mejor').textContent = mejor !== null ? mejor.toFixed(1) + '%' : '—';
+            document.getElementById('kpi-peor').textContent = peor !== null ? peor.toFixed(1) + '%' : '—';
+        }
+
+        function renderCharts() {
+            initChartLib();
+            if (trendChart) { trendChart.destroy(); trendChart = null; }
+            if (radarChart) { radarChart.destroy(); radarChart = null; }
+
+            const canvas1 = document.getElementById('chartTendencia');
+            const canvas2 = document.getElementById('chartRadar');
+            if (!canvas1 || !canvas2) return;
+
+            // Trend line chart
+            const labels = stateEvals.map(e => 'S' + (e.week || '?'));
+            const data = stateEvals.map(e => Number(e.weeklyAverage) || 0);
+
+            if (labels.length === 0) {
+                drawEmptyChartMessage(canvas1, 'Sin evaluaciones para mostrar tendencia.');
+            } else {
+                trendChart = new Chart(canvas1, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Promedio Semanal',
+                            data: data,
+                            borderColor: COLOR_PRIMARIO,
+                            backgroundColor: COLOR_PRIMARIO_BG,
+                            fill: true, tension: 0.35,
+                            pointBackgroundColor: COLOR_PRIMARIO,
+                            pointRadius: 5, pointHoverRadius: 7,
+                            borderWidth: 3
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { callbacks: { label: ctx => 'Promedio: ' + ctx.parsed.y.toFixed(1) + '%' } }
+                        },
+                        scales: {
+                            y: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%' } },
+                            x: { ticks: { font: { size: 10 } } }
+                        }
+                    }
+                });
+            }
+
+            // Radar - average score by indicator
+            const indicators = stateConfig?.indicators || [];
+            const indicatorNames = indicators.map(i => i.name);
+            const indicatorAvg = indicatorNames.map(name => {
+                const scores = stateEvals.map(ev => {
+                    const s = (ev.scores || []).find(x => x.indicatorName === name);
+                    return s ? Number(s.score) : null;
+                }).filter(v => v !== null && !isNaN(v));
+                if (!scores.length) return 0;
+                const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+                return avg * 100;
+            });
+
+            if (indicatorNames.length === 0) {
+                drawEmptyChartMessage(canvas2, 'Sin indicadores configurados.');
+            } else {
+                radarChart = new Chart(canvas2, {
+                    type: 'radar',
+                    data: {
+                        labels: indicatorNames,
+                        datasets: [{
+                            label: 'Promedio por Indicador',
+                            data: indicatorAvg,
+                            borderColor: COLOR_PRIMARIO,
+                            backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                            borderWidth: 2,
+                            pointBackgroundColor: COLOR_PRIMARIO,
+                            pointRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom', labels: { font: { size: 10 }, boxWidth: 12, padding: 8 } },
+                            tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + ctx.parsed.r.toFixed(1) + '%' } }
+                        },
+                        scales: { r: { beginAtZero: true, max: 100, ticks: { stepSize: 20, font: { size: 9 } }, grid: { color: '#e2e8f0' } } }
+                    }
+                });
+            }
+        }
+
+        function drawEmptyChartMessage(canvas, msg) {
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width = canvas.offsetWidth;
+            const h = canvas.height = canvas.offsetHeight;
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '12px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(msg, w / 2, h / 2);
+        }
+
+        function initChartLib() {
+            if (typeof Chart === 'undefined') {
+                setTimeout(renderCharts, 200);
+                return;
+            }
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            Chart.defaults.color = '#64748b';
+            Chart.defaults.font.size = 11;
+        }
+
+        function renderHistorial() {
+            const tbody = document.getElementById('tbody-historial');
+            if (!stateEvals.length) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-row">No hay evaluaciones registradas todavía.</td></tr>';
+                return;
+            }
+            const rows = stateEvals.slice().reverse().map(ev => {
+                const avg = Number(ev.weeklyAverage) || 0;
+                const st = statusFor(avg);
+                return `<tr>
+                    <td class="center-cell"><strong>S${ev.week || '?'}</strong></td>
+                    <td>${escapeHtml(ev.weekRange || '—')}</td>
+                    <td>${escapeHtml(ev.month || '—')}</td>
+                    <td class="num-cell">${avg.toFixed(1)}%</td>
+                    <td class="center-cell"><span class="status-badge ${st.cls}">${st.text}</span></td>
+                    <td class="center-cell">
+                        <button class="btn-action btn-view" onclick="abrirDetalle(${JSON.stringify(ev).replace(/"/g, '&quot;')})">
+                            <i data-lucide="eye"></i> Ver detalle
+                        </button>
+                    </td>
+                </tr>`;
+            }).join('');
+            tbody.innerHTML = rows;
+        }
+
+        function renderDefs() {
+            const tbody = document.getElementById('tbody-defs');
+            if (!stateConfig || !stateConfig.indicators || !stateConfig.indicators.length) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-row">No hay indicadores configurados. Contacta a tu supervisor.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = stateConfig.indicators.map(ind => `
+                <tr>
+                    <td><strong>${escapeHtml(ind.name)}</strong></td>
+                    <td class="center-cell">${ind.weight || 0}%</td>
+                    <td>${escapeHtml(ind.deliveryMethod || '—')}</td>
+                    <td>${escapeHtml(ind.recipients || '—')}</td>
+                    <td>${escapeHtml(ind.deadline || '—')}</td>
+                </tr>
+            `).join('');
+        }
+
+        function renderEmptyStates() {
+            document.getElementById('tbody-historial').innerHTML = '<tr><td colspan="6" class="empty-row">No se pudieron cargar las evaluaciones.</td></tr>';
+            document.getElementById('tbody-defs').innerHTML = '<tr><td colspan="5" class="empty-row">No se pudo cargar la configuración de KPIs.</td></tr>';
+            document.getElementById('worker-name').textContent = WORKER_NAME;
+            document.getElementById('worker-position').textContent = 'Sin conexión';
+        }
+
+        // =====================================================
+        // Modal detalle
+        // =====================================================
+        function abrirDetalle(evalObj) {
+            const ev = typeof evalObj === 'string' ? JSON.parse(evalObj.replace(/&quot;/g, '"')) : evalObj;
+            document.getElementById('modal-detalle-title').textContent = 'Semana ' + (ev.week || '?');
+            document.getElementById('modal-detalle-subtitle').textContent = (ev.workerName || WORKER_NAME) + ' • ' + (ev.weekRange || '—');
+            document.getElementById('modal-stat-semana').textContent = 'S' + (ev.week || '?');
+            document.getElementById('modal-stat-periodo').textContent = ev.weekRange || '—';
+            const avg = Number(ev.weeklyAverage) || 0;
+            document.getElementById('modal-stat-promedio').textContent = avg.toFixed(1) + '%';
+
+            const scores = ev.scores || [];
+            const tbody = document.getElementById('tbody-detalle');
+            if (!scores.length) {
+                tbody.innerHTML = '<tr><td colspan="4" class="empty-row">Sin indicadores en esta evaluación.</td></tr>';
+            } else {
+                tbody.innerHTML = scores.map(s => {
+                    const w = Number(s.weight) || 0;
+                    const sc = Number(s.score) || 0;
+                    const aporte = w * sc;
+                    return `<tr>
+                        <td><strong>${escapeHtml(s.indicatorName)}</strong></td>
+                        <td class="center-cell">${w}%</td>
+                        <td class="center-cell">${(sc * 100).toFixed(0)}%</td>
+                        <td class="num-cell">${aporte.toFixed(1)}</td>
+                    </tr>`;
+                }).join('');
+            }
+
+            const obs = ev.observation && String(ev.observation).trim();
+            document.getElementById('modal-observacion').textContent = obs || 'Sin observaciones registradas para esta semana.';
+            const evalBy = ev.evaluatedBy ? ' • Por: ' + ev.evaluatedBy : '';
+            document.getElementById('modal-observacion').title = evalBy;
+
+            document.getElementById('modal-detalle').classList.add('show');
+            lucide.createIcons();
+        }
+
+        function cerrarModalDetalle() {
+            document.getElementById('modal-detalle').classList.remove('show');
+        }
+
+        // Close modal on overlay click
+        document.getElementById('modal-detalle').addEventListener('click', function(e) {
+            if (e.target === this) cerrarModalDetalle();
+        });
+
+        // =====================================================
+        // Init
+        // =====================================================
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('user-initial').innerText = (WORKER_NAME.charAt(0) || 'U').toUpperCase();
+
+            fetch('menu.html').then(res => res.text()).then(html => {
+                document.getElementById('sidebar').innerHTML = html;
+                lucide.createIcons();
+                fyttsa_applyPrivilegeMenu();
+                const linkInicio = document.getElementById('link-inicio'); if (linkInicio) linkInicio.classList.remove('active');
+                const linkKpis = document.getElementById('link-kpis'); if (linkKpis) linkKpis.classList.add('active');
+            });
+
+            document.getElementById('toggle-menu').addEventListener('click', () => {
+                document.getElementById('sidebar').classList.toggle('open');
+            });
+
+            loadAll();
+        });
+    </script>
+</body>
+</html>
