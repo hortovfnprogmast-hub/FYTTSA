@@ -214,9 +214,11 @@
             .summary-value { font-size: 14px; }
             .card { padding: 16px; }
             .card-title { font-size: 13px; }
-            .actions-bar { flex-direction: column; }
-            .actions-bar .btn { width: 100%; justify-content: center; }
-            .btn { font-size: 12px; padding: 10px 14px; }
+            .actions-bar { flex-direction: column; gap: 8px; }
+            .actions-bar .btn, .actions-bar .left { width: 100%; justify-content: center; margin-right: 0; }
+            .actions-bar .btn-secondary { background: #000000; color: #ffffff; border: none; }
+            .actions-bar .btn-secondary:hover { background: #1a1a1a; }
+            .btn { font-size: 14px; padding: 12px 14px; width: 100%; justify-content: center; box-sizing: border-box; }
         }
         .signature-user-info { display: flex; align-items: center; gap: 14px; }
         .signature-avatar { width: 56px; height: 56px; border-radius: 50%; background: var(--primary-blue); color: white; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800; flex-shrink: 0; }
