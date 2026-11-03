@@ -148,15 +148,48 @@
         .signature-section { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center; padding: 24px; background: linear-gradient(135deg, #e8e8e8 0%, #f8fafc 100%); border-radius: 16px; border: 1px solid #cccccc; }
         @media (max-width: 768px) {
             .signature-section { grid-template-columns: 1fr; }
-            /* Tabla responsive en movil */
-            .expense-table { min-width: 0 !important; font-size: 11px; }
-            .expense-table thead th { padding: 6px 4px; font-size: 9px; }
-            .expense-table tbody td { padding: 4px 4px; }
-            .table-input { font-size: 10px; padding: 4px 4px; }
-            .table-input.right { font-size: 10px; }
-            .row-num { width: 25px; font-size: 10px; }
-            .col-obs { display: none !important; }
-            .expense-table thead th.col-obs { display: none !important; }
+            /* Tabla vertical en movil - cada fila se convierte en tarjeta */
+            .table-wrap { border: none; border-radius: 0; overflow: visible; }
+            .expense-table { min-width: 0 !important; width: 100%; }
+            .expense-table thead { display: none; }
+            .expense-table tbody tr {
+                display: block;
+                background: white;
+                border: 1px solid var(--border-color);
+                border-radius: 12px;
+                margin-bottom: 12px;
+                padding: 8px 12px;
+            }
+            .expense-table tbody tr:hover { background: white; }
+            .expense-table tbody tr:last-child td { border-bottom: none; }
+            .expense-table tbody td {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                border: none;
+                border-bottom: 1px solid #f1f5f9;
+                padding: 8px 0;
+                text-align: left;
+            }
+            .expense-table tbody td:last-child { border-bottom: none; }
+            .expense-table tbody td::before {
+                content: attr(data-label);
+                font-size: 11px;
+                font-weight: 700;
+                color: var(--text-muted);
+                text-transform: uppercase;
+                min-width: 80px;
+                flex-shrink: 0;
+            }
+            .expense-table tbody td.col-actions::before { display: none; }
+            .expense-table tbody td.col-actions { justify-content: flex-end; }
+            .expense-table tbody td.col-actions .btn-remove-row { width: 36px; height: 36px; }
+            .expense-table tbody td.col-actions .btn-remove-row i { width: 16px; height: 16px; }
+            .row-num { width: auto; background: transparent; font-size: 12px; }
+            .table-input { font-size: 13px; padding: 8px 10px; flex: 1; }
+            .table-input.right { font-size: 13px; }
+            .autocomplete-list { font-size: 11px; }
+            .autocomplete-item { padding: 6px 8px; }
             .req-data-grid { grid-template-columns: 1fr !important; }
             .top-grid { grid-template-columns: 1fr !important; }
             .summary-grid { grid-template-columns: 1fr 1fr !important; }
@@ -166,8 +199,6 @@
             .actions-bar { flex-direction: column; }
             .actions-bar .btn { width: 100%; justify-content: center; }
             .btn { font-size: 12px; padding: 10px 14px; }
-            .autocomplete-list { font-size: 10px; }
-            .autocomplete-item { padding: 6px 8px; }
         }
         .signature-user-info { display: flex; align-items: center; gap: 14px; }
         .signature-avatar { width: 56px; height: 56px; border-radius: 50%; background: var(--primary-blue); color: white; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800; flex-shrink: 0; }
@@ -763,8 +794,8 @@ function fyttsa_applyPrivilegeMenu() {
                         ? '<span class="inv-badge in">En Inventario</span>'
                         : '<span class="inv-badge out">Fuera de Inventario</span>';
                     tr.innerHTML = `
-                        <td class="row-num">${idx + 1}</td>
-                        <td class="col-desc">
+                        <td class="row-num" data-label="No.">${idx + 1}</td>
+                        <td class="col-desc" data-label="Descripción">
                             <div class="autocomplete-wrapper">
                                 <input type="text" class="table-input desc-input" data-field="descripcion"
                                     placeholder="Escribe para buscar en inventario..."
@@ -773,11 +804,11 @@ function fyttsa_applyPrivilegeMenu() {
                             </div>
                             ${invBadge}
                         </td>
-                        <td class="col-unidad"><input type="text" class="table-input" data-field="unidad" placeholder="PZA" value="${escapeHtml(item.unidad)}"></td>
-                        <td class="col-cantidad"><input type="number" class="table-input right" data-field="cantidad" placeholder="0" min="0" step="1" value="${item.cantidad || ''}"></td>
-                        <td class="col-codigo"><input type="text" class="table-input readonly-field" data-field="codigo" placeholder="Auto" value="${escapeHtml(item.codigo)}" readonly></td>
-                        <td class="col-obs"><input type="text" class="table-input" data-field="observacion" placeholder="Notas (opcional)" value="${escapeHtml(item.observacion)}"></td>
-                        <td class="col-actions">
+                        <td class="col-unidad" data-label="Unidad"><input type="text" class="table-input" data-field="unidad" placeholder="PZA" value="${escapeHtml(item.unidad)}"></td>
+                        <td class="col-cantidad" data-label="Cantidad"><input type="number" class="table-input right" data-field="cantidad" placeholder="0" min="0" step="1" value="${item.cantidad || ''}"></td>
+                        <td class="col-codigo" data-label="Código"><input type="text" class="table-input readonly-field" data-field="codigo" placeholder="Auto" value="${escapeHtml(item.codigo)}" readonly></td>
+                        <td class="col-obs" data-label="Notas"><input type="text" class="table-input" data-field="observacion" placeholder="Notas (opcional)" value="${escapeHtml(item.observacion)}"></td>
+                        <td class="col-actions" data-label="">
                             <button type="button" class="btn-remove-row" data-action="remove" title="Eliminar"><i data-lucide="trash-2"></i></button>
                         </td>
                     `;
