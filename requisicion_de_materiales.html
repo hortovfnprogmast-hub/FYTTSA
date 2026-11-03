@@ -148,6 +148,10 @@
         .signature-section { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center; padding: 24px; background: linear-gradient(135deg, #e8e8e8 0%, #f8fafc 100%); border-radius: 16px; border: 1px solid #cccccc; }
         @media (max-width: 768px) {
             .signature-section { grid-template-columns: 1fr; }
+            /* Tabs en grid 2x2 */
+            .tabs-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; border-bottom: none; padding-bottom: 0; }
+            .tab-btn { width: 100%; justify-content: center; padding: 10px 8px; font-size: 12px; }
+            .tab-badge { min-width: 18px; height: 18px; font-size: 10px; }
             /* Tabla vertical en movil - estilo formulario con etiqueta arriba y recuadro abajo */
             .table-wrap { border: none; border-radius: 0; overflow: visible; }
             .expense-table { min-width: 0 !important; width: 100%; }
@@ -185,6 +189,7 @@
             .expense-table tbody td.col-actions .btn-remove-row { width: 36px; height: 36px; }
             .expense-table tbody td.col-actions .btn-remove-row i { width: 16px; height: 16px; }
             .row-num { width: auto; background: transparent; font-size: 13px; font-weight: 800; }
+            /* Todos los inputs al mismo ancho */
             .table-input {
                 font-size: 14px;
                 padding: 10px 12px;
