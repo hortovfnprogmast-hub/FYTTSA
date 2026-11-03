@@ -148,7 +148,7 @@
         .signature-section { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center; padding: 24px; background: linear-gradient(135deg, #e8e8e8 0%, #f8fafc 100%); border-radius: 16px; border: 1px solid #cccccc; }
         @media (max-width: 768px) {
             .signature-section { grid-template-columns: 1fr; }
-            /* Tabla vertical en movil - cada fila se convierte en tarjeta */
+            /* Tabla vertical en movil - estilo formulario con etiqueta arriba y recuadro abajo */
             .table-wrap { border: none; border-radius: 0; overflow: visible; }
             .expense-table { min-width: 0 !important; width: 100%; }
             .expense-table thead { display: none; }
@@ -158,18 +158,18 @@
                 border: 1px solid var(--border-color);
                 border-radius: 12px;
                 margin-bottom: 12px;
-                padding: 8px 12px;
+                padding: 12px 14px;
             }
             .expense-table tbody tr:hover { background: white; }
             .expense-table tbody tr:last-child td { border-bottom: none; }
             .expense-table tbody td {
                 display: flex;
-                align-items: center;
-                gap: 8px;
+                flex-direction: column;
                 border: none;
                 border-bottom: 1px solid #f1f5f9;
-                padding: 8px 0;
+                padding: 6px 0;
                 text-align: left;
+                gap: 4px;
             }
             .expense-table tbody td:last-child { border-bottom: none; }
             .expense-table tbody td::before {
@@ -178,18 +178,29 @@
                 font-weight: 700;
                 color: var(--text-muted);
                 text-transform: uppercase;
-                min-width: 80px;
-                flex-shrink: 0;
+                letter-spacing: 0.3px;
             }
             .expense-table tbody td.col-actions::before { display: none; }
-            .expense-table tbody td.col-actions { justify-content: flex-end; }
+            .expense-table tbody td.col-actions { flex-direction: row; justify-content: flex-end; padding: 8px 0 4px 0; }
             .expense-table tbody td.col-actions .btn-remove-row { width: 36px; height: 36px; }
             .expense-table tbody td.col-actions .btn-remove-row i { width: 16px; height: 16px; }
-            .row-num { width: auto; background: transparent; font-size: 12px; }
-            .table-input { font-size: 13px; padding: 8px 10px; flex: 1; }
-            .table-input.right { font-size: 13px; }
-            .autocomplete-list { font-size: 11px; }
-            .autocomplete-item { padding: 6px 8px; }
+            .row-num { width: auto; background: transparent; font-size: 13px; font-weight: 800; }
+            .table-input {
+                font-size: 14px;
+                padding: 10px 12px;
+                width: 100%;
+                border: 1.5px solid var(--border-color);
+                border-radius: 8px;
+                background: white;
+                box-sizing: border-box;
+            }
+            .table-input:focus {
+                border-color: var(--primary-blue);
+                box-shadow: 0 0 0 2px rgba(0,0,0,0.08);
+            }
+            .table-input.right { font-size: 14px; text-align: left; }
+            .autocomplete-list { font-size: 12px; }
+            .autocomplete-item { padding: 8px 10px; }
             .req-data-grid { grid-template-columns: 1fr !important; }
             .top-grid { grid-template-columns: 1fr !important; }
             .summary-grid { grid-template-columns: 1fr 1fr !important; }
