@@ -1031,13 +1031,41 @@ function fyttsa_applyPrivilegeMenu() {
         // =====================================================
         async function loadAllWorkers() {
             try {
-                const snap = await db.collection('kpi_workers').get();
                 stateWorkers = {};
+
+                // 1. Load all registered users from 'usuarios' collection (from login)
+                try {
+                    const userSnap = await db.collection('usuarios').get();
+                    userSnap.forEach(doc => {
+                        const data = doc.data();
+                        stateWorkers[doc.id] = {
+                            _id: doc.id,
+                            workerName: data.nombre || doc.id,
+                            workerId: doc.id,
+                            position: '',
+                            indicators: [],
+                            observations: {},
+                            _fromUsuarios: true
+                        };
+                    });
+                } catch (e) {
+                    console.warn('[Control KPIs] Could not load usuarios collection:', e);
+                }
+
+                // 2. Load KPI data from 'kpi_workers' collection (overrides/merges with usuarios)
+                const snap = await db.collection('kpi_workers').get();
                 snap.forEach(doc => {
                     const data = doc.data();
                     data._id = doc.id;
-                    stateWorkers[doc.id] = data;
+                    if (stateWorkers[doc.id]) {
+                        // Merge: keep the KPI data but preserve the user info
+                        Object.assign(stateWorkers[doc.id], data);
+                        stateWorkers[doc.id]._fromUsuarios = false;
+                    } else {
+                        stateWorkers[doc.id] = data;
+                    }
                 });
+
                 renderDashboard();
                 populateWorkerSelector();
                 renderEvalTable();
