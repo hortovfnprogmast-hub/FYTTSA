@@ -901,6 +901,27 @@ function fyttsa_applyPrivilegeMenu() {
         </div>
     </div>
 
+    <!-- Modal de detalle (Ver) -->
+    <div class="modal-overlay" id="modal-detalle">
+        <div class="modal-box" style="max-width: 680px;">
+            <div class="modal-header">
+                <div class="modal-icon" style="background:#e0e0e0;color:#000000;">
+                    <i data-lucide="eye"></i>
+                </div>
+                <div>
+                    <div class="modal-title">Detalle de Comprobación</div>
+                    <div class="modal-subtitle" id="detalle-folio">Folio: —</div>
+                </div>
+            </div>
+            <div id="detalle-content" style="font-size:13px;line-height:1.6;"></div>
+            <div class="modal-actions">
+                <button class="btn-modal btn-modal-cancel" onclick="document.getElementById('modal-detalle').classList.remove('show')">
+                    <i data-lucide="x"></i> Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast -->
     <div class="toast" id="toast">
         <i data-lucide="check-circle"></i>
@@ -1150,6 +1171,9 @@ function fyttsa_applyPrivilegeMenu() {
                 let actions = '';
                 if (h.status === 'guardado') {
                     actions = `
+                        <button class="btn-action btn-view" onclick="verDetalle('${escapeHtml(h.folio)}')">
+                            <i data-lucide="eye"></i> Ver
+                        </button>
                         <button class="btn-action btn-approve" onclick="aprobarComprobacion('${escapeHtml(h.folio)}')">
                             <i data-lucide="check"></i> Aprobar
                         </button>
@@ -1250,23 +1274,62 @@ function fyttsa_applyPrivilegeMenu() {
         function verDetalle(folio) {
             const h = historial.find(x => x.folio === folio);
             if (!h) { showToast('No se encontró la comprobación.', 'error'); return; }
-            // Construir un resumen con los detalles
-            let detalle = `Folio: ${h.folio}\n`;
-            detalle += `Obra: ${h.obra}\n`;
-            detalle += `Colaborador: ${h.usuario || '—'}\n`;
-            detalle += `Periodo: ${h.periodo}\n`;
-            detalle += `Status: ${h.status}\n`;
-            detalle += `Total: ${formatCurrency(h.total)}\n\n`;
-            detalle += 'Comprobantes:\n';
+            document.getElementById('detalle-folio').textContent = 'Folio: ' + h.folio;
+            let statusLabel = h.status === 'guardado' ? 'Pendiente' : (h.status === 'aprobado' ? 'Aprobado' : 'Rechazado');
+            let statusColor = h.status === 'guardado' ? '#92400e' : (h.status === 'aprobado' ? '#166534' : '#991b1b');
+            let statusBg = h.status === 'guardado' ? '#fef3c7' : (h.status === 'aprobado' ? '#dcfce7' : '#fee2e2');
+            let html = `
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+                    <div><strong style="color:#000000;">Obra:</strong> ${escapeHtml(h.obra)}</div>
+                    <div><strong style="color:#000000;">Colaborador:</strong> ${escapeHtml(h.usuario || '—')}</div>
+                    <div><strong style="color:#000000;">Periodo:</strong> ${escapeHtml(h.periodo || '—')}</div>
+                    <div><strong style="color:#000000;">Estatus:</strong> <span style="background:${statusBg};color:${statusColor};padding:2px 8px;border-radius:4px;font-weight:700;font-size:11px;">${statusLabel}</span></div>
+                    <div><strong style="color:#000000;">Facturado:</strong> ${formatCurrency(h.facturado || 0)}</div>
+                    <div><strong style="color:#000000;">No Facturado:</strong> ${formatCurrency(h.noFacturado || 0)}</div>
+                    <div><strong style="color:#000000;">Recibido:</strong> ${formatCurrency(h.recibido || 0)}</div>
+                    <div><strong style="color:#000000;">Devolución:</strong> ${formatCurrency(h.devolucion || 0)}</div>
+                </div>
+                <div style="background:#e8e8e8;padding:12px;border-radius:8px;margin-bottom:16px;text-align:center;">
+                    <span style="font-size:11px;color:#64748b;text-transform:uppercase;font-weight:700;">Importe Total</span><br>
+                    <span style="font-size:22px;font-weight:800;color:#000000;">${formatCurrency(h.total || 0)}</span>
+                </div>
+                <h4 style="font-size:13px;font-weight:700;color:#000000;margin-bottom:8px;border-bottom:2px solid #e8e8e8;padding-bottom:6px;">Comprobantes (${h.items ? h.items.length : 0})</h4>
+                <table style="width:100%;border-collapse:collapse;font-size:11px;">
+                    <thead>
+                        <tr style="background:#f8fafc;">
+                            <th style="padding:6px;text-align:left;border-bottom:1px solid #e2e8f0;">Tipo</th>
+                            <th style="padding:6px;text-align:left;border-bottom:1px solid #e2e8f0;">Folio</th>
+                            <th style="padding:6px;text-align:left;border-bottom:1px solid #e2e8f0;">Proveedor</th>
+                            <th style="padding:6px;text-align:left;border-bottom:1px solid #e2e8f0;">Concepto</th>
+                            <th style="padding:6px;text-align:right;border-bottom:1px solid #e2e8f0;">Importe</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
             if (h.items && h.items.length) {
-                h.items.forEach((it, i) => {
-                    detalle += `${i+1}. [${it.tipo}] ${it.folio} - ${it.proveedor} - ${it.concepto} - ${formatCurrency(it.importe)}\n`;
+                h.items.forEach(it => {
+                    let tipoBg = it.tipo === 'Factura' ? '#dcfce7' : '#fef3c7';
+                    let tipoColor = it.tipo === 'Factura' ? '#166534' : '#92400e';
+                    html += `<tr>
+                        <td style="padding:6px;border-bottom:1px solid #f1f5f9;"><span style="background:${tipoBg};color:${tipoColor};padding:2px 6px;border-radius:3px;font-size:9px;font-weight:700;">${escapeHtml(it.tipo)}</span></td>
+                        <td style="padding:6px;border-bottom:1px solid #f1f5f9;font-family:monospace;">${escapeHtml(it.folio || '—')}</td>
+                        <td style="padding:6px;border-bottom:1px solid #f1f5f9;">${escapeHtml(it.proveedor || '—')}</td>
+                        <td style="padding:6px;border-bottom:1px solid #f1f5f9;">${escapeHtml(it.concepto || '—')}</td>
+                        <td style="padding:6px;border-bottom:1px solid #f1f5f9;text-align:right;font-weight:700;color:#000000;">${formatCurrency(it.importe)}</td>
+                    </tr>`;
                 });
+            } else {
+                html += '<tr><td colspan="5" style="padding:12px;text-align:center;color:#94a3b8;">Sin comprobantes</td></tr>';
             }
+            html += '</tbody></table>';
             if (h.observacionRechazo) {
-                detalle += `\nObservación de rechazo: ${h.observacionRechazo}`;
+                html += `<div style="margin-top:14px;background:#fee2e2;border-left:4px solid #ef4444;padding:10px 14px;border-radius:8px;">
+                    <strong style="color:#991b1b;font-size:11px;text-transform:uppercase;">Observación de rechazo:</strong>
+                    <p style="margin:4px 0 0 0;color:#991b1b;font-size:12px;">${escapeHtml(h.observacionRechazo)}</p>
+                </div>`;
             }
-            alert(detalle);
+            document.getElementById('detalle-content').innerHTML = html;
+            document.getElementById('modal-detalle').classList.add('show');
+            lucide.createIcons();
         }
 
         // =====================================================
