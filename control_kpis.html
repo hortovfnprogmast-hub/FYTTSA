@@ -240,7 +240,7 @@
             background: var(--bg-color); border-radius: 12px;
             border: 1px solid var(--border-color);
         }
-        .filter-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 180px; }
+        .filter-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 160px; }
         .filter-label { font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
 
         .filter-indicator {
@@ -289,13 +289,21 @@
         .btn-action i { width: 12px; height: 12px; }
         .btn-view { background: white; color: var(--primary-blue); border: 1.5px solid var(--primary-blue); }
         .btn-view:hover { background: var(--light-blue); }
-        .btn-edit { background: #dbeafe; color: #1d4ed8; }
-        .btn-edit:hover { background: #bfdbfe; }
         .btn-danger { background: var(--danger); color: white; }
         .btn-danger:hover { background: #b91c1c; }
         .btn-success { background: var(--success); color: white; }
         .btn-success:hover { background: #059669; }
         .action-buttons-cell { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; }
+
+        .btn-icon-del {
+            background: none; border: 1px solid transparent;
+            color: var(--danger); cursor: pointer;
+            padding: 6px; border-radius: 6px;
+            display: inline-flex; align-items: center; justify-content: center;
+            transition: all 0.15s;
+        }
+        .btn-icon-del:hover { background: #fee2e2; border-color: var(--danger); }
+        .btn-icon-del i { width: 16px; height: 16px; }
 
         .empty-state {
             text-align: center; padding: 50px 20px;
@@ -304,51 +312,6 @@
         .empty-state i { width: 64px; height: 64px; color: var(--border-color); margin-bottom: 14px; }
         .empty-state h3 { font-size: 18px; font-weight: 700; color: var(--text-main); margin-bottom: 6px; }
         .empty-state p { font-size: 13px; margin-bottom: 18px; }
-
-        /* Modal */
-        .modal-overlay {
-            display: none; position: fixed; inset: 0;
-            background: rgba(15, 23, 42, 0.82);
-            backdrop-filter: blur(6px);
-            z-index: 2000;
-            align-items: center; justify-content: center;
-            padding: 16px;
-        }
-        .modal-overlay.show { display: flex; }
-        .modal-box {
-            background: white; border-radius: 20px;
-            width: 100%; max-width: 860px; padding: 24px;
-            box-shadow: 0 30px 70px rgba(0,0,0,0.4);
-            animation: slideIn 0.3s cubic-bezier(.2,.8,.3,1);
-            max-height: 90vh; overflow-y: auto;
-        }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .modal-header {
-            display: flex; align-items: center; justify-content: space-between;
-            gap: 12px; margin-bottom: 16px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid var(--bg-color);
-        }
-        .modal-header-left { display: flex; align-items: center; gap: 12px; }
-        .modal-icon {
-            width: 44px; height: 44px; border-radius: 12px;
-            background: var(--light-blue); color: var(--primary-blue);
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0;
-        }
-        .modal-icon i { width: 24px; height: 24px; }
-        .modal-title { font-size: 16px; font-weight: 800; color: var(--text-main); }
-        .modal-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-        .modal-close {
-            background: none; border: none; cursor: pointer;
-            color: var(--text-muted); padding: 6px;
-        }
-        .modal-close i { width: 20px; height: 20px; }
-        .modal-close:hover { color: var(--danger); }
-        .modal-actions {
-            display: flex; gap: 10px; justify-content: flex-end;
-            margin-top: 18px;
-        }
 
         /* Toast */
         .toast {
@@ -368,31 +331,177 @@
         .toast.info { background: var(--info); }
         .toast i { width: 18px; height: 18px; }
 
-        .score-input {
-            width: 80px; padding: 6px 8px;
-            border: 1.5px solid var(--border-color);
-            border-radius: 6px; font-size: 12px;
-            text-align: center; font-weight: 700;
-        }
-        .score-input:focus { outline: none; border-color: var(--primary-blue); }
-
         .loading-row { text-align: center; color: var(--text-muted); padding: 32px !important; }
         .loading-row i { width: 28px; height: 28px; animation: spin 1s linear infinite; display: inline-block; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        .indicator-row input[type="text"],
-        .indicator-row input[type="number"],
-        .indicator-row select {
-            width: 100%; padding: 7px 9px;
-            border: 1.5px solid var(--border-color);
-            border-radius: 6px; font-size: 12px;
-            font-family: 'Inter', sans-serif; color: var(--text-main);
+        /* =====================================================
+           KPI EXCEL-STYLE TABLE (Evaluacion tab)
+           ===================================================== */
+        .kpi-excel-wrap {
+            width: 100%; overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
             background: white;
         }
-        .indicator-row input:focus,
-        .indicator-row select:focus {
+        .kpi-excel-table {
+            width: 100%; border-collapse: collapse;
+            font-size: 12px; min-width: 900px;
+            table-layout: fixed;
+        }
+        .kpi-excel-table col.col-name   { width: 280px; }
+        .kpi-excel-table col.col-via    { width: 170px; }
+        .kpi-excel-table col.col-corte  { width: 120px; }
+        .kpi-excel-table col.col-peso   { width: 55px; }
+        .kpi-excel-table col.col-week   { width: 62px; }
+        .kpi-excel-table col.col-action { width: 40px; }
+
+        .kpi-excel-table thead th {
+            background: var(--primary-blue); color: white;
+            padding: 8px 4px; text-align: center;
+            font-size: 11px; font-weight: 800;
+            border-right: 1px solid rgba(255,255,255,0.15);
+            letter-spacing: 0.3px; white-space: nowrap;
+            vertical-align: middle;
+        }
+        .kpi-excel-table thead th:first-child,
+        .kpi-excel-table thead th:nth-child(2),
+        .kpi-excel-table thead th:nth-child(3) { text-align: left; padding-left: 10px; }
+        .kpi-excel-table thead th:last-child { border-right: none; }
+        .kpi-excel-table thead th .week-num { display: block; font-size: 11px; line-height: 1.2; }
+        .kpi-excel-table thead th .week-date { display: block; font-size: 9px; font-weight: 500; opacity: 0.75; margin-top: 2px; }
+        .kpi-excel-table thead th .week-month { display: block; font-size: 8px; font-weight: 600; opacity: 0.6; margin-top: 1px; text-transform: uppercase; }
+        .kpi-excel-table thead th.current-week { background: #2d2d2d; box-shadow: inset 0 -3px 0 var(--success); }
+
+        .kpi-excel-table tbody td {
+            padding: 3px 4px;
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+            font-size: 12px;
+        }
+        .kpi-excel-table tbody td:last-child { border-right: none; }
+
+        /* Worker row (Row 1) */
+        .kpi-excel-table tr.worker-row td {
+            background: var(--light-blue);
+            font-weight: 800; font-size: 13px;
+            padding: 8px 10px;
+        }
+        .kpi-excel-table tr.worker-row td.worker-cell { padding: 6px 10px; }
+        .kpi-excel-table tr.worker-row .worker-name-input {
+            font-size: 14px; font-weight: 800; color: var(--primary-blue);
+            background: white; border: 1px solid var(--border-color);
+            padding: 6px 8px; border-radius: 6px; width: 100%; margin-bottom: 4px;
+        }
+        .kpi-excel-table tr.worker-row .worker-name-input:focus {
             outline: none; border-color: var(--primary-blue);
-            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
+        }
+        .kpi-excel-table tr.worker-row .worker-position-input {
+            font-size: 11px; font-weight: 600; color: var(--text-muted);
+            background: white; border: 1px solid var(--border-color);
+            padding: 4px 8px; border-radius: 6px; width: 100%;
+        }
+        .kpi-excel-table tr.worker-row .worker-position-input:focus {
+            outline: none; border-color: var(--primary-blue);
+        }
+        .kpi-excel-table tr.worker-row td.peso-cell,
+        .kpi-excel-table tr.worker-row td.overall-cell {
+            text-align: center; font-weight: 800; font-size: 12px;
+            color: var(--primary-blue);
+        }
+        .kpi-excel-table tr.worker-row td.overall-cell.current-week { background: #d4d4d4; }
+
+        /* % Inc row (Row 2) */
+        .kpi-excel-table tr.inc-row td {
+            background: #f1f1f1; font-style: italic;
+            font-size: 11px; color: var(--text-muted);
+            font-weight: 700; padding: 5px 10px;
+        }
+        .kpi-excel-table tr.inc-row td.inc-label { text-align: left; }
+        .kpi-excel-table tr.inc-row td.inc-cell {
+            text-align: center; font-weight: 800; font-style: normal;
+            color: var(--primary-blue); font-size: 12px;
+        }
+        .kpi-excel-table tr.inc-row td.inc-cell.current-week { background: #e8e8e8; }
+
+        /* Indicator rows (Row 3+) */
+        .kpi-excel-table tr.indicator-row td { background: white; }
+        .kpi-excel-table tr.indicator-row:nth-child(even) td { background: #fafafa; }
+        .kpi-excel-table tr.indicator-row:hover td { background: #f0f0f0; }
+
+        .kpi-excel-table td.peso-cell {
+            text-align: center; font-weight: 800; font-size: 12px;
+            color: var(--primary-blue);
+        }
+
+        .kpi-input {
+            width: 100%; border: 1px solid transparent;
+            background: transparent; padding: 5px 7px;
+            font-size: 12px; font-family: 'Inter', sans-serif;
+            color: var(--text-main); border-radius: 4px;
+            transition: all 0.15s;
+        }
+        .kpi-input:hover { border-color: var(--border-color); background: white; }
+        .kpi-input:focus {
+            outline: none; border-color: var(--primary-blue);
+            background: white; box-shadow: 0 0 0 2px rgba(0,0,0,0.08);
+        }
+        .kpi-input.score-input {
+            text-align: center; font-weight: 700; font-size: 11.5px;
+        }
+        .kpi-input.peso-input {
+            text-align: center; font-weight: 800; color: var(--primary-blue);
+        }
+
+        /* Score cell color tints (applied to td, input is transparent) */
+        .kpi-excel-table td.score-cell { text-align: center; padding: 2px; }
+        .kpi-excel-table td.score-cell.score-good    { background-color: #dcfce7 !important; }
+        .kpi-excel-table td.score-cell.score-medium  { background-color: #fef3c7 !important; }
+        .kpi-excel-table td.score-cell.score-bad     { background-color: #fee2e2 !important; }
+        .kpi-excel-table td.score-cell.current-week  { box-shadow: inset 0 -3px 0 var(--success); }
+
+        /* Observations grid */
+        .observations-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 14px; margin-top: 10px;
+        }
+        .obs-week-card {
+            background: #fffbeb; border: 1px solid #fef3c7;
+            border-radius: 10px; padding: 10px 12px;
+        }
+        .obs-week-card .obs-week-title {
+            font-size: 11px; font-weight: 800; color: #92400e;
+            text-transform: uppercase; letter-spacing: 0.3px;
+            margin-bottom: 6px; display: flex; align-items: center; gap: 6px;
+        }
+        .obs-week-card .obs-week-title i { width: 12px; height: 12px; }
+        .obs-week-card textarea {
+            width: 100%; min-height: 60px; resize: vertical;
+            border: 1px solid #fde68a; border-radius: 6px;
+            padding: 8px; font-size: 12px; font-family: 'Inter', sans-serif;
+            background: white; color: #4d2b00;
+        }
+        .obs-week-card textarea:focus {
+            outline: none; border-color: var(--warning);
+            box-shadow: 0 0 0 2px rgba(245,158,11,0.15);
+        }
+
+        /* Quarter preset buttons */
+        .quarter-presets {
+            display: flex; gap: 6px; flex-wrap: wrap;
+        }
+        .quarter-presets button {
+            background: white; border: 1.5px solid var(--border-color);
+            color: var(--text-muted); padding: 6px 12px;
+            border-radius: 8px; font-size: 11px; font-weight: 700;
+            cursor: pointer; font-family: 'Inter', sans-serif;
+            transition: all 0.15s;
+        }
+        .quarter-presets button:hover { border-color: var(--primary-blue); color: var(--primary-blue); }
+        .quarter-presets button.active {
+            background: var(--primary-blue); color: white; border-color: var(--primary-blue);
         }
     </style>
 
@@ -403,7 +512,6 @@
 // =====================================================
 // FYTTSA Shared Data Helper
 // Centralizes Firebase Firestore sync for cross-device data sharing.
-// All user-specific data is stored under: usuarios/{userId}/app_data/{key}
 // Falls back to localStorage if Firebase is unavailable or no user.
 // =====================================================
 
@@ -453,93 +561,10 @@ function fyttsa_getUserId() {
     return localStorage.getItem('usuario') || null;
 }
 
-/**
- * Load data for the current user from Firestore.
- * Falls back to localStorage if Firestore is unavailable.
- */
-async function fyttsa_loadData(key) {
-    const userId = fyttsa_getUserId();
-
-    if (userId) {
-        if (!_fyttsaFirebaseReady && typeof firebase !== 'undefined') {
-            _fyttsaInitFirebase();
-        }
-        if (_fyttsaFirebaseReady) {
-            try {
-                const doc = await _fyttsaDb.collection('usuarios')
-                    .doc(userId)
-                    .collection('app_data')
-                    .doc(key)
-                    .get();
-                if (doc.exists && doc.data().value !== undefined) {
-                    return doc.data().value;
-                }
-            } catch (e) {
-                console.warn('[FYTTSA] Firestore load failed, falling back to localStorage:', e);
-            }
-        }
-    }
-
-    // Fallback to localStorage
-    try {
-        const raw = localStorage.getItem(key);
-        return raw ? JSON.parse(raw) : null;
-    } catch (e) {
-        return null;
-    }
-}
-
-/**
- * Save data for the current user to Firestore.
- * Also saves to localStorage as a cache/fallback.
- */
-async function fyttsa_saveData(key, value) {
-    const userId = fyttsa_getUserId();
-
-    try {
-        localStorage.setItem(key, JSON.stringify(value));
-    } catch (e) {
-        console.warn('[FYTTSA] localStorage save failed:', e);
-    }
-
-    if (userId) {
-        if (!_fyttsaFirebaseReady && typeof firebase !== 'undefined') {
-            _fyttsaInitFirebase();
-        }
-        if (_fyttsaFirebaseReady) {
-            try {
-                await _fyttsaDb.collection('usuarios')
-                    .doc(userId)
-                    .collection('app_data')
-                    .doc(key)
-                    .set({
-                        value: value,
-                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-            } catch (e) {
-                console.warn('[FYTTSA] Firestore save failed:', e);
-            }
-        }
-    }
-}
-
-/**
- * Save data synchronously to localStorage and fire async Firestore save.
- */
-function fyttsa_saveDataSync(key, value) {
-    try {
-        localStorage.setItem(key, JSON.stringify(value));
-    } catch (e) {
-        console.warn('[FYTTSA] localStorage save failed:', e);
-    }
-    fyttsa_saveData(key, value);
-}
-
 // =====================================================
 // PRIVILEGE-BASED MENU VISIBILITY + ACTIVE MENU STYLING
-// =====================================================
 // Privilegio 1 = see ALL menu sections
-// Privilegio 2 = see ONLY Inicio + Trabajador section (hide Obra, Control, Almacén)
+// Privilegio 2 = see ONLY Inicio + Trabajador section
 // =====================================================
 
 function _fyttsa_applyMenuVisibility() {
@@ -580,10 +605,6 @@ function fyttsa_applyPrivilegeMenu() {
 
 // =====================================================
 // AUTO-SETUP: Runs automatically when the script loads.
-// Uses a MutationObserver to detect when the sidebar content
-// changes (i.e., when menu.html is loaded via fetch), then:
-//   1. Applies privilege-based menu visibility
-//   2. Starts an interval to apply active menu styling
 // =====================================================
 
 (function() {
@@ -682,17 +703,14 @@ function fyttsa_applyPrivilegeMenu() {
                 <i data-lucide="target"></i>
                 Control de KPIs
             </h1>
-            <p class="page-subtitle">Gestiona indicadores de desempeño por colaborador, configura definiciones y registra evaluaciones semanales.</p>
+            <p class="page-subtitle">Gestiona indicadores de desempeño por colaborador. Estructura compatible con el Excel "Equipo Construcción SCD Indicadores 2026".</p>
 
             <div class="tabs-bar">
                 <button class="tab-btn active" data-tab="dashboard">
                     <i data-lucide="bar-chart-3"></i> Dashboard
                 </button>
-                <button class="tab-btn" data-tab="config">
-                    <i data-lucide="settings-2"></i> Configuración
-                </button>
                 <button class="tab-btn" data-tab="evaluacion">
-                    <i data-lucide="clipboard-check"></i> Evaluación
+                    <i data-lucide="clipboard-check"></i> Evaluacion
                 </button>
             </div>
 
@@ -731,7 +749,7 @@ function fyttsa_applyPrivilegeMenu() {
 
                 <div class="charts-grid">
                     <div class="chart-box">
-                        <div class="chart-title"><i data-lucide="bar-chart-2"></i> Promedio por Trabajador <span class="chart-hint">Click para filtrar</span></div>
+                        <div class="chart-title"><i data-lucide="bar-chart-2"></i> Promedio por Trabajador <span class="chart-hint">Click para abrir en Evaluacion</span></div>
                         <div class="chart-wrap"><canvas id="chartBarWorkers"></canvas></div>
                     </div>
                     <div class="chart-box">
@@ -763,7 +781,7 @@ function fyttsa_applyPrivilegeMenu() {
                                     <th>Trabajador</th>
                                     <th>Puesto</th>
                                     <th class="center">Indicadores</th>
-                                    <th class="center">Evaluaciones</th>
+                                    <th class="center">Semanas</th>
                                     <th class="right">Promedio</th>
                                     <th class="center">Tendencia</th>
                                 </tr>
@@ -776,244 +794,76 @@ function fyttsa_applyPrivilegeMenu() {
                 </div>
             </div>
 
-            <!-- =================== TAB: CONFIGURACIÓN =================== -->
-            <div class="tab-content" id="content-config">
-                <div class="card">
-                    <h3 class="card-title"><i data-lucide="user-cog"></i> Seleccionar Trabajador</h3>
-                    <div class="form-group">
-                        <label class="form-label">Trabajador</label>
-                        <select class="form-select" id="config-worker-select">
-                            <option value="">— Selecciona un trabajador —</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="card" id="config-worker-card" style="display: none;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 2px solid var(--light-blue);">
-                        <h3 class="card-title" style="margin: 0; border: none; padding: 0;">
-                            <i data-lucide="sliders-horizontal"></i> Configuración de KPIs
-                        </h3>
-                        <div style="display: flex; gap: 8px;">
-                            <button class="btn-secondary" onclick="addIndicatorRow()"><i data-lucide="plus"></i> Agregar indicador</button>
-                            <button class="btn-primary" id="btn-save-config" onclick="saveConfig()"><i data-lucide="save"></i> Guardar</button>
-                        </div>
-                    </div>
-
-                    <div class="form-row" style="margin-bottom: 18px;">
-                        <div class="form-group">
-                            <label class="form-label">Nombre del Trabajador</label>
-                            <input type="text" class="form-input" id="config-worker-name" placeholder="Nombre completo">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Puesto</label>
-                            <input type="text" class="form-input" id="config-worker-position" placeholder="Puesto / Cargo">
-                        </div>
-                    </div>
-
-                    <div class="table-responsive">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Indicador</th>
-                                    <th class="center">Peso (%)</th>
-                                    <th>Entrega</th>
-                                    <th>Destinatarios</th>
-                                    <th>Plazo</th>
-                                    <th class="center">Acción</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-config-indicators">
-                                <tr><td colspan="6" class="empty-row">Sin indicadores. Agrega uno con el botón superior.</td></tr>
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td style="text-align: right; font-weight: 800; color: var(--primary-blue);">Total</td>
-                                    <td class="center-cell" id="config-total-weight" style="font-weight: 800; color: var(--primary-blue);">0%</td>
-                                    <td colspan="4"></td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="card" id="config-empty-card" style="display: none;">
-                    <div class="empty-state">
-                        <i data-lucide="inbox"></i>
-                        <h3>Sin configuración</h3>
-                        <p>Este trabajador no tiene indicadores configurados.</p>
-                        <button class="btn-primary" onclick="createConfig()"><i data-lucide="plus-circle"></i> Crear configuración</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- =================== TAB: EVALUACIÓN =================== -->
+            <!-- =================== TAB: EVALUACION =================== -->
             <div class="tab-content" id="content-evaluacion">
+
+                <!-- Top bar: worker dropdown, week range selector, add-indicator + save -->
                 <div class="card">
-                    <h3 class="card-title"><i data-lucide="filter"></i> Filtros de Evaluación</h3>
+                    <h3 class="card-title"><i data-lucide="filter"></i> Seleccion de Trabajador y Periodo</h3>
                     <div class="filters-bar">
-                        <div class="filter-group">
-                            <label class="filter-label">Semana</label>
-                            <select class="form-select" id="eval-week-select"><option value="">— Semana —</option></select>
-                        </div>
-                        <div class="filter-group">
+                        <div class="filter-group" style="min-width: 280px;">
                             <label class="filter-label">Trabajador</label>
-                            <select class="form-select" id="eval-worker-select"><option value="">— Trabajador —</option></select>
+                            <select class="form-select" id="eval-worker-select">
+                                <option value="">— Nuevo trabajador —</option>
+                            </select>
                         </div>
-                        <button class="btn-secondary" onclick="loadEvalForm()"><i data-lucide="search"></i> Cargar</button>
-                        <button class="btn-secondary" onclick="openHistorial()"><i data-lucide="history"></i> Ver historial</button>
+                        <div class="filter-group" style="min-width: 120px;">
+                            <label class="filter-label">Semana inicio</label>
+                            <select class="form-select" id="eval-week-start"></select>
+                        </div>
+                        <div class="filter-group" style="min-width: 120px;">
+                            <label class="filter-label">Semana fin</label>
+                            <select class="form-select" id="eval-week-end"></select>
+                        </div>
+                        <div class="filter-group" style="flex: 0 0 auto; min-width: auto;">
+                            <label class="filter-label">Presets</label>
+                            <div class="quarter-presets" id="quarter-presets">
+                                <button data-q="1" type="button">Q1</button>
+                                <button data-q="2" type="button">Q2</button>
+                                <button data-q="3" type="button" class="active">Q3</button>
+                                <button data-q="4" type="button">Q4</button>
+                            </div>
+                        </div>
+                        <div class="filter-group" style="flex: 0 0 auto; min-width: auto;">
+                            <label class="filter-label">&nbsp;</label>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn-secondary" id="btn-add-indicator" onclick="addIndicatorRow()"><i data-lucide="plus"></i> Agregar indicador</button>
+                                <button class="btn-primary" id="btn-save-worker" onclick="saveWorker()"><i data-lucide="save"></i> Guardar</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="card" id="eval-form-card" style="display: none;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 2px solid var(--light-blue);">
+                <!-- Main Excel-like table -->
+                <div class="card" id="eval-table-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 2px solid var(--light-blue); flex-wrap: wrap; gap: 10px;">
                         <h3 class="card-title" style="margin: 0; border: none; padding: 0;">
-                            <i data-lucide="clipboard-edit"></i> <span id="eval-form-title">Evaluación</span>
+                            <i data-lucide="clipboard-edit"></i> Equipo Construccion SCD Indicadores
                         </h3>
-                        <button class="btn-primary" id="btn-save-eval" onclick="saveEval()"><i data-lucide="save"></i> Guardar evaluación</button>
                     </div>
 
-                    <div class="form-row" style="margin-bottom: 18px;">
-                        <div class="form-group">
-                            <label class="form-label">Trabajador</label>
-                            <input type="text" class="form-input" id="eval-worker-name" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Semana</label>
-                            <input type="text" class="form-input" id="eval-week-display" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Periodo</label>
-                            <input type="text" class="form-input" id="eval-weekrange" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Mes</label>
-                            <input type="text" class="form-input" id="eval-month" readonly>
-                        </div>
-                    </div>
-
-                    <div class="table-responsive">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Indicador</th>
-                                    <th class="center">Peso</th>
-                                    <th class="center">Score (0-100%)</th>
-                                    <th class="right">Aporte</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-eval-scores">
-                                <tr><td colspan="4" class="empty-row">Selecciona un trabajador para cargar sus indicadores.</td></tr>
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td colspan="2" style="text-align: right; font-weight: 800; color: var(--primary-blue);">Promedio Semanal</td>
-                                    <td class="center-cell" id="eval-promedio" style="font-weight: 800; color: var(--primary-blue); font-size: 14px;">0.0%</td>
-                                    <td></td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-
-                    <div class="form-group" style="margin-top: 18px;">
-                        <label class="form-label">Observación del Supervisor</label>
-                        <textarea class="form-textarea" id="eval-observation" placeholder="Notas, comentarios y acciones de mejora..."></textarea>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 2px solid var(--light-blue);">
-                        <h3 class="card-title" style="margin: 0; border: none; padding: 0;">
-                            <i data-lucide="list"></i> Evaluaciones de la Semana
-                        </h3>
-                        <div class="filter-indicator" id="filter-indicator-eval">
-                            <i data-lucide="filter"></i>
-                            <span id="filter-text-eval"></span>
-                            <button onclick="clearEvalFilter()">Limpiar</button>
-                        </div>
-                    </div>
-                    <div class="filters-bar" style="margin-bottom: 14px;">
-                        <div class="filter-group">
-                            <label class="filter-label">Filtrar por semana</label>
-                            <select class="form-select" id="eval-table-week-filter"><option value="">Todas las semanas</option></select>
-                        </div>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Trabajador</th>
-                                    <th>Puesto</th>
-                                    <th class="center">Semana</th>
-                                    <th class="right">Promedio</th>
-                                    <th class="center">Estatus</th>
-                                    <th>Observación</th>
-                                    <th class="center">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-eval-list">
-                                <tr><td colspan="7" class="empty-row">Cargando evaluaciones...</td></tr>
+                    <div class="kpi-excel-wrap">
+                        <table class="kpi-excel-table" id="eval-table">
+                            <thead id="thead-eval"></thead>
+                            <tbody id="tbody-eval">
+                                <tr><td colspan="5" class="empty-row">Selecciona un trabajador o comienza a capturar uno nuevo.</td></tr>
                             </tbody>
                         </table>
+                    </div>
+
+                    <!-- Observations -->
+                    <div style="margin-top: 20px;">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+                            <i data-lucide="message-square" style="width:18px; height:18px; color: var(--primary-blue);"></i>
+                            <span style="font-size: 13px; font-weight: 700; color: var(--text-main);">Observaciones del Supervisor (por semana)</span>
+                        </div>
+                        <div class="observations-grid" id="observations-grid">
+                            <div style="color: var(--text-muted); font-size: 12px; font-style: italic;">Las observaciones aparecerán al cargar un trabajador.</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </main>
-    </div>
-
-    <!-- Modal historial -->
-    <div class="modal-overlay" id="modal-historial">
-        <div class="modal-box">
-            <div class="modal-header">
-                <div class="modal-header-left">
-                    <div class="modal-icon"><i data-lucide="history"></i></div>
-                    <div>
-                        <div class="modal-title" id="historial-title">Historial de Evaluaciones</div>
-                        <div class="modal-subtitle" id="historial-subtitle">—</div>
-                    </div>
-                </div>
-                <button class="modal-close" onclick="cerrarHistorial()"><i data-lucide="x"></i></button>
-            </div>
-            <div class="table-responsive">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th class="center">Semana</th>
-                            <th>Periodo</th>
-                            <th class="right">Promedio</th>
-                            <th class="center">Estatus</th>
-                            <th class="center">Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbody-historial">
-                        <tr><td colspan="5" class="empty-row">Sin evaluaciones.</td></tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="modal-actions">
-                <button class="btn-secondary" onclick="cerrarHistorial()"><i data-lucide="x"></i> Cerrar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal confirmar eliminación -->
-    <div class="modal-overlay" id="modal-delete">
-        <div class="modal-box" style="max-width: 420px;">
-            <div class="modal-header">
-                <div class="modal-header-left">
-                    <div class="modal-icon" style="background: #fee2e2; color: var(--danger);"><i data-lucide="trash-2"></i></div>
-                    <div>
-                        <div class="modal-title">Eliminar Evaluación</div>
-                        <div class="modal-subtitle">Esta acción no se puede deshacer.</div>
-                    </div>
-                </div>
-                <button class="modal-close" onclick="cerrarModalDelete()"><i data-lucide="x"></i></button>
-            </div>
-            <p style="font-size: 14px; color: var(--text-main); margin-bottom: 18px;" id="delete-msg">¿Seguro que deseas eliminar esta evaluación?</p>
-            <div class="modal-actions">
-                <button class="btn-secondary" onclick="cerrarModalDelete()">Cancelar</button>
-                <button class="btn-primary" id="btn-confirm-delete" style="background: var(--danger);"><i data-lucide="trash-2"></i> Eliminar</button>
-            </div>
-        </div>
     </div>
 
     <!-- Toast -->
@@ -1032,33 +882,31 @@ function fyttsa_applyPrivilegeMenu() {
         // =====================================================
         // State
         // =====================================================
-        let stateConfigs = {};        // { workerId: configDoc }
-        let stateEvals = [];          // array of eval docs
-        let stateWorkers = [];        // list of workers (from configs + extra)
+        // stateWorkers: { workerId: workerDoc } loaded from kpi_workers collection
+        let stateWorkers = {};
 
-        // Charts
+        // Dashboard charts
         let chartBarWorkers = null, chartLineTeam = null, chartStacked = null;
-
-        // Config tab state
-        let configEditingWorkerId = null;
-
-        // Eval tab state
-        let evalSelectedConfig = null;
-        let evalSelectedWeekNum = null;
-        let evalFilterWeek = '';
-        let deleteTargetId = null;
-
-        // Dashboard filter
         let dashboardFilterWorkerId = null;
 
-        // Color palette for workers
+        // Evaluacion tab state
+        // currentWorker holds the working copy of the worker doc being edited.
+        let currentWorker = null;        // { workerName, position, indicators:[], observations:{} }
+        let currentWorkerId = null;      // doc id in kpi_workers (null = new)
+        let evalWeeks = [];              // array of week numbers shown in table
+
+        // Weeks 1..52, default visible range 27..40 (matches Excel layout)
+        const TOTAL_WEEKS = 52;
+        const DEFAULT_WEEK_START = 27;
+        const DEFAULT_WEEK_END = 40;
+
+        // Color palette
         const WORKER_PALETTE = ['#000000', '#404040', '#606060', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4', '#ec4899', '#84cc16', '#f97316', '#6366f1'];
         function workerColor(id) {
-            const list = Object.keys(stateConfigs).sort();
+            const list = Object.keys(stateWorkers).sort();
             const idx = list.indexOf(id);
             return WORKER_PALETTE[(idx >= 0 ? idx : 0) % WORKER_PALETTE.length];
         }
-
         const COLOR_PRIMARIO = '#000000';
         const COLOR_PRIMARIO_BG = 'rgba(0, 0, 0, 0.15)';
 
@@ -1080,12 +928,7 @@ function fyttsa_applyPrivilegeMenu() {
             if (s === null || s === undefined) return '';
             return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
         }
-
-        function statusFor(avg) {
-            if (avg >= 75) return { cls: 'good', text: 'Bueno' };
-            if (avg >= 50) return { cls: 'medium', text: 'Regular' };
-            return { cls: 'bad', text: 'Bajo' };
-        }
+        function escapeAttr(s) { return escapeHtml(s); }
 
         function truncate(s, n) {
             if (!s) return '—';
@@ -1093,111 +936,171 @@ function fyttsa_applyPrivilegeMenu() {
             return s.length > n ? s.substring(0, n) + '…' : s;
         }
 
-        // Week range calc (NS sheet base = Dec 29, 2025)
+        // Week date calc — Week 1 starts Dec 29, 2025 (FYTTSA 2026 calendar)
+        function getWeekStart(weekNum) {
+            const base = new Date(2025, 11, 29); // Dec 29, 2025
+            const d = new Date(base);
+            d.setDate(base.getDate() + (weekNum - 1) * 7);
+            return d;
+        }
         function getWeekRange(weekNum) {
-            const startOfWeek1 = new Date(2025, 11, 29); // Dec 29, 2025
-            const startDate = new Date(startOfWeek1);
-            startDate.setDate(startOfWeek1.getDate() + (weekNum - 1) * 7);
-            const endDate = new Date(startDate);
-            endDate.setDate(startDate.getDate() + 6);
+            const start = getWeekStart(weekNum);
+            const end = new Date(start);
+            end.setDate(start.getDate() + 6);
             const months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-            const month = months[endDate.getMonth()];
+            const month = months[end.getMonth()];
             const fmt = d => d.toLocaleDateString('en-GB'); // DD/MM/YYYY
-            return { start: fmt(startDate), end: fmt(endDate), month };
+            return { start: fmt(start), end: fmt(end), month, startDate: start, endDate: end };
+        }
+        function getWeekMonth(weekNum) {
+            return getWeekRange(weekNum).month;
+        }
+        function getCurrentWeek() {
+            const week1Start = new Date(2025, 11, 29);
+            const now = new Date();
+            const diffDays = Math.floor((now - week1Start) / (1000 * 60 * 60 * 24));
+            if (diffDays < 0) return null;
+            return Math.floor(diffDays / 7) + 1;
+        }
+
+        // Normalize a raw score to 0..1 decimal.
+        // Accepts "0.80", "0.8", "80", "80%", "1", "100", "100%".
+        function normalizeScore(v) {
+            if (v === null || v === undefined || v === '') return null;
+            const s = String(v).trim().replace('%', '').replace(',', '.');
+            const n = Number(s);
+            if (isNaN(n)) return null;
+            if (n > 1) return n / 100;
+            return n;
+        }
+
+        // Simple average of indicator scores for a given week (0..1)
+        function computeWeekOverall(indicators, weekNum) {
+            const w = String(weekNum);
+            const scores = (indicators || [])
+                .map(ind => normalizeScore(ind.weeklyScores && ind.weeklyScores[w]))
+                .filter(v => v !== null);
+            if (!scores.length) return null;
+            return scores.reduce((a, b) => a + b, 0) / scores.length;
+        }
+
+        // Weighted sum: sum(weight * score) where weight is in %, score normalized 0..1.
+        // Returns a 0..1 value (since weights sum to 100).
+        function computeWeekWeighted(indicators, weekNum) {
+            const w = String(weekNum);
+            let total = 0, totalWeight = 0;
+            (indicators || []).forEach(ind => {
+                const s = normalizeScore(ind.weeklyScores && ind.weeklyScores[w]);
+                const weight = Number(ind.weight) || 0;
+                if (s !== null && weight > 0) {
+                    total += s * weight;
+                    totalWeight += weight;
+                }
+            });
+            if (totalWeight === 0) return null;
+            return total / 100; // weight in %, so /100 -> 0..1
+        }
+
+        // Average of weekly weighted scores across all weeks that have any score.
+        function computeWorkerOverallAvg(workerDoc) {
+            const indicators = workerDoc && workerDoc.indicators ? workerDoc.indicators : [];
+            const weeks = getAllWeeksForWorker(workerDoc);
+            const weekly = weeks.map(w => computeWeekWeighted(indicators, w)).filter(v => v !== null);
+            if (!weekly.length) return null;
+            return weekly.reduce((a, b) => a + b, 0) / weekly.length; // 0..1
+        }
+
+        function getAllWeeksForWorker(workerDoc) {
+            const weeks = new Set();
+            (workerDoc && workerDoc.indicators || []).forEach(ind => {
+                if (ind.weeklyScores) Object.keys(ind.weeklyScores).forEach(w => { if (w !== '') weeks.add(Number(w)); });
+            });
+            return [...weeks].sort((a, b) => a - b);
+        }
+
+        function getAllWeeksAcrossWorkers() {
+            const weeks = new Set();
+            Object.keys(stateWorkers).forEach(wid => {
+                getAllWeeksForWorker(stateWorkers[wid]).forEach(w => weeks.add(w));
+            });
+            return [...weeks].sort((a, b) => a - b);
         }
 
         // =====================================================
         // Data load
         // =====================================================
-        async function loadAllData() {
+        async function loadAllWorkers() {
             try {
-                const [cfgSnap, evalSnap] = await Promise.all([
-                    db.collection('kpis_config').get(),
-                    db.collection('kpis_eval').get()
-                ]);
-
-                stateConfigs = {};
-                cfgSnap.forEach(doc => {
-                    stateConfigs[doc.id] = doc.data();
+                const snap = await db.collection('kpi_workers').get();
+                stateWorkers = {};
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    data._id = doc.id;
+                    stateWorkers[doc.id] = data;
                 });
-
-                stateEvals = [];
-                evalSnap.forEach(doc => {
-                    const d = doc.data();
-                    d._docId = doc.id;
-                    stateEvals.push(d);
-                });
-                stateEvals.sort((a, b) => (a.workerName || '').localeCompare(b.workerName || '') || (a.week || 0) - (b.week || 0));
-
-                // Build workers list from configs
-                stateWorkers = Object.keys(stateConfigs).map(id => ({
-                    id,
-                    name: stateConfigs[id].workerName || id,
-                    position: stateConfigs[id].position || '—'
-                }));
-
-                renderAll();
-                populateWorkerSelectors();
+                renderDashboard();
+                populateWorkerSelector();
+                renderEvalTable();
+                renderObservations();
+                lucide.createIcons();
             } catch (e) {
-                console.error('[Control KPIs] Error al cargar:', e);
+                console.error('[Control KPIs] Error al cargar kpi_workers:', e);
                 showToast('Error al cargar datos: ' + e.message, 'error');
             }
         }
 
         // =====================================================
-        // Render (Dashboard)
+        // Dashboard render
         // =====================================================
-        function renderAll() {
+        function renderDashboard() {
             renderDashboardKpis();
             renderDashboardCharts();
             renderResumenTable();
-            renderEvalListTable();
-            populateWeekFilters();
             lucide.createIcons();
         }
 
-        function computeWorkerStats(workerId) {
-            const evs = stateEvals.filter(e => e.workerId === workerId);
-            const avgs = evs.map(e => Number(e.weeklyAverage)).filter(v => !isNaN(v));
-            const overall = avgs.length ? (avgs.reduce((a, b) => a + b, 0) / avgs.length) : null;
-            const last = evs.length ? evs[evs.length - 1] : null;
-            const prev = evs.length > 1 ? evs[evs.length - 2] : null;
+        function computeWorkerDashboardStats(workerId) {
+            const doc = stateWorkers[workerId];
+            if (!doc) return { overall: null, weeksCount: 0, last: null, prev: null, trend: 'flat' };
+            const indicators = doc.indicators || [];
+            const weeks = getAllWeeksForWorker(doc);
+            const weeklyWeighted = weeks.map(w => computeWeekWeighted(indicators, w));
+            const valid = weeklyWeighted.filter(v => v !== null);
+            const overall = valid.length ? (valid.reduce((a, b) => a + b, 0) / valid.length) : null;
+            const last = weeks.length ? weeklyWeighted[weeklyWeighted.length - 1] : null;
+            const prev = weeks.length > 1 ? weeklyWeighted[weeklyWeighted.length - 2] : null;
             let trend = 'flat';
-            if (last && prev) {
-                const l = Number(last.weeklyAverage) || 0;
-                const p = Number(prev.weeklyAverage) || 0;
-                if (l > p + 0.5) trend = 'up';
-                else if (l < p - 0.5) trend = 'down';
+            if (last !== null && prev !== null) {
+                if (last > prev + 0.005) trend = 'up';
+                else if (last < prev - 0.005) trend = 'down';
             }
-            return { evals: evs, count: evs.length, avgCount: avgs.length, overall, last, prev, trend };
+            return { overall, weeksCount: weeks.length, last, prev, trend };
         }
 
         function renderDashboardKpis() {
-            const workerIds = Object.keys(stateConfigs);
-            const allAvgs = stateEvals.map(e => Number(e.weeklyAverage)).filter(v => !isNaN(v));
-            const teamAvg = allAvgs.length ? (allAvgs.reduce((a, b) => a + b, 0) / allAvgs.length) : null;
-            const evaluatedCount = new Set(stateEvals.map(e => e.workerId)).size;
+            const workerIds = Object.keys(stateWorkers);
+            const allOveralls = workerIds.map(wid => computeWorkerOverallAvg(stateWorkers[wid])).filter(v => v !== null);
+            const teamAvg = allOveralls.length ? (allOveralls.reduce((a, b) => a + b, 0) / allOveralls.length) : null;
+            const evaluatedCount = workerIds.filter(wid => getAllWeeksForWorker(stateWorkers[wid]).length > 0).length;
 
-            // Best / worst worker by overall average
             let best = null, worst = null;
             workerIds.forEach(wid => {
-                const s = computeWorkerStats(wid);
-                if (s.overall === null) return;
-                if (!best || s.overall > best.avg) best = { id: wid, name: stateConfigs[wid].workerName || wid, avg: s.overall };
-                if (!worst || s.overall < worst.avg) worst = { id: wid, name: stateConfigs[wid].workerName || wid, avg: s.overall };
+                const o = computeWorkerOverallAvg(stateWorkers[wid]);
+                if (o === null) return;
+                const name = stateWorkers[wid].workerName || wid;
+                if (!best || o > best.avg) best = { id: wid, name, avg: o };
+                if (!worst || o < worst.avg) worst = { id: wid, name, avg: o };
             });
 
-            document.getElementById('kpi-promedio-equipo').textContent = teamAvg !== null ? teamAvg.toFixed(1) + '%' : '—';
+            document.getElementById('kpi-promedio-equipo').textContent = teamAvg !== null ? (teamAvg * 100).toFixed(1) + '%' : '—';
             document.getElementById('kpi-evaluados').textContent = evaluatedCount;
-            document.getElementById('kpi-mejor-desempeno').textContent = best ? best.name + ' (' + best.avg.toFixed(0) + '%)' : '—';
-            document.getElementById('kpi-peor-desempeno').textContent = worst ? worst.name + ' (' + worst.avg.toFixed(0) + '%)' : '—';
+            document.getElementById('kpi-mejor-desempeno').textContent = best ? truncate(best.name, 20) + ' (' + (best.avg * 100).toFixed(0) + '%)' : '—';
+            document.getElementById('kpi-peor-desempeno').textContent = worst ? truncate(worst.name, 20) + ' (' + (worst.avg * 100).toFixed(0) + '%)' : '—';
         }
 
         function initChartLib() {
             if (typeof Chart === 'undefined') {
-                setTimeout(() => {
-                    renderDashboardCharts();
-                }, 200);
+                setTimeout(() => { renderDashboardCharts(); }, 200);
                 return false;
             }
             Chart.defaults.font.family = "'Inter', sans-serif";
@@ -1212,15 +1115,16 @@ function fyttsa_applyPrivilegeMenu() {
             if (chartLineTeam) { chartLineTeam.destroy(); chartLineTeam = null; }
             if (chartStacked) { chartStacked.destroy(); chartStacked = null; }
 
-            // Bar - avg by worker (clickable)
-            const workerIds = Object.keys(stateConfigs).sort();
-            const labels = workerIds.map(wid => stateConfigs[wid].workerName || wid);
+            const workerIds = Object.keys(stateWorkers).sort((a, b) =>
+                (stateWorkers[a].workerName || a).localeCompare(stateWorkers[b].workerName || b));
+            const labels = workerIds.map(wid => stateWorkers[wid].workerName || wid);
             const data = workerIds.map(wid => {
-                const s = computeWorkerStats(wid);
-                return s.overall !== null ? Number(s.overall.toFixed(1)) : 0;
+                const o = computeWorkerOverallAvg(stateWorkers[wid]);
+                return o !== null ? Number((o * 100).toFixed(1)) : 0;
             });
             const colors = workerIds.map(wid => workerColor(wid));
 
+            // Bar - avg by worker (clickable -> open in Evaluacion)
             const ctx1 = document.getElementById('chartBarWorkers');
             if (ctx1) {
                 chartBarWorkers = new Chart(ctx1, {
@@ -1245,7 +1149,7 @@ function fyttsa_applyPrivilegeMenu() {
                             if (elements && elements.length) {
                                 const idx = elements[0].index;
                                 const wid = workerIds[idx];
-                                applyDashboardFilter(wid);
+                                openWorkerInEval(wid);
                             }
                         }
                     }
@@ -1253,12 +1157,11 @@ function fyttsa_applyPrivilegeMenu() {
             }
 
             // Line - team trend by week
-            const allWeeks = [...new Set(stateEvals.map(e => e.week))].sort((a, b) => (a || 0) - (b || 0));
+            const allWeeks = getAllWeeksAcrossWorkers();
             const teamTrend = allWeeks.map(w => {
-                const evs = stateEvals.filter(e => e.week === w);
-                const avgs = evs.map(e => Number(e.weeklyAverage)).filter(v => !isNaN(v));
-                if (!avgs.length) return 0;
-                return Number((avgs.reduce((a, b) => a + b, 0) / avgs.length).toFixed(1));
+                const vals = workerIds.map(wid => computeWeekWeighted(stateWorkers[wid].indicators || [], w)).filter(v => v !== null);
+                if (!vals.length) return 0;
+                return Number((vals.reduce((a, b) => a + b, 0) / vals.length * 100).toFixed(1));
             });
             const ctx2 = document.getElementById('chartLineTeam');
             if (ctx2) {
@@ -1283,41 +1186,28 @@ function fyttsa_applyPrivilegeMenu() {
                             legend: { display: false },
                             tooltip: { callbacks: { label: ctx => 'Promedio: ' + ctx.parsed.y.toFixed(1) + '%' } }
                         },
-                        scales: { y: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%' } } },
-                        onClick: (evt, elements) => {
-                            if (elements && elements.length) {
-                                const idx = elements[0].index;
-                                const wk = allWeeks[idx];
-                                evalFilterWeek = String(wk);
-                                const sel = document.getElementById('eval-table-week-filter');
-                                if (sel) sel.value = String(wk);
-                                renderEvalListTable();
-                                switchTab('evaluacion');
-                                showToast('Filtro por Semana ' + wk + ' aplicado en Evaluación', 'info');
-                            }
-                        }
+                        scales: { y: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%' } } }
                     }
                 });
             }
 
-            // Stacked bar - per worker per indicator
+            // Stacked bar - per worker per indicator (avg across weeks)
             const indicatorSet = [];
             workerIds.forEach(wid => {
-                const inds = stateConfigs[wid].indicators || [];
-                inds.forEach(i => { if (!indicatorSet.includes(i.name)) indicatorSet.push(i.name); });
+                const inds = stateWorkers[wid].indicators || [];
+                inds.forEach(i => { if (i.name && !indicatorSet.includes(i.name)) indicatorSet.push(i.name); });
             });
-            const datasets = indicatorSet.map(indName => ({
+            const datasets = indicatorSet.map((indName, i) => ({
                 label: indName,
                 data: workerIds.map(wid => {
-                    const evs = stateEvals.filter(e => e.workerId === wid);
-                    const scores = evs.map(e => {
-                        const s = (e.scores || []).find(x => x.indicatorName === indName);
-                        return s ? Number(s.score) : null;
-                    }).filter(v => v !== null && !isNaN(v));
+                    const inds = stateWorkers[wid].indicators || [];
+                    const ind = inds.find(x => x.name === indName);
+                    if (!ind || !ind.weeklyScores) return 0;
+                    const scores = Object.values(ind.weeklyScores).map(v => normalizeScore(v)).filter(v => v !== null);
                     if (!scores.length) return 0;
                     return Number((scores.reduce((a, b) => a + b, 0) / scores.length * 100).toFixed(1));
                 }),
-                backgroundColor: indColor(indName, indicatorSet),
+                backgroundColor: WORKER_PALETTE[i % WORKER_PALETTE.length],
                 borderWidth: 1, borderColor: 'white'
             }));
             const ctx3 = document.getElementById('chartStacked');
@@ -1339,7 +1229,7 @@ function fyttsa_applyPrivilegeMenu() {
                             if (elements && elements.length) {
                                 const idx = elements[0].index;
                                 const wid = workerIds[idx];
-                                applyDashboardFilter(wid);
+                                openWorkerInEval(wid);
                             }
                         }
                     }
@@ -1347,16 +1237,12 @@ function fyttsa_applyPrivilegeMenu() {
             }
         }
 
-        function indColor(name, list) {
-            const idx = list.indexOf(name);
-            return WORKER_PALETTE[idx % WORKER_PALETTE.length];
-        }
-
         function renderResumenTable() {
             const tbody = document.getElementById('tbody-resumen');
-            const workerIds = Object.keys(stateConfigs).sort((a, b) => (stateConfigs[a].workerName || a).localeCompare(stateConfigs[b].workerName || b));
+            const workerIds = Object.keys(stateWorkers).sort((a, b) =>
+                (stateWorkers[a].workerName || a).localeCompare(stateWorkers[b].workerName || b));
             if (!workerIds.length) {
-                tbody.innerHTML = '<tr><td colspan="6" class="empty-row">No hay trabajadores configurados.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-row">No hay trabajadores registrados. Ve a la pestaña Evaluacion para crear uno.</td></tr>';
                 return;
             }
             const filtered = dashboardFilterWorkerId ? workerIds.filter(w => w === dashboardFilterWorkerId) : workerIds;
@@ -1365,17 +1251,17 @@ function fyttsa_applyPrivilegeMenu() {
                 return;
             }
             tbody.innerHTML = filtered.map(wid => {
-                const cfg = stateConfigs[wid];
-                const s = computeWorkerStats(wid);
-                const avg = s.overall !== null ? s.overall.toFixed(1) + '%' : '—';
+                const doc = stateWorkers[wid];
+                const s = computeWorkerDashboardStats(wid);
+                const avg = s.overall !== null ? (s.overall * 100).toFixed(1) + '%' : '—';
                 const trendIcon = s.trend === 'up' ? '<i data-lucide="trending-up"></i> Sube' :
                                   s.trend === 'down' ? '<i data-lucide="trending-down"></i> Baja' :
                                   '<i data-lucide="minus"></i> Igual';
                 return `<tr>
-                    <td><strong>${escapeHtml(cfg.workerName || wid)}</strong><div style="font-size:10px; color:var(--text-muted);">${escapeHtml(wid)}</div></td>
-                    <td>${escapeHtml(cfg.position || '—')}</td>
-                    <td class="center-cell">${(cfg.indicators || []).length}</td>
-                    <td class="center-cell">${s.count}</td>
+                    <td><strong>${escapeHtml(doc.workerName || wid)}</strong></td>
+                    <td>${escapeHtml(doc.position || '—')}</td>
+                    <td class="center-cell">${(doc.indicators || []).length}</td>
+                    <td class="center-cell">${s.weeksCount}</td>
                     <td class="num-cell">${avg}</td>
                     <td class="center-cell"><span class="trend-arrow ${s.trend}">${trendIcon}</span></td>
                 </tr>`;
@@ -1385,7 +1271,7 @@ function fyttsa_applyPrivilegeMenu() {
 
         function applyDashboardFilter(workerId) {
             dashboardFilterWorkerId = workerId;
-            const name = stateConfigs[workerId]?.workerName || workerId;
+            const name = stateWorkers[workerId]?.workerName || workerId;
             const fi = document.getElementById('filter-indicator-dashboard');
             document.getElementById('filter-text-dashboard').textContent = 'Filtrado por: ' + name;
             fi.classList.add('show');
@@ -1399,6 +1285,14 @@ function fyttsa_applyPrivilegeMenu() {
             renderResumenTable();
         }
 
+        function openWorkerInEval(workerId) {
+            // Switch to Evaluacion tab and select the worker
+            switchTab('evaluacion');
+            const sel = document.getElementById('eval-worker-select');
+            if (sel) sel.value = workerId;
+            selectWorker(workerId);
+        }
+
         // =====================================================
         // Tab switching
         // =====================================================
@@ -1410,483 +1304,439 @@ function fyttsa_applyPrivilegeMenu() {
             const ct = document.getElementById('content-' + tabName);
             if (ct) ct.classList.add('active');
             lucide.createIcons();
+            // Re-render charts when returning to dashboard (canvas sizing)
+            if (tabName === 'dashboard') {
+                setTimeout(() => {
+                    if (chartBarWorkers) chartBarWorkers.resize();
+                    if (chartLineTeam) chartLineTeam.resize();
+                    if (chartStacked) chartStacked.resize();
+                }, 50);
+            }
         }
 
         // =====================================================
-        // Worker selectors
+        // Worker & week selectors
         // =====================================================
-        function populateWorkerSelectors() {
-            const sorted = stateWorkers.slice().sort((a, b) => a.name.localeCompare(b.name));
-            const opts = '<option value="">— Selecciona un trabajador —</option>' +
-                sorted.map(w => `<option value="${escapeHtml(w.id)}">${escapeHtml(w.name)} (${escapeHtml(w.id)})</option>`).join('');
-            const sel1 = document.getElementById('config-worker-select');
-            const sel2 = document.getElementById('eval-worker-select');
-            if (sel1) sel1.innerHTML = opts;
-            if (sel2) sel2.innerHTML = opts;
+        function populateWorkerSelector() {
+            const sel = document.getElementById('eval-worker-select');
+            if (!sel) return;
+            const sorted = Object.keys(stateWorkers).sort((a, b) =>
+                (stateWorkers[a].workerName || a).localeCompare(stateWorkers[b].workerName || b));
+            const opts = '<option value="">— Nuevo trabajador —</option>' +
+                sorted.map(wid => {
+                    const doc = stateWorkers[wid];
+                    const name = doc.workerName || wid;
+                    const pos = doc.position ? ' — ' + doc.position : '';
+                    return `<option value="${escapeAttr(wid)}">${escapeHtml(name)}${escapeHtml(pos)}</option>`;
+                }).join('');
+            const cur = sel.value;
+            sel.innerHTML = opts;
+            if (cur && stateWorkers[cur]) sel.value = cur;
         }
 
-        function populateWeekFilters() {
-            // Generate week options 1..53
+        function populateWeekSelectors() {
+            const startSel = document.getElementById('eval-week-start');
+            const endSel = document.getElementById('eval-week-end');
             const weeks = [];
-            for (let i = 1; i <= 53; i++) weeks.push(i);
+            for (let i = 1; i <= TOTAL_WEEKS; i++) weeks.push(i);
             const optHtml = weeks.map(w => {
                 const r = getWeekRange(w);
-                return `<option value="${w}">Semana ${w} — ${r.start} al ${r.end} (${r.month})</option>`;
+                return `<option value="${w}">Sem ${w} — ${r.start} al ${r.end}</option>`;
             }).join('');
-            const selWeek = document.getElementById('eval-week-select');
-            if (selWeek) {
-                const cur = selWeek.value;
-                selWeek.innerHTML = '<option value="">— Semana —</option>' + optHtml;
-                if (cur) selWeek.value = cur;
+            if (startSel) {
+                startSel.innerHTML = optHtml;
+                startSel.value = DEFAULT_WEEK_START;
             }
+            if (endSel) {
+                endSel.innerHTML = optHtml;
+                endSel.value = DEFAULT_WEEK_END;
+            }
+        }
 
-            // Filter dropdown - only weeks that have evals
-            const presentWeeks = [...new Set(stateEvals.map(e => e.week))].sort((a, b) => (a || 0) - (b || 0));
-            const selFilter = document.getElementById('eval-table-week-filter');
-            if (selFilter) {
-                selFilter.innerHTML = '<option value="">Todas las semanas</option>' +
-                    presentWeeks.map(w => `<option value="${w}">Semana ${w}</option>`).join('');
-                if (evalFilterWeek) selFilter.value = evalFilterWeek;
-            }
+        function updateEvalWeeksFromSelectors() {
+            const startSel = document.getElementById('eval-week-start');
+            const endSel = document.getElementById('eval-week-end');
+            let s = Number(startSel.value) || DEFAULT_WEEK_START;
+            let e = Number(endSel.value) || DEFAULT_WEEK_END;
+            if (s > e) { const t = s; s = e; e = t; }
+            const arr = [];
+            for (let i = s; i <= e; i++) arr.push(i);
+            evalWeeks = arr;
+            // Update preset button highlight
+            document.querySelectorAll('#quarter-presets button').forEach(b => b.classList.remove('active'));
+            if (s === 1 && e === 13) document.querySelector('#quarter-presets button[data-q="1"]')?.classList.add('active');
+            else if (s === 14 && e === 26) document.querySelector('#quarter-presets button[data-q="2"]')?.classList.add('active');
+            else if (s === 27 && e === 40) document.querySelector('#quarter-presets button[data-q="3"]')?.classList.add('active');
+            else if (s === 41 && e === 52) document.querySelector('#quarter-presets button[data-q="4"]')?.classList.add('active');
+        }
+
+        function applyQuarterPreset(q) {
+            const ranges = { 1: [1, 13], 2: [14, 26], 3: [27, 40], 4: [41, 52] };
+            const [s, e] = ranges[q];
+            document.getElementById('eval-week-start').value = String(s);
+            document.getElementById('eval-week-end').value = String(e);
+            updateEvalWeeksFromSelectors();
+            renderEvalTable();
+            renderObservations();
         }
 
         // =====================================================
-        // TAB: Configuración
+        // Evaluacion: worker selection / new worker
         // =====================================================
-        function onConfigWorkerChange() {
-            const wid = document.getElementById('config-worker-select').value;
-            configEditingWorkerId = wid;
-            if (!wid) {
-                document.getElementById('config-worker-card').style.display = 'none';
-                document.getElementById('config-empty-card').style.display = 'none';
-                return;
-            }
-            const cfg = stateConfigs[wid];
-            if (cfg) {
-                document.getElementById('config-empty-card').style.display = 'none';
-                document.getElementById('config-worker-card').style.display = 'block';
-                document.getElementById('config-worker-name').value = cfg.workerName || wid;
-                document.getElementById('config-worker-position').value = cfg.position || '';
-                renderConfigIndicators(cfg.indicators || []);
+        function selectWorker(workerId) {
+            if (!workerId) {
+                // New worker
+                currentWorkerId = null;
+                currentWorker = {
+                    workerName: '',
+                    position: '',
+                    indicators: [ makeEmptyIndicator() ],
+                    observations: {}
+                };
             } else {
-                document.getElementById('config-worker-card').style.display = 'none';
-                document.getElementById('config-empty-card').style.display = 'block';
+                const doc = stateWorkers[workerId];
+                if (!doc) return;
+                currentWorkerId = workerId;
+                // Deep clone so editing doesn't mutate state until save
+                currentWorker = JSON.parse(JSON.stringify({
+                    workerName: doc.workerName || '',
+                    position: doc.position || '',
+                    indicators: doc.indicators || [ makeEmptyIndicator() ],
+                    observations: doc.observations || {}
+                }));
+                if (!currentWorker.indicators.length) currentWorker.indicators.push(makeEmptyIndicator());
             }
+            renderEvalTable();
+            renderObservations();
             lucide.createIcons();
         }
 
-        function createConfig() {
-            const wid = configEditingWorkerId;
-            if (!wid) return;
-            document.getElementById('config-empty-card').style.display = 'none';
-            document.getElementById('config-worker-card').style.display = 'block';
-            document.getElementById('config-worker-name').value = wid;
-            document.getElementById('config-worker-position').value = '';
-            renderConfigIndicators([]);
-            lucide.createIcons();
-        }
-
-        function renderConfigIndicators(indicators) {
-            const tbody = document.getElementById('tbody-config-indicators');
-            if (!indicators.length) {
-                tbody.innerHTML = '<tr class="indicator-row" data-empty="1"><td colspan="6" class="empty-row">Sin indicadores. Agrega uno con el botón superior.</td></tr>';
-            } else {
-                tbody.innerHTML = indicators.map((ind, idx) => indicatorRowHtml(ind, idx)).join('');
-            }
-            updateTotalWeight();
-        }
-
-        function indicatorRowHtml(ind, idx) {
-            const name = escapeHtml(ind.name || '');
-            const weight = ind.weight || '';
-            const method = escapeHtml(ind.deliveryMethod || '');
-            const recip = escapeHtml(ind.recipients || '');
-            const deadline = escapeHtml(ind.deadline || '');
-            return `<tr class="indicator-row" data-idx="${idx}">
-                <td><input type="text" class="ind-name" value="${name}" placeholder="Nombre del indicador"></td>
-                <td><input type="number" class="ind-weight" min="0" max="100" step="1" value="${weight}" style="text-align:center;"></td>
-                <td><select class="ind-method">
-                    ${['Correo','WhatsApp','App','Reporte físico','Reunión','Otro'].map(m => `<option ${method === m ? 'selected' : ''}>${m}</option>`).join('')}
-                </select></td>
-                <td><input type="text" class="ind-recipients" value="${recip}" placeholder="Destinatarios"></td>
-                <td><input type="text" class="ind-deadline" value="${deadline}" placeholder="Ej: Viernes 3pm"></td>
-                <td class="center-cell"><button class="btn-action btn-danger" onclick="removeIndicatorRow(this)"><i data-lucide="trash-2"></i></button></td>
-            </tr>`;
+        function makeEmptyIndicator() {
+            return {
+                name: '',
+                via: '',
+                corte: '',
+                weight: 0,
+                weeklyScores: {}
+            };
         }
 
         function addIndicatorRow() {
-            const tbody = document.getElementById('tbody-config-indicators');
-            const emptyRow = tbody.querySelector('tr[data-empty="1"]');
-            if (emptyRow) emptyRow.remove();
-            const idx = tbody.querySelectorAll('tr.indicator-row').length;
-            const tr = document.createElement('tr');
-            tr.className = 'indicator-row';
-            tr.dataset.idx = idx;
-            tr.innerHTML = indicatorRowHtml({}, idx);
-            tbody.appendChild(tr);
+            if (!currentWorker) {
+                selectWorker(''); // start a new worker
+                return;
+            }
+            currentWorker.indicators.push(makeEmptyIndicator());
+            renderEvalTable();
             lucide.createIcons();
-            tr.querySelector('.ind-name').focus();
-            updateTotalWeight();
+            // Focus the new row's name input
+            const idx = currentWorker.indicators.length - 1;
+            setTimeout(() => {
+                const inp = document.querySelector(`input.ind-name[data-idx="${idx}"]`);
+                if (inp) inp.focus();
+            }, 50);
         }
 
-        function removeIndicatorRow(btn) {
-            const tr = btn.closest('tr');
-            tr.remove();
-            const tbody = document.getElementById('tbody-config-indicators');
-            if (!tbody.querySelectorAll('tr.indicator-row').length) {
-                tbody.innerHTML = '<tr class="indicator-row" data-empty="1"><td colspan="6" class="empty-row">Sin indicadores. Agrega uno con el botón superior.</td></tr>';
-            }
-            updateTotalWeight();
-        }
-
-        function updateTotalWeight() {
-            const rows = document.querySelectorAll('#tbody-config-indicators tr.indicator-row:not([data-empty])');
-            let total = 0;
-            rows.forEach(r => {
-                const v = Number(r.querySelector('.ind-weight')?.value || 0);
-                if (!isNaN(v)) total += v;
-            });
-            const el = document.getElementById('config-total-weight');
-            if (el) {
-                el.textContent = total + '%';
-                el.style.color = total === 100 ? 'var(--success)' : (total > 100 ? 'var(--danger)' : 'var(--warning)');
-            }
-        }
-
-        async function saveConfig() {
-            const wid = configEditingWorkerId;
-            if (!wid) { showToast('Selecciona un trabajador', 'error'); return; }
-            const name = document.getElementById('config-worker-name').value.trim();
-            const position = document.getElementById('config-worker-position').value.trim();
-            if (!name) { showToast('El nombre es obligatorio', 'error'); return; }
-
-            const rows = document.querySelectorAll('#tbody-config-indicators tr.indicator-row:not([data-empty])');
-            const indicators = [];
-            let totalWeight = 0;
-            rows.forEach(r => {
-                const n = r.querySelector('.ind-name').value.trim();
-                const w = Number(r.querySelector('.ind-weight').value || 0);
-                const m = r.querySelector('.ind-method').value;
-                const rec = r.querySelector('.ind-recipients').value.trim();
-                const dl = r.querySelector('.ind-deadline').value.trim();
-                if (n) {
-                    indicators.push({ name: n, weight: w, deliveryMethod: m, recipients: rec, deadline: dl });
-                    totalWeight += w;
-                }
-            });
-            if (totalWeight !== 100) {
-                if (!confirm('El peso total es ' + totalWeight + '%, no 100%. ¿Guardar de todas formas?')) return;
-            }
-
-            const btn = document.getElementById('btn-save-config');
-            btn.disabled = true; const oldHtml = btn.innerHTML;
-            btn.innerHTML = '<i data-lucide="loader-2"></i> Guardando...';
+        function deleteIndicator(idx) {
+            if (!currentWorker || !currentWorker.indicators[idx]) return;
+            if (!confirm('¿Eliminar el indicador "' + (currentWorker.indicators[idx].name || 'sin nombre') + '"?')) return;
+            currentWorker.indicators.splice(idx, 1);
+            if (!currentWorker.indicators.length) currentWorker.indicators.push(makeEmptyIndicator());
+            renderEvalTable();
             lucide.createIcons();
-
-            try {
-                const payload = {
-                    workerId: wid,
-                    workerName: name,
-                    position: position,
-                    indicators: indicators,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    updatedBy: ADMIN_USER
-                };
-                if (!stateConfigs[wid] || !stateConfigs[wid].createdAt) {
-                    payload.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-                }
-                await db.collection('kpis_config').doc(wid).set(payload, { merge: true });
-                stateConfigs[wid] = { ...stateConfigs[wid], ...payload };
-                // Update workers list
-                const existing = stateWorkers.find(w => w.id === wid);
-                if (existing) { existing.name = name; existing.position = position; }
-                else stateWorkers.push({ id: wid, name, position });
-                populateWorkerSelectors();
-                document.getElementById('config-worker-select').value = wid;
-                showToast('Configuración guardada correctamente', 'success');
-                renderAll();
-            } catch (e) {
-                console.error(e);
-                showToast('Error al guardar: ' + e.message, 'error');
-            } finally {
-                btn.disabled = false; btn.innerHTML = oldHtml; lucide.createIcons();
-            }
         }
 
         // =====================================================
-        // TAB: Evaluación
+        // Evaluacion: render Excel-like table
         // =====================================================
-        function loadEvalForm() {
-            const wid = document.getElementById('eval-worker-select').value;
-            const wkVal = document.getElementById('eval-week-select').value;
-            if (!wid || !wkVal) { showToast('Selecciona semana y trabajador', 'error'); return; }
-            const wk = Number(wkVal);
-            const cfg = stateConfigs[wid];
-            if (!cfg) { showToast('El trabajador no tiene configuración de KPIs. Configúralo primero.', 'error'); return; }
+        function renderEvalTable() {
+            renderEvalHead();
+            renderEvalBody();
+        }
 
-            evalSelectedConfig = cfg;
-            evalSelectedWeekNum = wk;
-            const range = getWeekRange(wk);
+        function renderEvalHead() {
+            const thead = document.getElementById('thead-eval');
+            if (!thead) return;
+            const currentWk = getCurrentWeek();
+            let html = '<tr>';
+            // Month sub-header would be ideal but keep simple: single row with week info.
+            html += '<th class="col-name">Trabajador / Indicador</th>';
+            html += '<th class="col-via">Via</th>';
+            html += '<th class="col-corte">Corte</th>';
+            html += '<th class="col-peso">Peso</th>';
+            evalWeeks.forEach(w => {
+                const r = getWeekRange(w);
+                const isCurrent = currentWk === w;
+                html += `<th class="col-week${isCurrent ? ' current-week' : ''}">
+                    <span class="week-num">Sem ${w}</span>
+                    <span class="week-date">${r.start}</span>
+                    <span class="week-month">${r.month}</span>
+                </th>`;
+            });
+            html += '<th class="col-action"></th>';
+            html += '</tr>';
+            thead.innerHTML = html;
+        }
 
-            document.getElementById('eval-form-card').style.display = 'block';
-            document.getElementById('eval-form-title').textContent = 'Evaluación • ' + (cfg.workerName || wid);
-            document.getElementById('eval-worker-name').value = cfg.workerName || wid;
-            document.getElementById('eval-week-display').value = 'Semana ' + wk;
-            document.getElementById('eval-weekrange').value = range.start + ' al ' + range.end;
-            document.getElementById('eval-month').value = range.month;
+        function renderEvalBody() {
+            const tbody = document.getElementById('tbody-eval');
+            if (!tbody) return;
+            if (!currentWorker) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-row">Selecciona un trabajador del dropdown o comienza uno nuevo.</td></tr>';
+                return;
+            }
+            const currentWk = getCurrentWeek();
+            let html = '';
 
-            // Check if eval already exists - prefill
-            const existing = stateEvals.find(e => e.workerId === wid && e.week === wk);
-            const scores = (cfg.indicators || []).map(ind => {
-                const ex = existing ? (existing.scores || []).find(s => s.indicatorName === ind.name) : null;
-                return {
-                    name: ind.name,
+            // --- Row 1: Worker name + position | empty | empty | 100% | weekly averages (read-only) ---
+            html += '<tr class="worker-row">';
+            html += `<td class="worker-cell">
+                <input type="text" class="worker-name-input" id="worker-name" placeholder="Nombre del trabajador" value="${escapeAttr(currentWorker.workerName)}">
+                <input type="text" class="worker-position-input" id="worker-position" placeholder="Puesto / Cargo" value="${escapeAttr(currentWorker.position)}">
+            </td>`;
+            html += '<td></td><td></td>';
+            html += '<td class="peso-cell">100%</td>';
+            evalWeeks.forEach(w => {
+                const o = computeWeekOverall(currentWorker.indicators, w);
+                const isCurrent = currentWk === w;
+                html += `<td class="overall-cell${isCurrent ? ' current-week' : ''}" data-week="${w}">${o !== null ? (o * 100).toFixed(2) + '%' : '—'}</td>`;
+            });
+            html += '<td></td></tr>';
+
+            // --- Row 2: % Inc | empty | empty | empty | weekly percentage (read-only) ---
+            html += '<tr class="inc-row">';
+            html += '<td class="inc-label">% Inc</td>';
+            html += '<td></td><td></td><td></td>';
+            evalWeeks.forEach(w => {
+                const inc = computeWeekWeighted(currentWorker.indicators, w);
+                const isCurrent = currentWk === w;
+                html += `<td class="inc-cell${isCurrent ? ' current-week' : ''}" data-week="${w}">${inc !== null ? (inc * 100).toFixed(0) + '%' : '—'}</td>`;
+            });
+            html += '<td></td></tr>';
+
+            // --- Row 3+: Each indicator: name | via | corte | peso | weekly scores ---
+            currentWorker.indicators.forEach((ind, idx) => {
+                html += `<tr class="indicator-row" data-idx="${idx}">`;
+                html += `<td><input type="text" class="kpi-input ind-name" data-idx="${idx}" placeholder="Nombre del indicador" value="${escapeAttr(ind.name)}"></td>`;
+                html += `<td><input type="text" class="kpi-input ind-via" data-idx="${idx}" placeholder="Via de entrega" value="${escapeAttr(ind.via)}"></td>`;
+                html += `<td><input type="text" class="kpi-input ind-corte" data-idx="${idx}" placeholder="Corte / plazo" value="${escapeAttr(ind.corte)}"></td>`;
+                html += `<td class="peso-cell"><input type="number" class="kpi-input peso-input ind-peso" data-idx="${idx}" value="${ind.weight || 0}" min="0" max="100" step="1"></td>`;
+                evalWeeks.forEach(w => {
+                    const rawScore = ind.weeklyScores ? ind.weeklyScores[String(w)] : undefined;
+                    const normalized = normalizeScore(rawScore);
+                    let scoreClass = '';
+                    if (normalized !== null) {
+                        if (normalized >= 0.75) scoreClass = 'score-good';
+                        else if (normalized >= 0.50) scoreClass = 'score-medium';
+                        else scoreClass = 'score-bad';
+                    }
+                    const isCurrent = currentWk === w;
+                    const displayVal = (rawScore !== undefined && rawScore !== null && rawScore !== '') ? escapeAttr(String(rawScore)) : '';
+                    html += `<td class="score-cell${scoreClass ? ' ' + scoreClass : ''}${isCurrent ? ' current-week' : ''}" data-idx="${idx}" data-week="${w}">
+                        <input type="text" class="kpi-input score-input ind-score" data-idx="${idx}" data-week="${w}" value="${displayVal}" placeholder="—">
+                    </td>`;
+                });
+                html += `<td class="center-cell"><button class="btn-icon-del" title="Eliminar indicador" onclick="deleteIndicator(${idx})"><i data-lucide="trash-2"></i></button></td>`;
+                html += '</tr>';
+            });
+
+            tbody.innerHTML = html;
+            lucide.createIcons();
+            attachEvalListeners();
+        }
+
+        function attachEvalListeners() {
+            // Worker name + position
+            const nameInput = document.getElementById('worker-name');
+            const posInput = document.getElementById('worker-position');
+            if (nameInput) nameInput.addEventListener('input', e => {
+                if (!currentWorker) return;
+                currentWorker.workerName = e.target.value;
+            });
+            if (posInput) posInput.addEventListener('input', e => {
+                if (!currentWorker) return;
+                currentWorker.position = e.target.value;
+            });
+
+            // Indicator inputs (delegation)
+            document.querySelectorAll('.ind-name').forEach(el => el.addEventListener('input', onIndInputChange));
+            document.querySelectorAll('.ind-via').forEach(el => el.addEventListener('input', onIndInputChange));
+            document.querySelectorAll('.ind-corte').forEach(el => el.addEventListener('input', onIndInputChange));
+            document.querySelectorAll('.ind-peso').forEach(el => el.addEventListener('input', onIndPesoChange));
+            document.querySelectorAll('.ind-score').forEach(el => el.addEventListener('input', onIndScoreChange));
+        }
+
+        function onIndInputChange(e) {
+            if (!currentWorker) return;
+            const idx = Number(e.target.dataset.idx);
+            if (!currentWorker.indicators[idx]) return;
+            const cls = e.target.classList;
+            if (cls.contains('ind-name')) currentWorker.indicators[idx].name = e.target.value;
+            else if (cls.contains('ind-via')) currentWorker.indicators[idx].via = e.target.value;
+            else if (cls.contains('ind-corte')) currentWorker.indicators[idx].corte = e.target.value;
+        }
+
+        function onIndPesoChange(e) {
+            if (!currentWorker) return;
+            const idx = Number(e.target.dataset.idx);
+            if (!currentWorker.indicators[idx]) return;
+            currentWorker.indicators[idx].weight = Number(e.target.value) || 0;
+            recalcOverallAndInc();
+        }
+
+        function onIndScoreChange(e) {
+            if (!currentWorker) return;
+            const idx = Number(e.target.dataset.idx);
+            const week = e.target.dataset.week;
+            if (!currentWorker.indicators[idx]) return;
+            if (!currentWorker.indicators[idx].weeklyScores) currentWorker.indicators[idx].weeklyScores = {};
+            const val = e.target.value.trim();
+            if (val === '') {
+                delete currentWorker.indicators[idx].weeklyScores[String(week)];
+            } else {
+                currentWorker.indicators[idx].weeklyScores[String(week)] = val;
+            }
+            recalcOverallAndInc();
+        }
+
+        // Recalculate only the overall/inc cells and score-cell tint (no full re-render,
+        // to preserve focus while typing).
+        function recalcOverallAndInc() {
+            if (!currentWorker) return;
+            const currentWk = getCurrentWeek();
+            // Update score cell tints
+            currentWorker.indicators.forEach((ind, idx) => {
+                evalWeeks.forEach(w => {
+                    const cell = document.querySelector(`td.score-cell[data-idx="${idx}"][data-week="${w}"]`);
+                    if (!cell) return;
+                    const rawScore = ind.weeklyScores ? ind.weeklyScores[String(w)] : undefined;
+                    const normalized = normalizeScore(rawScore);
+                    let scoreClass = '';
+                    if (normalized !== null) {
+                        if (normalized >= 0.75) scoreClass = 'score-good';
+                        else if (normalized >= 0.50) scoreClass = 'score-medium';
+                        else scoreClass = 'score-bad';
+                    }
+                    cell.className = 'score-cell' + (scoreClass ? ' ' + scoreClass : '') + (currentWk === w ? ' current-week' : '');
+                });
+            });
+            // Update overall + inc rows
+            evalWeeks.forEach(w => {
+                const o = computeWeekOverall(currentWorker.indicators, w);
+                const inc = computeWeekWeighted(currentWorker.indicators, w);
+                const oCell = document.querySelector(`td.overall-cell[data-week="${w}"]`);
+                const iCell = document.querySelector(`td.inc-cell[data-week="${w}"]`);
+                if (oCell) oCell.textContent = o !== null ? (o * 100).toFixed(2) + '%' : '—';
+                if (iCell) iCell.textContent = inc !== null ? (inc * 100).toFixed(0) + '%' : '—';
+            });
+        }
+
+        // =====================================================
+        // Observations
+        // =====================================================
+        function renderObservations() {
+            const grid = document.getElementById('observations-grid');
+            if (!grid) return;
+            if (!currentWorker) {
+                grid.innerHTML = '<div style="color: var(--text-muted); font-size: 12px; font-style: italic;">Las observaciones aparecerán al cargar un trabajador.</div>';
+                return;
+            }
+            if (!currentWorker.observations) currentWorker.observations = {};
+            grid.innerHTML = evalWeeks.map(w => {
+                const r = getWeekRange(w);
+                const val = currentWorker.observations[String(w)] || '';
+                return `<div class="obs-week-card">
+                    <div class="obs-week-title"><i data-lucide="calendar"></i> Sem ${w} — ${r.month}</div>
+                    <textarea class="obs-textarea" data-week="${w}" placeholder="Observaciones para la semana ${w}...">${escapeHtml(val)}</textarea>
+                </div>`;
+            }).join('');
+            lucide.createIcons();
+            grid.querySelectorAll('.obs-textarea').forEach(el => {
+                el.addEventListener('input', e => {
+                    if (!currentWorker) return;
+                    if (!currentWorker.observations) currentWorker.observations = {};
+                    const w = e.target.dataset.week;
+                    if (e.target.value.trim() === '') {
+                        delete currentWorker.observations[w];
+                    } else {
+                        currentWorker.observations[w] = e.target.value;
+                    }
+                });
+            });
+        }
+
+        // =====================================================
+        // Save worker
+        // Schema (one doc per worker in kpi_workers):
+        //   { workerName, position, indicators:[{name, via, corte, weight, weeklyScores:{"27":0.8,...}}],
+        //     observations:{"27":"..."}, updatedAt, updatedBy }
+        // Document ID = workerName (raw, used directly).
+        // =====================================================
+        async function saveWorker() {
+            const btn = document.getElementById('btn-save-worker');
+            if (!currentWorker) {
+                showToast('No hay datos para guardar. Selecciona o crea un trabajador.', 'error');
+                return;
+            }
+            const name = (currentWorker.workerName || '').trim();
+            if (!name) {
+                showToast('El nombre del trabajador es obligatorio.', 'error');
+                return;
+            }
+            // Clean indicators: remove fully-empty rows, ensure weights are numbers
+            const cleanIndicators = currentWorker.indicators
+                .filter(ind => (ind.name && ind.name.trim()) || Object.keys(ind.weeklyScores || {}).length)
+                .map(ind => ({
+                    name: (ind.name || '').trim(),
+                    via: (ind.via || '').trim(),
+                    corte: (ind.corte || '').trim(),
                     weight: Number(ind.weight) || 0,
-                    score: ex ? Number(ex.score) : null
-                };
-            });
-            renderEvalScores(scores);
-            document.getElementById('eval-observation').value = existing?.observation || '';
-            if (existing) showToast('Evaluación existente cargada para edición', 'info');
-            lucide.createIcons();
-        }
-
-        function renderEvalScores(scores) {
-            const tbody = document.getElementById('tbody-eval-scores');
-            if (!scores.length) {
-                tbody.innerHTML = '<tr><td colspan="4" class="empty-row">El trabajador no tiene indicadores configurados.</td></tr>';
-                updateEvalPromedio();
+                    weeklyScores: ind.weeklyScores || {}
+                }));
+            if (!cleanIndicators.length) {
+                showToast('Agrega al menos un indicador con nombre.', 'error');
                 return;
             }
-            tbody.innerHTML = scores.map((s, i) => {
-                const val = s.score === null ? '' : Math.round(s.score * 100);
-                return `<tr data-idx="${i}">
-                    <td><strong>${escapeHtml(s.name)}</strong></td>
-                    <td class="center-cell">${s.weight}%</td>
-                    <td class="center-cell"><input type="number" class="score-input" min="0" max="100" step="1" value="${val}" placeholder="0-100" oninput="updateEvalPromedio()"></td>
-                    <td class="num-cell aporte-cell">0.0</td>
-                </tr>`;
-            }).join('');
-            updateEvalPromedio();
-        }
 
-        function updateEvalPromedio() {
-            const rows = document.querySelectorAll('#tbody-eval-scores tr[data-idx]');
-            let total = 0;
-            let weightSum = 0;
-            rows.forEach(r => {
-                const weight = Number(r.querySelector('td:nth-child(2)').textContent.replace('%', '')) || 0;
-                const inp = r.querySelector('.score-input');
-                let v = Number(inp.value);
-                if (isNaN(v) || inp.value === '') v = 0;
-                if (v < 0) v = 0; if (v > 100) v = 100;
-                const aporte = weight * (v / 100);
-                total += aporte;
-                weightSum += weight;
-                const cell = r.querySelector('.aporte-cell');
-                if (cell) cell.textContent = aporte.toFixed(1);
-            });
-            const promedio = weightSum > 0 ? (total / weightSum * 100) : total;
-            // Actually weeklyAverage = sum(weight*score) where score in [0,1]
-            // So total already = sum(weight*score) = weeklyAverage in 0..100 if weights sum to 100
-            const el = document.getElementById('eval-promedio');
-            if (el) el.textContent = total.toFixed(1) + '%';
-        }
+            const payload = {
+                workerName: name,
+                position: (currentWorker.position || '').trim(),
+                indicators: cleanIndicators,
+                observations: currentWorker.observations || {},
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                updatedBy: ADMIN_USER
+            };
 
-        async function saveEval() {
-            const cfg = evalSelectedConfig;
-            const wk = evalSelectedWeekNum;
-            if (!cfg || !wk) { showToast('Carga primero el formulario', 'error'); return; }
+            // Worker ID = workerName (raw), used as the Firestore document ID.
+            // Trim is enough — no slugification, matches Excel structure exactly.
+            const docId = name;
 
-            const rows = document.querySelectorAll('#tbody-eval-scores tr[data-idx]');
-            if (!rows.length) { showToast('No hay indicadores para evaluar', 'error'); return; }
-
-            const scores = [];
-            rows.forEach(r => {
-                const name = r.querySelector('td strong').textContent;
-                const weight = Number(r.querySelector('td:nth-child(2)').textContent.replace('%', '')) || 0;
-                const inp = r.querySelector('.score-input');
-                let v = Number(inp.value);
-                if (isNaN(v) || inp.value === '') v = 0;
-                if (v < 0) v = 0; if (v > 100) v = 100;
-                scores.push({ indicatorName: name, weight: weight, score: v / 100 });
-            });
-
-            let weeklyAverage = 0;
-            scores.forEach(s => { weeklyAverage += s.weight * s.score; });
-            weeklyAverage = Number(weeklyAverage.toFixed(2));
-
-            const observation = document.getElementById('eval-observation').value.trim();
-            const range = getWeekRange(wk);
-
-            const btn = document.getElementById('btn-save-eval');
-            btn.disabled = true; const oldHtml = btn.innerHTML;
+            const oldHtml = btn.innerHTML;
+            btn.disabled = true;
             btn.innerHTML = '<i data-lucide="loader-2"></i> Guardando...';
             lucide.createIcons();
-
             try {
-                const docId = cfg.workerId + '_week' + wk;
-                const payload = {
-                    workerId: cfg.workerId,
-                    workerName: cfg.workerName || cfg.workerId,
-                    position: cfg.position || '',
-                    week: wk,
-                    weekRange: range.start + ' al ' + range.end,
-                    month: range.month,
-                    scores: scores,
-                    weeklyAverage: weeklyAverage,
-                    observation: observation,
-                    evaluatedBy: ADMIN_USER,
-                    evaluatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                };
-                await db.collection('kpis_eval').doc(docId).set(payload, { merge: true });
-                payload._docId = docId;
+                await db.collection('kpi_workers').doc(docId).set(payload, { merge: false });
                 // Update local state
-                const existingIdx = stateEvals.findIndex(e => e._docId === docId);
-                if (existingIdx >= 0) stateEvals[existingIdx] = payload;
-                else stateEvals.push(payload);
-                stateEvals.sort((a, b) => (a.workerName || '').localeCompare(b.workerName || '') || (a.week || 0) - (b.week || 0));
-
-                showToast('Evaluación guardada correctamente (promedio: ' + weeklyAverage.toFixed(1) + '%)', 'success');
-                renderAll();
+                payload._id = docId;
+                stateWorkers[docId] = payload;
+                currentWorkerId = docId;
+                // Update currentWorker with cleaned data
+                currentWorker = JSON.parse(JSON.stringify(payload));
+                showToast('Trabajador guardado correctamente.', 'success');
+                populateWorkerSelector();
+                const sel = document.getElementById('eval-worker-select');
+                if (sel) sel.value = docId;
+                renderDashboard();
+                renderEvalTable();
+                renderObservations();
+                lucide.createIcons();
             } catch (e) {
-                console.error(e);
+                console.error('[Control KPIs] Error al guardar:', e);
                 showToast('Error al guardar: ' + e.message, 'error');
             } finally {
                 btn.disabled = false; btn.innerHTML = oldHtml; lucide.createIcons();
             }
-        }
-
-        function renderEvalListTable() {
-            const tbody = document.getElementById('tbody-eval-list');
-            if (!stateEvals.length) {
-                tbody.innerHTML = '<tr><td colspan="7" class="empty-row">No hay evaluaciones registradas.</td></tr>';
-                return;
-            }
-            const wk = evalFilterWeek;
-            const filtered = wk ? stateEvals.filter(e => String(e.week) === String(wk)) : stateEvals;
-            if (!filtered.length) {
-                tbody.innerHTML = '<tr><td colspan="7" class="empty-row">Sin evaluaciones para la semana seleccionada.</td></tr>';
-                return;
-            }
-            tbody.innerHTML = filtered.map(ev => {
-                const avg = Number(ev.weeklyAverage) || 0;
-                const st = statusFor(avg);
-                return `<tr>
-                    <td><strong>${escapeHtml(ev.workerName || ev.workerId)}</strong><div style="font-size:10px; color:var(--text-muted);">${escapeHtml(ev.workerId)}</div></td>
-                    <td>${escapeHtml(ev.position || '—')}</td>
-                    <td class="center-cell">S${ev.week || '?'}<div style="font-size:10px; color:var(--text-muted);">${escapeHtml(ev.weekRange || '')}</div></td>
-                    <td class="num-cell">${avg.toFixed(1)}%</td>
-                    <td class="center-cell"><span class="status-badge ${st.cls}">${st.text}</span></td>
-                    <td style="font-size: 11px; color: var(--text-muted); max-width: 240px;">${escapeHtml(truncate(ev.observation, 80))}</td>
-                    <td class="center-cell">
-                        <div class="action-buttons-cell">
-                            <button class="btn-action btn-edit" onclick="editEval('${escapeHtml(ev._docId)}')"><i data-lucide="pencil"></i> Editar</button>
-                            <button class="btn-action btn-danger" onclick="confirmDeleteEval('${escapeHtml(ev._docId)}')"><i data-lucide="trash-2"></i></button>
-                        </div>
-                    </td>
-                </tr>`;
-            }).join('');
-            lucide.createIcons();
-        }
-
-        function editEval(docId) {
-            const ev = stateEvals.find(e => e._docId === docId);
-            if (!ev) return;
-            document.getElementById('eval-worker-select').value = ev.workerId;
-            document.getElementById('eval-week-select').value = String(ev.week);
-            loadEvalForm();
-            document.getElementById('eval-form-card').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function confirmDeleteEval(docId) {
-            deleteTargetId = docId;
-            const ev = stateEvals.find(e => e._docId === docId);
-            const msg = ev ? `¿Eliminar evaluación de ${ev.workerName} (Semana ${ev.week})?` : '¿Eliminar evaluación?';
-            document.getElementById('delete-msg').textContent = msg;
-            document.getElementById('modal-delete').classList.add('show');
-            lucide.createIcons();
-        }
-
-        function cerrarModalDelete() {
-            document.getElementById('modal-delete').classList.remove('show');
-            deleteTargetId = null;
-        }
-
-        async function doDeleteEval() {
-            if (!deleteTargetId) return;
-            const btn = document.getElementById('btn-confirm-delete');
-            btn.disabled = true; const oldHtml = btn.innerHTML;
-            btn.innerHTML = '<i data-lucide="loader-2"></i> Eliminando...';
-            lucide.createIcons();
-            try {
-                await db.collection('kpis_eval').doc(deleteTargetId).delete();
-                stateEvals = stateEvals.filter(e => e._docId !== deleteTargetId);
-                showToast('Evaluación eliminada', 'success');
-                cerrarModalDelete();
-                renderAll();
-            } catch (e) {
-                console.error(e);
-                showToast('Error al eliminar: ' + e.message, 'error');
-            } finally {
-                btn.disabled = false; btn.innerHTML = oldHtml; lucide.createIcons();
-            }
-        }
-
-        function clearEvalFilter() {
-            evalFilterWeek = '';
-            const sel = document.getElementById('eval-table-week-filter');
-            if (sel) sel.value = '';
-            document.getElementById('filter-indicator-eval').classList.remove('show');
-            renderEvalListTable();
-        }
-
-        // Filter dropdown change
-        function onEvalWeekFilterChange() {
-            const sel = document.getElementById('eval-table-week-filter');
-            evalFilterWeek = sel.value;
-            const fi = document.getElementById('filter-indicator-eval');
-            if (evalFilterWeek) {
-                document.getElementById('filter-text-eval').textContent = 'Filtrado por: Semana ' + evalFilterWeek;
-                fi.classList.add('show');
-            } else {
-                fi.classList.remove('show');
-            }
-            renderEvalListTable();
-        }
-
-        // =====================================================
-        // Historial modal
-        // =====================================================
-        function openHistorial() {
-            const wid = document.getElementById('eval-worker-select').value;
-            if (!wid) { showToast('Selecciona un trabajador', 'error'); return; }
-            const evs = stateEvals.filter(e => e.workerId === wid).sort((a, b) => (b.week || 0) - (a.week || 0));
-            const cfg = stateConfigs[wid];
-            document.getElementById('historial-title').textContent = 'Historial de ' + (cfg?.workerName || wid);
-            document.getElementById('historial-subtitle').textContent = evs.length + ' evaluaciones registradas';
-            const tbody = document.getElementById('tbody-historial');
-            if (!evs.length) {
-                tbody.innerHTML = '<tr><td colspan="5" class="empty-row">Sin evaluaciones.</td></tr>';
-            } else {
-                tbody.innerHTML = evs.map(ev => {
-                    const avg = Number(ev.weeklyAverage) || 0;
-                    const st = statusFor(avg);
-                    return `<tr>
-                        <td class="center-cell"><strong>S${ev.week}</strong></td>
-                        <td>${escapeHtml(ev.weekRange || '—')}</td>
-                        <td class="num-cell">${avg.toFixed(1)}%</td>
-                        <td class="center-cell"><span class="status-badge ${st.cls}">${st.text}</span></td>
-                        <td class="center-cell"><button class="btn-action btn-view" onclick="editEval('${escapeHtml(ev._docId)}'); cerrarHistorial();"><i data-lucide="pencil"></i> Cargar</button></td>
-                    </tr>`;
-                }).join('');
-            }
-            document.getElementById('modal-historial').classList.add('show');
-            lucide.createIcons();
-        }
-
-        function cerrarHistorial() {
-            document.getElementById('modal-historial').classList.remove('show');
         }
 
         // =====================================================
@@ -1895,7 +1745,8 @@ function fyttsa_applyPrivilegeMenu() {
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('user-initial').innerText = (ADMIN_USER.charAt(0) || 'U').toUpperCase();
 
-            fetch('menu.html').then(res => res.text()).then(html => {
+            // Load menu with cache-buster
+            fetch('menu.html?v=' + Date.now()).then(res => res.text()).then(html => {
                 document.getElementById('sidebar').innerHTML = html;
                 lucide.createIcons();
                 fyttsa_applyPrivilegeMenu();
@@ -1912,25 +1763,36 @@ function fyttsa_applyPrivilegeMenu() {
                 btn.addEventListener('click', () => switchTab(btn.dataset.tab));
             });
 
-            // Config worker change
-            document.getElementById('config-worker-select').addEventListener('change', onConfigWorkerChange);
-
-            // Eval worker/week load
-            // (load button has onclick)
-            document.getElementById('eval-table-week-filter').addEventListener('change', onEvalWeekFilterChange);
-
-            // Delete confirm
-            document.getElementById('btn-confirm-delete').addEventListener('click', doDeleteEval);
-
-            // Modal overlay click to close
-            document.getElementById('modal-historial').addEventListener('click', function(e) {
-                if (e.target === this) cerrarHistorial();
-            });
-            document.getElementById('modal-delete').addEventListener('click', function(e) {
-                if (e.target === this) cerrarModalDelete();
+            // Worker selector
+            document.getElementById('eval-worker-select').addEventListener('change', e => {
+                selectWorker(e.target.value);
             });
 
-            loadAllData();
+            // Week range selectors
+            populateWeekSelectors();
+            document.getElementById('eval-week-start').addEventListener('change', () => {
+                updateEvalWeeksFromSelectors();
+                renderEvalTable();
+                renderObservations();
+            });
+            document.getElementById('eval-week-end').addEventListener('change', () => {
+                updateEvalWeeksFromSelectors();
+                renderEvalTable();
+                renderObservations();
+            });
+
+            // Quarter presets
+            document.querySelectorAll('#quarter-presets button').forEach(btn => {
+                btn.addEventListener('click', () => applyQuarterPreset(btn.dataset.q));
+            });
+
+            // Initial weeks
+            updateEvalWeeksFromSelectors();
+
+            // Start with a fresh empty worker for immediate editing
+            selectWorker('');
+
+            loadAllWorkers();
         });
     </script>
 </body>
