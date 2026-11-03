@@ -24,7 +24,8 @@
         body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         .header { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: white; border-bottom: 1px solid var(--border-color); z-index: 50; flex-shrink: 0; }
         .header-left { display: flex; align-items: center; gap: 15px; }
-        .menu-btn { background: none; border: none; cursor: pointer; color: var(--text-main); padding: 5px; }
+        .menu-btn { background: none; border: none; cursor: pointer; color: var(--text-main); padding: 8px; font-size: 22px; min-width: 40px; min-height: 40px; display: flex; align-items: center; justify-content: center; }
+        .menu-btn i { width: 22px; height: 22px; }
         .header-title { margin: 0; font-size: 15px; font-weight: 700; color: var(--primary-blue); display: none; }
         @media (min-width: 768px) { .header-title { display: block; } }
         .header-right { display: flex; align-items: center; gap: 12px; }
@@ -146,7 +147,29 @@
         .amount-cell { font-weight: 800; text-align: right; color: var(--primary-blue); }
         .empty-row { text-align: center; color: var(--text-muted); font-style: italic; padding: 24px !important; }
         .signature-section { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center; padding: 24px; background: linear-gradient(135deg, #e8e8e8 0%, #f8fafc 100%); border-radius: 16px; border: 1px solid #cccccc; }
-        @media (max-width: 768px) { .signature-section { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) {
+            .signature-section { grid-template-columns: 1fr; }
+            /* Tabla responsive en movil */
+            .expense-table { min-width: 0 !important; font-size: 11px; }
+            .expense-table thead th { padding: 6px 4px; font-size: 9px; }
+            .expense-table tbody td { padding: 4px 4px; }
+            .table-input { font-size: 10px; padding: 4px 4px; }
+            .table-input.right { font-size: 10px; }
+            .row-num { width: 25px; font-size: 10px; }
+            .col-obs { display: none !important; }
+            .expense-table thead th.col-obs { display: none !important; }
+            .req-data-grid { grid-template-columns: 1fr !important; }
+            .top-grid { grid-template-columns: 1fr !important; }
+            .summary-grid { grid-template-columns: 1fr 1fr !important; }
+            .summary-value { font-size: 14px; }
+            .card { padding: 16px; }
+            .card-title { font-size: 13px; }
+            .actions-bar { flex-direction: column; }
+            .actions-bar .btn { width: 100%; justify-content: center; }
+            .btn { font-size: 12px; padding: 10px 14px; }
+            .autocomplete-list { font-size: 10px; }
+            .autocomplete-item { padding: 6px 8px; }
+        }
         .signature-user-info { display: flex; align-items: center; gap: 14px; }
         .signature-avatar { width: 56px; height: 56px; border-radius: 50%; background: var(--primary-blue); color: white; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800; flex-shrink: 0; }
         .signature-user-detail { display: flex; flex-direction: column; }
@@ -651,7 +674,7 @@ function fyttsa_applyPrivilegeMenu() {
         // =====================================================
         // MENU DINAMICO
         // =====================================================
-        fetch('menu.html')
+        fetch('menu.html?v=' + Date.now())
             .then(r => r.text())
             .then(html => {
                 document.getElementById('sidebar').innerHTML = html;
