@@ -517,6 +517,7 @@ function fyttsa_applyPrivilegeMenu() {
             <img src="https://i.ibb.co/x8Bw8KR8/MARFIL-1.jpg" alt="User" height="35" style="border-radius: 8px;">
         </div>
     </header>
+    <script>try{lucide.createIcons()}catch(e){}</script>
 
     <div class="main-layout">
         <aside class="sidebar" id="sidebar"></aside>
@@ -696,7 +697,7 @@ function fyttsa_applyPrivilegeMenu() {
         let chartUsuarios = null, chartTipos = null;
 
         document.addEventListener('DOMContentLoaded', () => {
-            fetch('menu.html').then(res => res.text()).then(html => {
+            fetch('menu.html?v=' + Date.now()).then(res => res.text()).then(html => {
                 document.getElementById('sidebar').innerHTML = html; lucide.createIcons();
                 fyttsa_applyPrivilegeMenu();
                 const linkInicio = document.getElementById('link-inicio'); if(linkInicio) linkInicio.classList.remove('active');
