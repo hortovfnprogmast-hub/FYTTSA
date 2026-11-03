@@ -1091,6 +1091,7 @@ function fyttsa_applyPrivilegeMenu() {
             <img src="https://i.ibb.co/x8Bw8KR8/MARFIL-1.jpg" alt="Logo" height="35" style="border-radius: 8px;">
         </div>
     </header>
+    <script>try{lucide.createIcons()}catch(e){}</script>
 
     <div class="main-layout">
         
@@ -1529,7 +1530,7 @@ function fyttsa_applyPrivilegeMenu() {
         document.body.scrollTop = 0;
 
         // 1. CARGAR MENÚ DINÁMICO
-        fetch('menu.html')
+        fetch('menu.html?v=' + Date.now())
             .then(response => response.text())
             .then(html => {
                 document.getElementById('sidebar').innerHTML = html;
