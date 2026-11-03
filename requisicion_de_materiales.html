@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Requisición de Materiales | FYTTSA</title>
+    <title>Caja Chica | FYTTSA</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <style>
@@ -19,19 +19,53 @@
             --danger: #ef4444;
             --info: #404040;
             --purple: #8b5cf6;
+            --green-soft: #d1fae5;
+            --green-dark: #065f46;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: white; border-bottom: 1px solid var(--border-color); z-index: 50; flex-shrink: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 50;
+            flex-shrink: 0;
+        }
         .header-left { display: flex; align-items: center; gap: 15px; }
         .menu-btn { background: none; border: none; cursor: pointer; color: var(--text-main); padding: 5px; }
         .header-title { margin: 0; font-size: 15px; font-weight: 700; color: var(--primary-blue); display: none; }
         @media (min-width: 768px) { .header-title { display: block; } }
         .header-right { display: flex; align-items: center; gap: 12px; }
-        .user-initial { width: 35px; height: 35px; border-radius: 50%; background-color: var(--primary-blue); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; }
+        .user-initial {
+            width: 35px; height: 35px; border-radius: 50%;
+            background-color: var(--primary-blue); color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 16px;
+        }
         .main-layout { display: flex; flex: 1; overflow: hidden; }
-        .sidebar { width: 260px; background: white; border-right: 1px solid var(--border-color); overflow-y: auto; transition: transform 0.3s ease; display: flex; flex-direction: column; flex-shrink: 0; }
-        @media (max-width: 768px) { .sidebar { position: fixed; height: calc(100vh - 60px); transform: translateX(-100%); z-index: 40; } .sidebar.open { transform: translateX(0); } .header-title { display: none; } }
+        .sidebar {
+            width: 260px; background: white;
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto; transition: transform 0.3s ease;
+            display: flex; flex-direction: column;
+            flex-shrink: 0;
+        }
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; height: calc(100vh - 60px); transform: translateX(-100%); z-index: 40; }
+            .sidebar.open { transform: translateX(0); }
+            .header-title { display: none; }
+        }
+        /* Estilos del menu lateral (mismos que gasolina.html) */
         .sidebar-nav { padding: 15px 10px; }
         .sidebar-section { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
         .sidebar-section:last-child { border-bottom: none; }
@@ -40,112 +74,592 @@
         .nav-item:hover { background-color: var(--bg-color); }
         .nav-item.active { background-color: #e8e8e8 !important; color: #000000 !important; font-weight: 700 !important; border-left: 4px solid #000000 !important; border-radius: 8px !important; }
         .nav-item.active i { color: var(--primary-blue); }
-        .content { flex: 1; padding: 30px; overflow-y: auto; }
+        .content {
+            flex: 1; padding: 30px; overflow-y: auto;
+        }
         @media (max-width: 768px) { .content { padding: 20px; } }
-        .page-title { display: flex; align-items: center; gap: 12px; font-size: 22px; font-weight: 800; color: var(--primary-blue); margin-bottom: 8px; }
+
+        /* Page Title */
+        .page-title {
+            display: flex; align-items: center; gap: 12px;
+            font-size: 22px; font-weight: 800; color: var(--primary-blue);
+            margin-bottom: 8px;
+        }
         .page-title i { width: 28px; height: 28px; }
-        .page-subtitle { color: var(--text-muted); font-size: 13px; margin-bottom: 25px; }
-        .tabs-bar { display: flex; gap: 8px; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 2px solid var(--border-color); flex-wrap: wrap; }
-        .tab-btn { background: var(--bg-color); border: 1.5px solid var(--border-color); color: var(--text-muted); padding: 10px 20px; font-size: 13px; font-weight: 700; cursor: pointer; border-radius: 10px; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; font-family: 'Inter', sans-serif; }
-        .tab-btn:hover { background: white; color: var(--text-main); border-color: var(--primary-blue); }
-        .tab-btn.active { background: var(--primary-blue); color: white; border-color: var(--primary-blue); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25); }
-        .tab-btn i { width: 16px; height: 16px; }
-        .tab-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 11px; font-size: 11px; font-weight: 800; background: white; color: var(--text-muted); border: 1px solid var(--border-color); }
-        .tab-btn.active .tab-badge { background: white; color: var(--primary-blue); border-color: white; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.25s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .card { background: white; border-radius: 20px; padding: 24px; border: 1px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.04); margin-bottom: 20px; }
-        .card-title { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 18px; padding-bottom: 12px; border-bottom: 2px solid var(--light-blue); }
+        .page-subtitle {
+            color: var(--text-muted); font-size: 13px;
+            margin-bottom: 25px;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            margin-bottom: 20px;
+        }
+        .card-title {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 15px; font-weight: 700; color: var(--text-main);
+            margin-bottom: 18px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--light-blue);
+        }
         .card-title i { color: var(--primary-blue); width: 20px; height: 20px; }
-        .card-title .badge-count { margin-left: auto; background: var(--light-blue); color: var(--primary-blue); font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+        .card-title .badge-count {
+            margin-left: auto;
+            background: var(--light-blue);
+            color: var(--primary-blue);
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        /* Form */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+        }
         .form-group { display: flex; flex-direction: column; }
         .form-group.full { grid-column: 1 / -1; }
-        .form-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 6px; }
+        .form-label {
+            font-size: 11px; font-weight: 700; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: 0.4px;
+            margin-bottom: 6px;
+        }
         .form-label .req { color: var(--danger); }
-        .form-control { padding: 10px 12px; border: 1.5px solid var(--border-color); border-radius: 10px; font-size: 13.5px; font-family: 'Inter', sans-serif; color: var(--text-main); background: white; transition: all 0.2s; width: 100%; }
-        .form-control:focus { outline: none; border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1); }
-        .form-control[readonly] { background: #e2e8f0; color: var(--text-muted); cursor: not-allowed; font-weight: bold; }
-        .top-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
-        @media (max-width: 900px) { .top-grid { grid-template-columns: 1fr; } }
-        @media (max-width: 768px) {
-            .top-grid .form-grid { grid-template-columns: 1fr !important; }
+        .form-control {
+            padding: 10px 12px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 13.5px;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-main);
+            background: white;
+            transition: all 0.2s;
+            width: 100%;
         }
-        /* En computadora: 6 rubros en 2 filas de 3 columnas (3 arriba, 3 abajo) */
-        .req-data-grid {
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+        }
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 32px;
+        }
+        .top-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 18px 24px;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
         }
-        .req-data-grid .form-group.span-full {
-            grid-column: 1 / -1;
+        @media (max-width: 900px) {
+            .top-grid { grid-template-columns: 1fr; }
         }
-        /* En tablet: 2 columnas */
-        @media (max-width: 1024px) {
-            .req-data-grid { grid-template-columns: repeat(2, 1fr); }
+
+        /* TABLE - el formato principal */
+        .table-wrap {
+            overflow-x: auto;
+            border: 1.5px solid var(--border-color);
+            border-radius: 14px;
+            margin-bottom: 14px;
+            background: white;
         }
-        /* En celular: 1 columna (uno abajo de otro) */
-        @media (max-width: 768px) {
-            .req-data-grid { grid-template-columns: 1fr; }
+        .expense-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12.5px;
+            min-width: 1100px;
         }
-        .table-wrap { overflow-x: auto; border: 1.5px solid var(--border-color); border-radius: 14px; margin-bottom: 14px; background: white; }
-        .expense-table { width: 100%; border-collapse: collapse; font-size: 12.5px; min-width: 1100px; }
-        .expense-table thead th { background: var(--primary-blue); color: white; text-transform: uppercase; font-size: 10.5px; font-weight: 800; padding: 12px 8px; text-align: left; border-right: 1px solid rgba(255,255,255,0.15); letter-spacing: 0.4px; position: sticky; top: 0; z-index: 2; }
+        .expense-table thead th {
+            background: var(--primary-blue);
+            color: white;
+            text-transform: uppercase;
+            font-size: 10.5px;
+            font-weight: 800;
+            padding: 12px 8px;
+            text-align: left;
+            border-right: 1px solid rgba(255,255,255,0.15);
+            letter-spacing: 0.4px;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
         .expense-table thead th:last-child { border-right: none; }
         .expense-table thead th.center { text-align: center; }
         .expense-table thead th.right { text-align: right; }
-        .expense-table tbody td { padding: 6px 6px; border-bottom: 1px solid var(--bg-color); border-right: 1px solid var(--bg-color); vertical-align: middle; }
+        .expense-table tbody td {
+            padding: 6px 6px;
+            border-bottom: 1px solid var(--bg-color);
+            border-right: 1px solid var(--bg-color);
+            vertical-align: middle;
+        }
         .expense-table tbody td:last-child { border-right: none; }
         .expense-table tbody tr:last-child td { border-bottom: none; }
         .expense-table tbody tr:hover { background: var(--bg-color); }
-        .row-num { text-align: center; font-weight: 700; color: var(--text-muted); width: 50px; background: var(--bg-color); }
-        .col-desc { min-width: 280px; }
-        .col-unidad { width: 90px; }
-        .col-cantidad { width: 100px; }
-        .col-codigo { width: 130px; }
-        .col-obs { min-width: 180px; }
+        .row-num {
+            text-align: center;
+            font-weight: 700;
+            color: var(--text-muted);
+            width: 40px;
+            background: var(--bg-color);
+        }
+        .col-tipo { width: 110px; }
+        .col-folio { width: 140px; }
+        .col-fecha { width: 130px; }
+        .col-proveedor { min-width: 180px; }
+        .col-concepto { min-width: 220px; }
+        .col-importe { width: 120px; }
+        .col-observ { min-width: 160px; }
+        .col-adjuntos { width: 160px; }
         .col-actions { width: 50px; text-align: center; }
-        .table-input { width: 100%; padding: 6px 8px; border: 1px solid transparent; border-radius: 6px; font-size: 12px; font-family: 'Inter', sans-serif; background: transparent; color: var(--text-main); transition: all 0.15s; }
-        .table-input:hover { background: var(--bg-color); }
-        .table-input:focus { outline: none; background: white; border-color: var(--primary-blue); box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1); }
-        .table-input.right { text-align: right; font-weight: 700; color: var(--primary-blue); }
-        .table-input.readonly-field { background: #f1f5f9; color: var(--text-muted); font-weight: 600; cursor: not-allowed; }
-        .autocomplete-wrapper { position: relative; }
-        .autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; z-index: 100; background: white; border: 1px solid var(--border-color); border-radius: 8px; max-height: 220px; overflow-y: auto; box-shadow: 0 8px 20px rgba(0,0,0,0.15); display: none; }
-        .autocomplete-list.show { display: block; }
-        .autocomplete-item { padding: 8px 12px; cursor: pointer; font-size: 12px; border-bottom: 1px solid var(--bg-color); }
-        .autocomplete-item:last-child { border-bottom: none; }
-        .autocomplete-item:hover { background: var(--light-blue); }
-        .autocomplete-item .item-desc { font-weight: 600; color: var(--text-main); }
-        .autocomplete-item .item-meta { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
-        .inv-badge { display: inline-flex; align-items: center; gap: 3px; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 800; text-transform: uppercase; margin-left: 6px; vertical-align: middle; }
-        .inv-badge.in { background: #dcfce7; color: #166534; }
-        .inv-badge.out { background: #fee2e2; color: #991b1b; }
-        .btn { padding: 11px 18px; border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; border: none; font-family: 'Inter', sans-serif; }
-        .btn i { width: 16px; height: 16px; }
-        .btn-primary { background: var(--primary-blue); color: white; }
-        .btn-primary:hover { background: #1a1a1a; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25); }
-        .btn-secondary { background: white; color: var(--primary-blue); border: 1.5px solid var(--border-color); }
-        .btn-secondary:hover { background: var(--light-blue); border-color: var(--primary-blue); }
-        .btn-success { background: var(--success); color: white; }
-        .btn-success:hover { background: #059669; transform: translateY(-1px); }
-        .btn-danger { background: white; color: var(--danger); border: 1.5px solid #fecaca; }
-        .btn-danger:hover { background: var(--danger); color: white; }
-        .actions-bar { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; flex-wrap: wrap; }
-        .actions-bar .left { margin-right: auto; }
-        .btn-remove-row { background: #fee2e2; color: var(--danger); border: none; cursor: pointer; width: 26px; height: 26px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; transition: all 0.15s; }
-        .btn-remove-row:hover { background: var(--danger); color: white; }
+
+        /* Inputs dentro de la tabla */
+        .table-input, .table-select {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            font-size: 12px;
+            font-family: 'Inter', sans-serif;
+            background: transparent;
+            color: var(--text-main);
+            transition: all 0.15s;
+        }
+        .table-input:hover, .table-select:hover {
+            background: var(--bg-color);
+        }
+        .table-input:focus, .table-select:focus {
+            outline: none;
+            background: white;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+        }
+        .table-input.amount {
+            text-align: right;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+
+        /* Tipo toggle mini */
+        .tipo-toggle {
+            display: flex; gap: 0;
+            border: 1.5px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+        }
+        .tipo-btn {
+            flex: 1;
+            padding: 5px 4px;
+            text-align: center;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.15s;
+            border: none;
+            background: none;
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .tipo-btn.active.factura {
+            background: var(--success);
+            color: white;
+        }
+        .tipo-btn.active.nota {
+            background: var(--warning);
+            color: white;
+        }
+        .tipo-btn:hover:not(.active) {
+            background: var(--bg-color);
+        }
+
+        /* Adjuntos en la tabla */
+        .attach-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .attach-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            font-size: 10px;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 1px dashed var(--border-color);
+            background: var(--bg-color);
+            color: var(--text-muted);
+            transition: all 0.15s;
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            position: relative;
+            overflow: hidden;
+        }
+        .attach-btn:hover {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+            background: var(--light-blue);
+        }
+        .attach-btn.has-file {
+            border-style: solid;
+            background: var(--green-soft);
+            color: var(--green-dark);
+            border-color: var(--success);
+        }
+        .attach-btn input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+        .attach-btn i { width: 12px; height: 12px; }
+        .attach-btn .file-name {
+            max-width: 80px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .attach-btn .remove-attach {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0;
+            line-height: 1;
+            margin-left: 4px;
+            position: relative;
+            z-index: 3;
+        }
+
+        /* Subtotales en la tabla */
+        .subtotal-row td {
+            background: var(--light-blue) !important;
+            font-weight: 800;
+            color: var(--primary-blue);
+            font-size: 12px;
+            border-top: 2px solid var(--primary-blue);
+        }
+        .subtotal-row .subtotal-label {
+            text-align: right;
+            padding-right: 12px;
+        }
+        .subtotal-row .subtotal-amount {
+            text-align: right;
+            padding-right: 12px;
+            font-family: 'Courier New', monospace;
+        }
+        /* Subtotal de NO Facturado: franja gris clara */
+        .subtotal-row.subtotal-no-facturado td {
+            background: #f1f5f9 !important;
+            color: var(--text-main) !important;
+            border-top: 2px solid #cbd5e1 !important;
+        }
+        .subtotal-row.subtotal-no-facturado .subtotal-label,
+        .subtotal-row.subtotal-no-facturado .subtotal-amount {
+            color: var(--text-main) !important;
+        }
+        /* Fila TOTAL GASTADO: estilo azul fuerte como el header */
+        .subtotal-row.subtotal-total td {
+            background: var(--primary-blue) !important;
+            color: white !important;
+            border-top: 2px solid var(--primary-blue) !important;
+        }
+        .subtotal-row.subtotal-total .subtotal-label,
+        .subtotal-row.subtotal-total .subtotal-amount {
+            color: white !important;
+        }
+
+        /* Remove button */
+        .btn-remove-row {
+            background: #fee2e2;
+            color: var(--danger);
+            border: none;
+            cursor: pointer;
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+        .btn-remove-row:hover {
+            background: var(--danger);
+            color: white;
+        }
         .btn-remove-row i { width: 13px; height: 13px; }
-        .data-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
-        .data-table thead th { background: var(--bg-color); color: var(--text-muted); text-transform: uppercase; font-size: 10.5px; font-weight: 800; padding: 11px 12px; text-align: left; border-bottom: 2px solid var(--border-color); letter-spacing: 0.4px; }
-        .data-table tbody td { padding: 11px 12px; border-bottom: 1px solid var(--bg-color); color: var(--text-main); font-weight: 500; }
+
+        /* Buttons */
+        .btn {
+            padding: 11px 18px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            font-family: 'Inter', sans-serif;
+        }
+        .btn i { width: 16px; height: 16px; }
+        .btn-primary {
+            background: var(--primary-blue);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #1a1a1a;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+        }
+        .btn-secondary {
+            background: white;
+            color: var(--primary-blue);
+            border: 1.5px solid var(--border-color);
+        }
+        .btn-secondary:hover {
+            background: var(--light-blue);
+            border-color: var(--primary-blue);
+        }
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+        .btn-danger {
+            background: white;
+            color: var(--danger);
+            border: 1.5px solid #fecaca;
+        }
+        .btn-danger:hover { background: var(--danger); color: white; }
+        .actions-bar {
+            display: flex; gap: 10px;
+            justify-content: flex-end;
+            margin-top: 18px;
+            flex-wrap: wrap;
+        }
+        .actions-bar .left {
+            margin-right: auto;
+        }
+
+        /* === TABS HORIZONTALES === */
+        .tabs-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 2px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            background: var(--bg-color);
+            border: 1.5px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        .tab-btn:hover {
+            background: white;
+            color: var(--text-main);
+            border-color: var(--primary-blue);
+        }
+        .tab-btn.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        }
+        .tab-btn i { width: 16px; height: 16px; }
+        .tab-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 22px;
+            height: 22px;
+            padding: 0 6px;
+            border-radius: 11px;
+            font-size: 11px;
+            font-weight: 800;
+            background: white;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+        }
+        .tab-btn.active .tab-badge {
+            background: white;
+            color: var(--primary-blue);
+            border-color: white;
+        }
+        .tab-btn.tab-rechazados.active .tab-badge {
+            background: white;
+            color: var(--danger);
+        }
+        .tab-btn.tab-aprobados.active .tab-badge {
+            background: white;
+            color: var(--success);
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.25s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* === BOTONES DE ACCION ROJOS === */
+        .btn-action-red {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 11px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .btn-action-red:hover {
+            background: #b91c1c;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+        .btn-action-red i { width: 13px; height: 13px; }
+
+        /* Summary cards */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        .summary-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px 18px;
+            border: 1px solid var(--border-color);
+            border-left: 5px solid var(--primary-blue);
+            display: flex; align-items: center; gap: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+        .summary-card.facturado { border-left-color: var(--success); }
+        .summary-card.no-facturado { border-left-color: var(--warning); }
+        .summary-card.total { border-left-color: var(--primary-blue); }
+        .summary-card.devolucion { border-left-color: var(--purple); }
+        .summary-icon {
+            width: 40px; height: 40px; border-radius: 12px;
+            background: var(--light-blue); color: var(--primary-blue);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .summary-card.facturado .summary-icon { background: #dcfce7; color: var(--success); }
+        .summary-card.no-facturado .summary-icon { background: #fef3c7; color: var(--warning); }
+        .summary-card.devolucion .summary-icon { background: #ede9fe; color: var(--purple); }
+        .summary-icon i { width: 22px; height: 22px; }
+        .summary-info { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+        .summary-value {
+            font-size: 18px; font-weight: 800; color: var(--text-main);
+            line-height: 1.1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .summary-label {
+            font-size: 11px; color: var(--text-muted);
+            font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-top: 2px;
+        }
+
+        /* Recent table (últimas 5) */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12.5px;
+        }
+        .data-table thead th {
+            background: var(--bg-color);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 10.5px;
+            font-weight: 800;
+            padding: 11px 12px;
+            text-align: left;
+            border-bottom: 2px solid var(--border-color);
+            letter-spacing: 0.4px;
+        }
+        .data-table tbody td {
+            padding: 11px 12px;
+            border-bottom: 1px solid var(--bg-color);
+            color: var(--text-main);
+            font-weight: 500;
+        }
         .data-table tbody tr:last-child td { border-bottom: none; }
         .data-table tbody tr:hover { background: var(--bg-color); }
-        .folio-cell { font-family: 'Courier New', monospace; font-weight: 700; color: var(--primary-blue); }
-        .amount-cell { font-weight: 800; text-align: right; color: var(--primary-blue); }
-        .empty-row { text-align: center; color: var(--text-muted); font-style: italic; padding: 24px !important; }
-        .signature-section { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center; padding: 24px; background: linear-gradient(135deg, #e8e8e8 0%, #f8fafc 100%); border-radius: 16px; border: 1px solid #cccccc; }
+        .folio-cell {
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+        .badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 3px 9px; border-radius: 20px;
+            font-size: 10px; font-weight: 700; text-transform: uppercase;
+        }
+        .badge.ok { background: #dcfce7; color: #166534; }
+        .amount-cell {
+            font-weight: 800;
+            text-align: right;
+            color: var(--primary-blue);
+        }
+        .empty-row {
+            text-align: center;
+            color: var(--text-muted);
+            font-style: italic;
+            padding: 24px !important;
+        }
+
+        /* Signature section */
+        .signature-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            align-items: center;
+            padding: 24px;
+            background: linear-gradient(135deg, #e8e8e8 0%, #f8fafc 100%);
+            border-radius: 16px;
+            border: 1px solid #cccccc;
+        }
         @media (max-width: 768px) {
             .signature-section { grid-template-columns: 1fr; }
             /* Tabs en grid 2x2 */
@@ -190,9 +704,9 @@
             .expense-table tbody td.col-actions .btn-remove-row i { width: 16px; height: 16px; }
             .row-num { width: auto; background: transparent; font-size: 13px; font-weight: 800; }
             /* Override fixed column widths para que todos los inputs tengan el mismo ancho */
-            .col-desc, .col-unidad, .col-cantidad, .col-codigo, .col-obs { width: auto !important; min-width: 0 !important; }
+            .col-tipo, .col-folio, .col-fecha, .col-proveedor, .col-concepto, .col-importe, .col-observ, .col-adjuntos, .col-actions { width: auto !important; min-width: 0 !important; }
             /* Todos los inputs al mismo ancho */
-            .table-input {
+            .table-input, .table-select {
                 font-size: 14px;
                 padding: 10px 12px;
                 width: 100%;
@@ -201,14 +715,39 @@
                 background: white;
                 box-sizing: border-box;
             }
-            .table-input:focus {
+            .table-input:focus, .table-select:focus {
                 border-color: var(--primary-blue);
                 box-shadow: 0 0 0 2px rgba(0,0,0,0.08);
             }
             .table-input.right { font-size: 14px; text-align: left; }
-            .autocomplete-list { font-size: 12px; }
-            .autocomplete-item { padding: 8px 10px; }
-            .req-data-grid { grid-template-columns: 1fr !important; }
+            /* Tipo toggle: mismo ancho que los inputs */
+            .col-tipo .tipo-toggle { width: 100%; display: flex; gap: 0; }
+            .tipo-btn { font-size: 13px; padding: 10px 12px; flex: 1; border-radius: 8px 0 0 8px; }
+            .tipo-btn:last-child { border-radius: 0 8px 8px 0; }
+            /* Adjuntos: botones PDF y XML estilo gastos.html (negro, blanco, con icono) */
+            .attach-cell { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+            .attach-btn {
+                display: flex; align-items: center; justify-content: center; gap: 8px;
+                padding: 12px 18px;
+                background: #000000; color: #ffffff;
+                border: none; border-radius: 10px;
+                font-size: 14px; font-weight: 700;
+                font-family: 'Inter', sans-serif;
+                cursor: pointer; transition: all 0.2s;
+                width: 100%; box-sizing: border-box; min-height: 48px;
+            }
+            .attach-btn:hover { background: #1a1a1a; }
+            .attach-btn i { width: 18px; height: 18px; flex-shrink: 0; }
+            .attach-btn .file-name { flex: 1; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+            .attach-btn.has-file { background: #dcfce7; color: #166534; border: 2px solid var(--success); }
+            .attach-btn .remove-attach { font-size: 16px; padding: 0 4px; background: none; border: none; color: var(--danger); cursor: pointer; }
+            .col-observ, .col-adjuntos { display: flex; }
+            .expense-table thead th.col-observ, .expense-table thead th.col-adjuntos { display: none; }
+            .subtotal-row td { display: none; }
+            .subtotal-row td.subtotal-label, .subtotal-row td.subtotal-amount {
+                display: flex; padding: 8px 0; font-size: 14px; font-weight: 800;
+            }
+            .form-grid { grid-template-columns: 1fr !important; }
             .top-grid { grid-template-columns: 1fr !important; }
             .summary-grid { grid-template-columns: 1fr 1fr !important; }
             .summary-value { font-size: 14px; }
@@ -220,36 +759,114 @@
             .actions-bar .btn-secondary:hover { background: #1a1a1a; }
             .btn { font-size: 14px; padding: 12px 14px; width: 100%; justify-content: center; box-sizing: border-box; }
         }
-        .signature-user-info { display: flex; align-items: center; gap: 14px; }
-        .signature-avatar { width: 56px; height: 56px; border-radius: 50%; background: var(--primary-blue); color: white; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800; flex-shrink: 0; }
-        .signature-user-detail { display: flex; flex-direction: column; }
-        .signature-user-label { font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; }
-        .signature-user-name { font-size: 16px; color: var(--primary-blue); font-weight: 800; margin-top: 2px; }
-        .signature-user-role { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-        .signature-box { position: relative; background: white; border: 2px dashed var(--border-color); border-radius: 12px; padding: 12px; min-height: 100px; display: flex; align-items: center; justify-content: center; }
+        .signature-user-info {
+            display: flex; align-items: center; gap: 14px;
+        }
+        .signature-avatar {
+            width: 56px; height: 56px;
+            border-radius: 50%;
+            background: var(--primary-blue);
+            color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; font-weight: 800;
+            flex-shrink: 0;
+        }
+        .signature-user-detail {
+            display: flex; flex-direction: column;
+        }
+        .signature-user-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .signature-user-name {
+            font-size: 16px;
+            color: var(--primary-blue);
+            font-weight: 800;
+            margin-top: 2px;
+        }
+        .signature-user-role {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .signature-box {
+            position: relative;
+            background: white;
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 12px;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
         .signature-box.signed { border-color: var(--primary-blue); border-style: solid; }
-        #signature-canvas { display: block; width: 100%; height: 100px; cursor: crosshair; touch-action: none; }
-        .signature-hint { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #cbd5e1; font-size: 13px; font-style: italic; pointer-events: none; text-align: center; }
+        #signature-canvas {
+            display: block;
+            width: 100%;
+            height: 100px;
+            cursor: crosshair;
+            touch-action: none;
+        }
+        .signature-hint {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            color: #cbd5e1;
+            font-size: 13px;
+            font-style: italic;
+            pointer-events: none;
+            text-align: center;
+        }
         .signature-hint i { width: 16px; height: 16px; vertical-align: -3px; margin-right: 4px; }
-        .signature-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
-        .btn-mini { padding: 6px 12px; font-size: 11px; border-radius: 8px; border: none; cursor: pointer; font-weight: 700; font-family: 'Inter', sans-serif; display: inline-flex; align-items: center; gap: 4px; }
+        .signature-actions {
+            display: flex; gap: 8px; justify-content: flex-end;
+            margin-top: 8px;
+        }
+        .btn-mini {
+            padding: 6px 12px;
+            font-size: 11px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
         .btn-mini i { width: 12px; height: 12px; }
-        .btn-mini-clear { background: #fee2e2; color: var(--danger); }
+        .btn-mini-clear {
+            background: #fee2e2; color: var(--danger);
+        }
         .btn-mini-clear:hover { background: var(--danger); color: white; }
-        .btn-mini-clear:disabled { background: #f1f5f9; color: #cbd5e1; cursor: not-allowed; }
-        .btn-action-red { background: var(--danger); color: white; border: none; padding: 8px 14px; border-radius: 8px; font-weight: 700; font-size: 11px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 5px; transition: all 0.2s; font-family: 'Inter', sans-serif; text-transform: uppercase; letter-spacing: 0.3px; }
-        .btn-action-red:hover { background: #b91c1c; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3); }
-        .btn-action-red i { width: 13px; height: 13px; }
-        .toast { position: fixed; top: 20px; right: 20px; background: var(--text-main); color: white; padding: 14px 20px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 9999; display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; transform: translateX(120%); transition: transform 0.3s ease; }
+        .btn-mini-clear:disabled {
+            background: #f1f5f9; color: #cbd5e1;
+            cursor: not-allowed;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 20px; right: 20px;
+            background: var(--text-main);
+            color: white;
+            padding: 14px 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 9999;
+            display: flex; align-items: center; gap: 10px;
+            font-size: 13px; font-weight: 600;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+        }
         .toast.show { transform: translateX(0); }
         .toast.success { background: var(--success); }
         .toast.error { background: var(--danger); }
-        .toast.info { background: var(--info); }
         .toast i { width: 18px; height: 18px; }
-        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
-        .empty-state i { width: 48px; height: 48px; color: #cbd5e1; margin-bottom: 12px; }
-        .empty-state h4 { font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; }
-        .empty-state p { font-size: 12px; }
     </style>
 
     <!-- Firebase SDK + FYTTSA shared data helper -->
@@ -553,148 +1170,233 @@ function fyttsa_applyPrivilegeMenu() {
 
         <main class="content">
             <h1 class="page-title">
-                <i data-lucide="clipboard-list"></i>
-                Requisición de Materiales
+                <i data-lucide="wallet"></i>
+                Comprobación de Gastos
             </h1>
-            <p class="page-subtitle">Solicita materiales del almacén para tu obra. Los materiales deben existir en el inventario.</p>
+            <p class="page-subtitle">Captura de facturas y notas de caja chica por obra y periodo.</p>
 
+            <!-- TABS HORIZONTALES -->
             <div class="tabs-bar">
-                <button class="tab-btn active" data-tab="nuevo">
-                    <i data-lucide="file-plus-2"></i> Nuevo
+                <button class="tab-btn tab-nuevo active" data-tab="nuevo">
+                    <i data-lucide="plus-circle"></i> Nuevo
                 </button>
-                <button class="tab-btn" data-tab="guardados">
+                <button class="tab-btn tab-guardados" data-tab="guardados">
                     <i data-lucide="save"></i> Guardados
                     <span class="tab-badge" id="badge-guardados">0</span>
                 </button>
-                <button class="tab-btn" data-tab="aprobados">
-                    <i data-lucide="file-check-2"></i> Aprobados
-                    <span class="tab-badge" id="badge-aprobados">0</span>
-                </button>
-                <button class="tab-btn" data-tab="rechazados">
-                    <i data-lucide="file-x-2"></i> Rechazados
+                <button class="tab-btn tab-rechazados" data-tab="rechazados">
+                    <i data-lucide="x-circle"></i> Rechazados
                     <span class="tab-badge" id="badge-rechazados">0</span>
+                </button>
+                <button class="tab-btn tab-aprobados" data-tab="aprobados">
+                    <i data-lucide="check-circle"></i> Aprobados
+                    <span class="tab-badge" id="badge-aprobados">0</span>
                 </button>
             </div>
 
-            <!-- TAB NUEVO -->
+            <!-- CONTENIDO TAB NUEVO (el formulario actual) -->
             <div class="tab-content active" id="content-nuevo">
+                <!-- 1. OBRA Y PERIODO -->
                 <div class="top-grid">
-                    <div class="card">
-                        <h3 class="card-title"><i data-lucide="clipboard"></i> Datos de la Requisición</h3>
-                        <div class="req-data-grid">
-                            <div class="form-group">
-                                <label class="form-label">Folio</label>
-                                <input type="text" class="form-control" id="input-folio" readonly>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Número de Contrato <span class="req">*</span></label>
-                                <input type="text" class="form-control" id="input-contrato" placeholder="Ej. 3B Tultepec San Miguel Otlica">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Obra <span class="req">*</span></label>
-                                <input type="text" class="form-control" id="input-obra" placeholder="Ej. 3B Tultepec" list="obras-list">
-                                <datalist id="obras-list">
-                                    <option value="3B Zarzaparrillas"><option value="3B Santa Cecilia"><option value="3B Ixmiquilpan">
-                                    <option value="3B Mexiquense - Coacalco"><option value="3B San Miguel Otlica">
-                                    <option value="3B La Escondida"><option value="3B Los Pinos Ixtapaluca">
-                                    <option value="3B Paseo las Américas"><option value="3B Mexico Neza">
-                                    <option value="3B San Buenaventura"><option value="3B T Bara Tulancingo">
-                                    <option value="3B EKT Peñon"><option value="3B Industria">
-                                </datalist>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Frente de Trabajo <span class="req">*</span></label>
-                                <input type="text" class="form-control" id="input-frente" placeholder="Ej. TIENDA 3B">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Fecha de Requisición <span class="req">*</span></label>
-                                <input type="date" class="form-control" id="input-fecha-req">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Fecha de Necesidad <span class="req">*</span></label>
-                                <input type="date" class="form-control" id="input-fecha-necesidad">
-                            </div>
+                <div class="card">
+                    <h3 class="card-title">
+                        <i data-lucide="building-2"></i>
+                        Obra
+                    </h3>
+                    <div class="form-grid">
+                        <div class="form-group full">
+                            <label class="form-label">Nombre de la obra <span class="req">*</span></label>
+                            <input type="text" class="form-control" id="input-obra" placeholder="Ej. 3B Mexiquense - Coacalco" list="obras-list">
+                            <datalist id="obras-list">
+                                <option value="3B Zarzaparrillas">
+                                <option value="3B Santa Cecilia">
+                                <option value="3B Ixmiquilpan">
+                                <option value="3B Mexiquense - Coacalco">
+                                <option value="3B San Miguel Otlica">
+                                <option value="3B La Escondida">
+                                <option value="3B Los Pinos Ixtapaluca">
+                                <option value="3B Paseo las Américas">
+                                <option value="3B Mexico Neza">
+                                <option value="3B San Buenaventura">
+                                <option value="3B T Bara Tulancingo">
+                                <option value="3B EKT Peñon">
+                                <option value="3B Industria">
+                                <option value="Guarniciones y Banquetas">
+                                <option value="Bajo Puentes">
+                                <option value="Construcción">
+                                <option value="Adecuaciones/Construccion">
+                                <option value="Banamex">
+                                <option value="Black Sheep">
+                                <option value="Imper C100">
+                            </datalist>
+                        </div>
+                        <div class="form-group full">
+                            <label class="form-label">Folio</label>
+                            <input type="text" class="form-control" id="input-folio" readonly style="background:#e2e8f0; color:var(--text-muted); font-weight:bold; cursor:not-allowed;">
                         </div>
                     </div>
                 </div>
 
                 <div class="card">
                     <h3 class="card-title">
-                        <i data-lucide="package"></i>
-                        Materiales Solicitados
-                        <span class="badge-count" id="items-count">0 items</span>
+                        <i data-lucide="calendar-range"></i>
+                        Periodo
                     </h3>
-                    <div style="background:#fef3c7; border:1px solid #fde68a; border-left:4px solid var(--warning); border-radius:10px; padding:10px 14px; font-size:12px; color:#92400e; margin-bottom:14px; display:flex; align-items:center; gap:8px;">
-                        <i data-lucide="info" style="width:16px;height:16px;flex-shrink:0;"></i>
-                        <span>Al escribir la descripción, se sugerirán materiales del <strong>inventario del almacén</strong>. Si el material no está en inventario, se marcará como <strong>FUERA DE INVENTARIO</strong>.</span>
-                    </div>
-                    <div class="table-wrap">
-                        <table class="expense-table" id="expense-table">
-                            <thead>
-                                <tr>
-                                    <th class="center" style="width:50px;">No.</th>
-                                    <th class="col-desc">Descripción del Material</th>
-                                    <th class="center col-unidad">Unidad</th>
-                                    <th class="right col-cantidad">Total</th>
-                                    <th class="col-codigo">Código</th>
-                                    <th class="col-obs">Observaciones</th>
-                                    <th class="col-actions"></th>
-                                </tr>
-                            </thead>
-                            <tbody id="expense-tbody"></tbody>
-                        </table>
-                    </div>
-                    <div class="actions-bar">
-                        <button class="btn btn-secondary left" id="btn-add-item">
-                            <i data-lucide="plus"></i> Agregar material
-                        </button>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h3 class="card-title"><i data-lucide="sticky-note"></i> Notas</h3>
-                    <textarea class="form-control" id="input-notas" rows="3" placeholder="Notas adicionales sobre la requisición (opcional)" style="resize:vertical; min-height:80px;"></textarea>
-                </div>
-
-                <div class="card">
-                    <h3 class="card-title"><i data-lucide="send"></i> Acciones</h3>
-                    <div class="actions-bar" style="margin-top: 10px;">
-                        <button class="btn btn-danger" id="btn-cancel">
-                            <i data-lucide="x"></i> Cancelar
-                        </button>
-                        <button class="btn btn-primary" id="btn-save">
-                            <i data-lucide="save"></i> Guardar requisición
-                        </button>
-                        <button class="btn btn-success" id="btn-submit">
-                            <i data-lucide="send"></i> Enviar a almacén
-                        </button>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Fecha de inicio <span class="req">*</span></label>
+                            <input type="date" class="form-control" id="input-fecha-inicio">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Fecha final <span class="req">*</span></label>
+                            <input type="date" class="form-control" id="input-fecha-fin">
+                        </div>
+                        <div class="form-group full">
+                            <label class="form-label">Periodo (descripción)</label>
+                            <input type="text" class="form-control" id="input-periodo" placeholder="Se calcula automáticamente" readonly>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <!-- 2. TABLA DE COMPROBANTES (Facturas y Notas juntas) -->
+            <div class="card">
+                <h3 class="card-title">
+                    <i data-lucide="receipt"></i>
+                    Comprobantes
+                    <span class="badge-count" id="items-count">0 items</span>
+                </h3>
+                <div class="table-wrap">
+                    <table class="expense-table" id="expense-table">
+                        <thead>
+                            <tr>
+                                <th class="center col-num">No.</th>
+                                <th class="center col-tipo">Tipo</th>
+                                <th class="col-folio">No. Fact. / Nota</th>
+                                <th class="col-fecha">Fecha</th>
+                                <th class="col-proveedor">Proveedor</th>
+                                <th class="col-concepto">Concepto</th>
+                                <th class="right col-importe">Importe</th>
+                                <th class="col-observ">Observaciones</th>
+                                <th class="col-adjuntos">Adjuntos (PDF/XML/Foto)</th>
+                                <th class="col-actions"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="expense-tbody">
+                            <!-- Filas dinamicas -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="actions-bar">
+                    <button class="btn btn-secondary left" id="btn-add-item">
+                        <i data-lucide="plus"></i> Agregar comprobante
+                    </button>
+                </div>
+            </div>
+
+            <!-- 3. LIQUIDACIÓN DE CAJA -->
+            <div class="card">
+                <h3 class="card-title">
+                    <i data-lucide="coins"></i>
+                    Liquidación de Caja
+                </h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Monto recibido en efectivo</label>
+                        <input type="number" class="form-control" id="input-monto-recibido" placeholder="0.00" step="0.01" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Método de pago principal</label>
+                        <select class="form-control" id="input-metodo">
+                            <option value="Efectivo">Efectivo</option>
+                            <option value="TC">Tarjeta de Crédito (TC)</option>
+                            <option value="TCC">Tarjeta de Crédito Corporativa (TCC)</option>
+                            <option value="TD">Tarjeta de Débito (TD)</option>
+                            <option value="Transferencia">Transferencia</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. SUMATORIAS -->
+            <div class="summary-grid">
+                <div class="summary-card facturado">
+                    <div class="summary-icon"><i data-lucide="file-text"></i></div>
+                    <div class="summary-info">
+                        <span class="summary-value" id="sum-facturado">$0.00</span>
+                        <span class="summary-label">Total Facturado</span>
+                    </div>
+                </div>
+                <div class="summary-card no-facturado">
+                    <div class="summary-icon"><i data-lucide="file-question"></i></div>
+                    <div class="summary-info">
+                        <span class="summary-value" id="sum-no-facturado">$0.00</span>
+                        <span class="summary-label">Total No Facturado</span>
+                    </div>
+                </div>
+                <div class="summary-card total">
+                    <div class="summary-icon"><i data-lucide="calculator"></i></div>
+                    <div class="summary-info">
+                        <span class="summary-value" id="sum-total">$0.00</span>
+                        <span class="summary-label">Importe Total de Gastos</span>
+                    </div>
+                </div>
+                <div class="summary-card devolucion">
+                    <div class="summary-icon"><i data-lucide="banknote"></i></div>
+                    <div class="summary-info">
+                        <span class="summary-value" id="sum-devolucion">$0.00</span>
+                        <span class="summary-label">Se Devuelve en Efectivo</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. ACCIONES -->
+            <div class="card">
+                <h3 class="card-title">
+                    <i data-lucide="check-circle-2"></i>
+                    Acciones
+                </h3>
+                <div class="actions-bar" style="margin-top: 10px;">
+                    <button class="btn btn-danger" id="btn-cancel">
+                        <i data-lucide="x"></i> Cancelar
+                    </button>
+                    <button class="btn btn-primary" id="btn-save">
+                        <i data-lucide="save"></i> Guardar comprobación
+                    </button>
+                    <button class="btn btn-success" id="btn-submit">
+                        <i data-lucide="send"></i> Enviar a revisión
+                    </button>
+                </div>
+            </div>
+            </div><!-- /tab-content-nuevo -->
 
             <!-- TAB GUARDADOS -->
             <div class="tab-content" id="content-guardados">
                 <div class="card">
-                    <h3 class="card-title"><i data-lucide="save"></i> Requisiciones Guardadas <span class="badge-count" id="count-guardados">0</span></h3>
-                    <p style="color:var(--text-muted); font-size:12px; margin-bottom:16px;">Requisiciones en borrador que aún puedes editar y enviar.</p>
+                    <h3 class="card-title">
+                        <i data-lucide="save"></i>
+                        Comprobaciones Guardadas
+                        <span class="badge-count" id="count-guardados">0</span>
+                    </h3>
+                    <p style="color:var(--text-muted); font-size:12px; margin-bottom:16px;">
+                        Comprobaciones en borrador que aún puedes editar y enviar a revisión.
+                    </p>
                     <div style="overflow-x: auto;">
-                        <table class="data-table">
-                            <thead><tr><th>Fecha</th><th>Folio</th><th>Obra</th><th>Frente</th><th style="text-align:center;">Materiales</th><th style="text-align:center;">Acción</th></tr></thead>
-                            <tbody id="tbody-guardados"><tr><td colspan="6" class="empty-row">No hay requisiciones guardadas.</td></tr></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB APROBADOS -->
-            <div class="tab-content" id="content-aprobados">
-                <div class="card">
-                    <h3 class="card-title"><i data-lucide="file-check-2"></i> Requisiciones Aprobadas <span class="badge-count" id="count-aprobados">0</span></h3>
-                    <p style="color:var(--text-muted); font-size:12px; margin-bottom:16px;">Requisiciones aprobadas. Solo consulta (no editables).</p>
-                    <div style="overflow-x: auto;">
-                        <table class="data-table">
-                            <thead><tr><th>Fecha</th><th>Folio</th><th>Obra</th><th>Frente</th><th style="text-align:center;">Materiales</th><th style="text-align:center;">Acción</th></tr></thead>
-                            <tbody id="tbody-aprobados"><tr><td colspan="6" class="empty-row">No hay requisiciones aprobadas.</td></tr></tbody>
+                        <table class="data-table" id="table-guardados">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Folio</th>
+                                    <th>Obra</th>
+                                    <th style="text-align:right;">Importe</th>
+                                    <th style="text-align:center;">No. Conceptos</th>
+                                    <th style="text-align:center;">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-guardados">
+                                <tr><td colspan="6" class="empty-row">No hay comprobaciones guardadas.</td></tr>
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -703,12 +1405,61 @@ function fyttsa_applyPrivilegeMenu() {
             <!-- TAB RECHAZADOS -->
             <div class="tab-content" id="content-rechazados">
                 <div class="card">
-                    <h3 class="card-title"><i data-lucide="file-x-2"></i> Requisiciones Rechazadas <span class="badge-count" id="count-rechazados">0</span></h3>
-                    <p style="color:var(--text-muted); font-size:12px; margin-bottom:16px;">Requisiciones rechazadas. Edita los datos y vuelve a enviar.</p>
+                    <h3 class="card-title">
+                        <i data-lucide="x-circle"></i>
+                        Comprobaciones Rechazadas
+                        <span class="badge-count" id="count-rechazados">0</span>
+                    </h3>
+                    <p style="color:var(--text-muted); font-size:12px; margin-bottom:16px;">
+                        Comprobaciones rechazadas por el revisor. Edita los datos y vuelve a enviar.
+                    </p>
                     <div style="overflow-x: auto;">
-                        <table class="data-table">
-                            <thead><tr><th>Fecha</th><th>Folio</th><th>Obra</th><th>Frente</th><th style="text-align:center;">Materiales</th><th>Observación</th><th style="text-align:center;">Acción</th></tr></thead>
-                            <tbody id="tbody-rechazados"><tr><td colspan="7" class="empty-row">No hay requisiciones rechazadas.</td></tr></tbody>
+                        <table class="data-table" id="table-rechazados">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Folio</th>
+                                    <th>Obra</th>
+                                    <th style="text-align:right;">Importe</th>
+                                    <th style="text-align:center;">No. Conceptos</th>
+                                    <th style="text-align:center;">Observación</th>
+                                    <th style="text-align:center;">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-rechazados">
+                                <tr><td colspan="7" class="empty-row">No hay comprobaciones rechazadas.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB APROBADOS -->
+            <div class="tab-content" id="content-aprobados">
+                <div class="card">
+                    <h3 class="card-title">
+                        <i data-lucide="check-circle"></i>
+                        Comprobaciones Aprobadas
+                        <span class="badge-count" id="count-aprobados">0</span>
+                    </h3>
+                    <p style="color:var(--text-muted); font-size:12px; margin-bottom:16px;">
+                        Comprobaciones revisadas y aprobadas. Solo consulta (no editables).
+                    </p>
+                    <div style="overflow-x: auto;">
+                        <table class="data-table" id="table-aprobados">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Folio</th>
+                                    <th>Obra</th>
+                                    <th style="text-align:right;">Importe</th>
+                                    <th style="text-align:center;">No. Conceptos</th>
+                                    <th style="text-align:center;">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-aprobados">
+                                <tr><td colspan="6" class="empty-row">No hay comprobaciones aprobadas.</td></tr>
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -723,7 +1474,7 @@ function fyttsa_applyPrivilegeMenu() {
 
     <script>
         // =====================================================
-        // MENU DINAMICO
+        // 1. MENU DINAMICO
         // =====================================================
         fetch('menu.html?v=' + Date.now())
             .then(r => r.text())
@@ -731,188 +1482,260 @@ function fyttsa_applyPrivilegeMenu() {
                 document.getElementById('sidebar').innerHTML = html;
                 lucide.createIcons();
                 fyttsa_applyPrivilegeMenu();
-                const link = document.getElementById('link-requisicion');
+                const link = document.getElementById('link-cajachica') || document.getElementById('link-caja-chica');
                 if (link) link.classList.add('active');
             })
             .catch(err => console.error('Error cargando el menú:', err));
+
         document.getElementById('toggle-menu').addEventListener('click', () => {
             document.getElementById('sidebar').classList.toggle('open');
         });
 
         // =====================================================
-        // USUARIO LOGUEADO
+        // 2. USUARIO LOGUEADO
         // =====================================================
-        function getUserName() { return localStorage.getItem('nombre') || ''; }
+        function getUserName() {
+            return localStorage.getItem('nombre') || '';
+        }
         function applyUserName() {
             const nombre = getUserName();
             if (nombre) {
                 document.getElementById('user-initial').textContent = nombre.charAt(0).toUpperCase();
-            } else { setTimeout(applyUserName, 1500); }
+            } else {
+                setTimeout(applyUserName, 1500);
+            }
         }
         applyUserName();
-        document.getElementById('input-fecha-req').valueAsDate = new Date();
 
         // =====================================================
-        // INVENTARIO (compartido con almacen.html)
+        // 3. PERIODO AUTOMATICO
         // =====================================================
-        const INV_KEY = 'fyttsa_almacen_inventario';
-        let inventario = [];
-        async function loadInventario() {
-            try {
-                const data = await fyttsa_loadData(INV_KEY);
-                inventario = data || [];
-            } catch (e) { inventario = []; }
+        function updatePeriodo() {
+            const ini = document.getElementById('input-fecha-inicio').value;
+            const fin = document.getElementById('input-fecha-fin').value;
+            if (ini && fin) {
+                const dIni = new Date(ini);
+                const dFin = new Date(fin);
+                const diffDays = Math.ceil((dFin - dIni) / (1000 * 60 * 60 * 24)) + 1;
+                const opts = { day: '2-digit', month: 'short', year: 'numeric' };
+                const txt = `Del ${dIni.toLocaleDateString('es-MX', opts)} al ${dFin.toLocaleDateString('es-MX', opts)}` +
+                            (diffDays > 0 ? ` (${diffDays} días)` : '');
+                document.getElementById('input-periodo').value = txt;
+            } else {
+                document.getElementById('input-periodo').value = '';
+            }
         }
-        function buscarEnInventario(query) {
-            if (!query || query.length < 2) return [];
-            const q = query.toLowerCase().trim();
-            return inventario.filter(i =>
-                (i.descripcion || '').toLowerCase().includes(q) ||
-                (i.codificacion || '').toLowerCase().includes(q)
-            ).slice(0, 8);
-        }
+        document.getElementById('input-fecha-inicio').addEventListener('change', updatePeriodo);
+        document.getElementById('input-fecha-fin').addEventListener('change', updatePeriodo);
 
         // =====================================================
-        // HELPERS
+        // 4. ITEMS (Comprobantes en tabla)
         // =====================================================
+        let items = []; // {id, tipo, folio, fecha, proveedor, concepto, importe, observacion, pdfFactura, xmlFactura, fotoNota}
+
+        function newItemId() {
+            return 'item-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+        }
+
         function escapeHtml(str) {
-            if (str === null || str === undefined) return '';
-            return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+            if (!str) return '';
+            return String(str).replace(/[&<>"']/g, c => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            })[c]);
         }
-        function formatNumber(num) { return (num || 0).toLocaleString('es-MX'); }
-        function showToast(msg, type = 'success') {
-            const toast = document.getElementById('toast');
-            const iconName = type === 'success' ? 'check-circle' : (type === 'error' ? 'alert-circle' : 'info');
-            toast.innerHTML = `<i data-lucide="${iconName}"></i><span>${escapeHtml(msg)}</span>`;
-            toast.className = 'toast ' + type;
-            lucide.createIcons();
-            toast.classList.add('show');
-            clearTimeout(window._toastTimer);
-            window._toastTimer = setTimeout(() => toast.classList.remove('show'), 3500);
-        }
-
-        // =====================================================
-        // ITEMS (Materiales)
-        // =====================================================
-        let items = [];
-        let editingFolio = null;
-        let viewMode = false;
-
-        function newItemId() { return 'item-' + Date.now() + '-' + Math.floor(Math.random() * 1000); }
 
         function renderItems() {
             const tbody = document.getElementById('expense-tbody');
             tbody.innerHTML = '';
+
             if (items.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="empty-row">No hay materiales. Presiona "Agregar material" para comenzar.</td></tr>';
+                tbody.innerHTML = `
+                    <tr><td colspan="10" class="empty-row">
+                        No hay comprobantes. Presiona "Agregar comprobante" para comenzar.
+                    </td></tr>
+                `;
             } else {
                 items.forEach((item, idx) => {
                     const tr = document.createElement('tr');
                     tr.dataset.id = item.id;
-                    const enInventario = item.enInventario;
-                    const invBadge = enInventario
-                        ? '<span class="inv-badge in">En Inventario</span>'
-                        : '<span class="inv-badge out">Fuera de Inventario</span>';
+                    const folioPlaceholder = item.tipo === 'Factura' ? 'Ej. HMA-2683' : 'Ej. S/N o EDIF 490';
                     tr.innerHTML = `
                         <td class="row-num" data-label="No.">${idx + 1}</td>
-                        <td class="col-desc" data-label="Descripción">
-                            <div class="autocomplete-wrapper">
-                                <input type="text" class="table-input desc-input" data-field="descripcion"
-                                    placeholder="Escribe para buscar en inventario..."
-                                    value="${escapeHtml(item.descripcion)}">
-                                <div class="autocomplete-list"></div>
+                        <td class="col-tipo" data-label="Tipo">
+                            <div class="tipo-toggle">
+                                <button type="button" class="tipo-btn factura ${item.tipo === 'Factura' ? 'active' : ''}" data-value="Factura">Factura</button>
+                                <button type="button" class="tipo-btn nota ${item.tipo === 'Nota' ? 'active' : ''}" data-value="Nota">Nota</button>
                             </div>
-                            ${invBadge}
                         </td>
-                        <td class="col-unidad" data-label="Unidad"><input type="text" class="table-input" data-field="unidad" placeholder="PZA" value="${escapeHtml(item.unidad)}"></td>
-                        <td class="col-cantidad" data-label="Cantidad"><input type="number" class="table-input right" data-field="cantidad" placeholder="0" min="0" step="1" value="${item.cantidad || ''}"></td>
-                        <td class="col-codigo" data-label="Código"><input type="text" class="table-input readonly-field" data-field="codigo" placeholder="Auto" value="${escapeHtml(item.codigo)}" readonly></td>
-                        <td class="col-obs" data-label="Notas"><input type="text" class="table-input" data-field="observacion" placeholder="Notas (opcional)" value="${escapeHtml(item.observacion)}"></td>
+                        <td class="col-folio" data-label="Folio/Nota">
+                            <input type="text" class="table-input" data-field="folio"
+                                placeholder="${folioPlaceholder}"
+                                value="${escapeHtml(item.folio)}">
+                        </td>
+                        <td class="col-fecha" data-label="Fecha">
+                            <input type="date" class="table-input" data-field="fecha" value="${item.fecha || ''}">
+                        </td>
+                        <td class="col-proveedor" data-label="Proveedor">
+                            <input type="text" class="table-input" data-field="proveedor"
+                                placeholder="Nombre del proveedor"
+                                value="${escapeHtml(item.proveedor)}">
+                        </td>
+                        <td class="col-concepto" data-label="Concepto">
+                            <input type="text" class="table-input" data-field="concepto"
+                                placeholder="Descripción del gasto"
+                                value="${escapeHtml(item.concepto)}">
+                        </td>
+                        <td class="col-importe" data-label="Importe">
+                            <input type="number" class="table-input amount" data-field="importe"
+                                placeholder="0.00" step="0.01" min="0"
+                                value="${item.importe || ''}">
+                        </td>
+                        <td class="col-observ" data-label="Observ.">
+                            <input type="text" class="table-input" data-field="observacion"
+                                placeholder="Ej. EFECTIVO, TD, TC..."
+                                value="${escapeHtml(item.observacion)}">
+                        </td>
+                        <td class="col-adjuntos" data-label="Adjuntos">
+                            <div class="attach-cell"></div>
+                        </td>
                         <td class="col-actions" data-label="">
-                            <button type="button" class="btn-remove-row" data-action="remove" title="Eliminar"><i data-lucide="trash-2"></i></button>
+                            <button type="button" class="btn-remove-row" data-action="remove" title="Eliminar">
+                                <i data-lucide="trash-2"></i>
+                            </button>
                         </td>
                     `;
                     tbody.appendChild(tr);
                     bindRowEvents(tr, item);
+                    renderAttachments(tr, item);
                 });
+
+                // Filas de subtotal
+                const facturado = items.filter(i => i.tipo === 'Factura').reduce((a, i) => a + (parseFloat(i.importe) || 0), 0);
+                const noFacturado = items.filter(i => i.tipo === 'Nota').reduce((a, i) => a + (parseFloat(i.importe) || 0), 0);
+                const total = facturado + noFacturado;
+
+                if (items.length > 0) {
+                    const subTotalFact = document.createElement('tr');
+                    subTotalFact.className = 'subtotal-row';
+                    subTotalFact.innerHTML = `
+                        <td colspan="6" class="subtotal-label">SUBTOTAL FACTURADO (${items.filter(i => i.tipo === 'Factura').length})</td>
+                        <td class="subtotal-amount">${formatCurrency(facturado)}</td>
+                        <td colspan="3"></td>
+                    `;
+                    tbody.appendChild(subTotalFact);
+
+                    const subTotalNota = document.createElement('tr');
+                    subTotalNota.className = 'subtotal-row subtotal-no-facturado';
+                    subTotalNota.innerHTML = `
+                        <td colspan="6" class="subtotal-label">SUBTOTAL NO FACTURADO (${items.filter(i => i.tipo === 'Nota').length})</td>
+                        <td class="subtotal-amount">${formatCurrency(noFacturado)}</td>
+                        <td colspan="3"></td>
+                    `;
+                    tbody.appendChild(subTotalNota);
+
+                    const totalRow = document.createElement('tr');
+                    totalRow.className = 'subtotal-row subtotal-total';
+                    totalRow.innerHTML = `
+                        <td colspan="6" class="subtotal-label" style="color: white;">IMPORTE TOTAL GASTADO</td>
+                        <td class="subtotal-amount" style="color: white;">${formatCurrency(total)}</td>
+                        <td colspan="3"></td>
+                    `;
+                    tbody.appendChild(totalRow);
+                }
             }
+
             document.getElementById('items-count').textContent = items.length + (items.length === 1 ? ' item' : ' items');
+            lucide.createIcons();
+            updateSummary();
+        }
+
+        function renderAttachments(tr, item) {
+            const cell = tr.querySelector('.attach-cell');
+            if (!cell) return;
+            cell.innerHTML = '';
+
+            if (item.tipo === 'Factura') {
+                // PDF + XML
+                cell.appendChild(makeAttachBtn('Seleccionar PDF', 'pdfFactura', item, 'file-text'));
+                cell.appendChild(makeAttachBtn('Seleccionar XML', 'xmlFactura', item, 'file-code'));
+            } else {
+                // Foto o PDF de la nota
+                cell.appendChild(makeAttachBtn('Foto/PDF', 'fotoNota', item, 'image'));
+            }
             lucide.createIcons();
         }
 
-        function bindRowEvents(tr, item) {
-            // Descripcion con autocomplete
-            const descInput = tr.querySelector('.desc-input');
-            const acList = tr.querySelector('.autocomplete-list');
-            let acTimer = null;
-
-            descInput.addEventListener('input', () => {
-                item.descripcion = descInput.value;
-                item.enInventario = false;
-                item.codigo = '';
-                item.unidad = '';
-                clearTimeout(acTimer);
-                acTimer = setTimeout(() => {
-                    const results = buscarEnInventario(descInput.value);
-                    if (results.length === 0 || descInput.value.length < 2) {
-                        acList.classList.remove('show');
-                        acList.innerHTML = '';
-                        // Marcar como fuera de inventario si tiene texto
-                        if (descInput.value.length >= 2) {
-                            const badge = tr.querySelector('.inv-badge');
-                            if (badge) {
-                                badge.className = 'inv-badge out';
-                                badge.textContent = 'Fuera de Inventario';
-                            }
-                        }
-                        return;
-                    }
-                    acList.innerHTML = results.map(r => `
-                        <div class="autocomplete-item" data-codigo="${escapeHtml(r.codificacion)}" data-unidad="${escapeHtml(r.unidad)}" data-desc="${escapeHtml(r.descripcion)}">
-                            <div class="item-desc">${escapeHtml(r.descripcion)}</div>
-                            <div class="item-meta">Código: ${escapeHtml(r.codificacion)} · Unidad: ${escapeHtml(r.unidad)} · Stock: ${formatNumber(r.cantidad)}</div>
-                        </div>
-                    `).join('');
-                    acList.classList.add('show');
-                    // Bind clicks
-                    acList.querySelectorAll('.autocomplete-item').forEach(el => {
-                        el.addEventListener('click', () => {
-                            item.descripcion = el.dataset.desc;
-                            item.codigo = el.dataset.codigo;
-                            item.unidad = el.dataset.unidad;
-                            item.enInventario = true;
-                            descInput.value = item.descripcion;
-                            tr.querySelector('[data-field="codigo"]').value = item.codigo;
-                            tr.querySelector('[data-field="unidad"]').value = item.unidad;
-                            acList.classList.remove('show');
-                            const badge = tr.querySelector('.inv-badge');
-                            if (badge) {
-                                badge.className = 'inv-badge in';
-                                badge.textContent = 'En Inventario';
-                            }
-                            lucide.createIcons();
-                        });
+        function makeAttachBtn(label, field, item, iconName) {
+            const hasFile = !!(item[field] && item[field + 'Name']);
+            const btn = document.createElement('label');
+            btn.className = 'attach-btn' + (hasFile ? ' has-file' : '');
+            btn.innerHTML = `
+                <i data-lucide="${iconName}"></i>
+                <span class="file-name">${hasFile ? escapeHtml(item[field + 'Name']) : label}</span>
+                ${hasFile ? '<button type="button" class="remove-attach" data-field="' + field + '">&times;</button>' : ''}
+                <input type="file" accept="${field === 'fotoNota' ? 'image/*,.pdf' : (field === 'xmlFactura' ? '.xml,text/xml' : '.pdf,application/pdf')}" data-field="${field}">
+            `;
+            const fileInput = btn.querySelector('input[type="file"]');
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    item[field] = file;
+                    item[field + 'Name'] = file.name;
+                    renderAttachments(tr, item);
+                }
+            });
+            if (hasFile) {
+                const rmBtn = btn.querySelector('.remove-attach');
+                if (rmBtn) {
+                    rmBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        item[field] = null;
+                        item[field + 'Name'] = null;
+                        renderAttachments(tr, item);
                     });
-                }, 200);
-            });
-            // Cerrar autocomplete al hacer click fuera
-            document.addEventListener('click', (e) => {
-                if (!tr.contains(e.target)) acList.classList.remove('show');
-            });
+                }
+            }
+            return btn;
+        }
 
-            // Otros inputs
+        function bindRowEvents(tr, item) {
+            // Tipo toggle
+            tr.querySelectorAll('.tipo-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const newValue = btn.dataset.value;
+                    item.tipo = newValue;
+                    tr.querySelectorAll('.tipo-btn').forEach(b => {
+                        b.classList.toggle('active', b.dataset.value === newValue);
+                    });
+                    // Limpiar adjuntos al cambiar tipo (porque cambian los campos)
+                    item.pdfFactura = null; item.pdfFacturaName = null;
+                    item.xmlFactura = null; item.xmlFacturaName = null;
+                    item.fotoNota = null; item.fotoNotaName = null;
+                    // Actualizar placeholder del folio
+                    const folioInput = tr.querySelector('[data-field="folio"]');
+                    if (folioInput) {
+                        folioInput.placeholder = (newValue === 'Factura' ? 'Ej. HMA-2683' : 'Ej. S/N o EDIF 490');
+                    }
+                    renderAttachments(tr, item);
+                });
+            });
+            // Inputs
             tr.querySelectorAll('input[data-field]').forEach(input => {
-                if (input.classList.contains('desc-input')) return;
+                if (input.type === 'file') return; // handled separately
                 input.addEventListener('input', () => {
                     const field = input.dataset.field;
-                    if (field === 'cantidad') {
+                    if (field === 'importe') {
                         item[field] = parseFloat(input.value) || 0;
+                        updateSummary();
+                        // Re-render para actualizar subtotales sin perder foco
+                        // Solo actualizamos las sumatorias y los subtotales
+                        updateSubtotals();
                     } else {
                         item[field] = input.value;
                     }
                 });
             });
-
             // Remove
             const removeBtn = tr.querySelector('[data-action="remove"]');
             if (removeBtn) {
@@ -923,11 +1746,37 @@ function fyttsa_applyPrivilegeMenu() {
             }
         }
 
+        function updateSubtotals() {
+            // Actualiza SOLO las filas de subtotal (sin re-render completo)
+            const tbody = document.getElementById('expense-tbody');
+            const facturado = items.filter(i => i.tipo === 'Factura').reduce((a, i) => a + (parseFloat(i.importe) || 0), 0);
+            const noFacturado = items.filter(i => i.tipo === 'Nota').reduce((a, i) => a + (parseFloat(i.importe) || 0), 0);
+            const total = facturado + noFacturado;
+            const subRows = tbody.querySelectorAll('.subtotal-row');
+            if (subRows.length >= 3) {
+                const fCount = items.filter(i => i.tipo === 'Factura').length;
+                const nCount = items.filter(i => i.tipo === 'Nota').length;
+                subRows[0].children[0].textContent = `SUBTOTAL FACTURADO (${fCount})`;
+                subRows[0].children[1].textContent = formatCurrency(facturado);
+                subRows[1].children[0].textContent = `SUBTOTAL NO FACTURADO (${nCount})`;
+                subRows[1].children[1].textContent = formatCurrency(noFacturado);
+                subRows[2].children[1].textContent = formatCurrency(total);
+            }
+        }
+
         function addItem(scroll) {
             const newItem = {
                 id: newItemId(),
-                descripcion: '', unidad: '', cantidad: 0, codigo: '',
-                observacion: '', enInventario: false
+                tipo: 'Factura',
+                folio: '',
+                fecha: '',
+                proveedor: '',
+                concepto: '',
+                importe: 0,
+                observacion: '',
+                pdfFactura: null, pdfFacturaName: null,
+                xmlFactura: null, xmlFacturaName: null,
+                fotoNota: null, fotoNotaName: null
             };
             items.push(newItem);
             renderItems();
@@ -936,37 +1785,85 @@ function fyttsa_applyPrivilegeMenu() {
                 if (last) last.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }, 50);
         }
+
         document.getElementById('btn-add-item').addEventListener('click', () => addItem(true));
         addItem(false);
 
         // =====================================================
-        // HISTORIAL CON STATUS
+        // 5. SUMATORIAS
         // =====================================================
-        const HIST_KEY = 'fyttsa_requisiciones_historial';
+        function formatCurrency(num) {
+            return '$' + (num || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function updateSummary() {
+            const facturado = items
+                .filter(i => i.tipo === 'Factura')
+                .reduce((acc, i) => acc + (parseFloat(i.importe) || 0), 0);
+            const noFacturado = items
+                .filter(i => i.tipo === 'Nota')
+                .reduce((acc, i) => acc + (parseFloat(i.importe) || 0), 0);
+            const total = facturado + noFacturado;
+            const recibido = parseFloat(document.getElementById('input-monto-recibido').value) || 0;
+            const devolucion = recibido - total;
+
+            document.getElementById('sum-facturado').textContent = formatCurrency(facturado);
+            document.getElementById('sum-no-facturado').textContent = formatCurrency(noFacturado);
+            document.getElementById('sum-total').textContent = formatCurrency(total);
+            document.getElementById('sum-devolucion').textContent = formatCurrency(devolucion);
+
+            const devCard = document.getElementById('sum-devolucion').parentElement.parentElement;
+            if (devolucion < 0) {
+                devCard.style.borderLeftColor = 'var(--danger)';
+                document.getElementById('sum-devolucion').style.color = 'var(--danger)';
+            } else {
+                devCard.style.borderLeftColor = 'var(--purple)';
+                document.getElementById('sum-devolucion').style.color = 'var(--text-main)';
+            }
+        }
+
+        document.getElementById('input-monto-recibido').addEventListener('input', updateSummary);
+
+        // =====================================================
+        // 6. HISTORIAL CON STATUS (guardado / rechazado / aprobado)
+        // =====================================================
         let historial = [];
+        let editingFolio = null; // folio que se está editando actualmente
+
+        const CAJACHICA_KEY = 'fyttsa_cajachica_historial';
         async function loadHistorial() {
             try {
-                const data = await fyttsa_loadData(HIST_KEY);
+                const data = await fyttsa_loadData(CAJACHICA_KEY);
                 historial = data || [];
-                historial.forEach(h => { if (!h.status) h.status = 'guardado'; });
+                // Migracion: si algun registro no tiene status, asignar 'guardado'
+                historial.forEach(h => {
+                    if (!h.status) h.status = 'guardado';
+                });
             } catch (e) { historial = []; }
         }
-        function saveHistorial() { fyttsa_saveDataSync(HIST_KEY, historial); }
+        function saveHistorial() {
+            fyttsa_saveDataSync(CAJACHICA_KEY, historial);
+        }
         function generateFolio() {
             const year = new Date().getFullYear();
+            // Buscar el maximo numero de folio del año actual
             let maxNum = 0;
             historial.forEach(h => {
-                if (h.folio && h.folio.startsWith('RM-' + year + '-')) {
+                if (h.folio && h.folio.startsWith('CC-' + year + '-')) {
                     const n = parseInt(h.folio.split('-')[2], 10);
                     if (!isNaN(n) && n > maxNum) maxNum = n;
                 }
             });
-            return 'RM-' + year + '-' + String(maxNum + 1).padStart(4, '0');
+            const nextNum = maxNum + 1;
+            return 'CC-' + year + '-' + String(nextNum).padStart(4, '0');
         }
         function updateFolioInput() {
             const folioInput = document.getElementById('input-folio');
-            if (folioInput && !editingFolio) folioInput.value = generateFolio();
+            if (folioInput && !editingFolio) {
+                folioInput.value = generateFolio();
+            }
         }
+
         function formatDate(fechaISO) {
             if (!fechaISO) return '—';
             const d = new Date(fechaISO);
@@ -975,127 +1872,177 @@ function fyttsa_applyPrivilegeMenu() {
                    ' ' + d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: true });
         }
 
+        // Renderea las tablas de cada tab
         function renderTabsTables() {
             const guardados = historial.filter(h => h.status === 'guardado').reverse();
-            const aprobados = historial.filter(h => h.status === 'aprobado').reverse();
             const rechazados = historial.filter(h => h.status === 'rechazado').reverse();
+            const aprobados = historial.filter(h => h.status === 'aprobado').reverse();
 
+            // Badges en los botones de tabs
             document.getElementById('badge-guardados').textContent = guardados.length;
-            document.getElementById('badge-aprobados').textContent = aprobados.length;
             document.getElementById('badge-rechazados').textContent = rechazados.length;
+            document.getElementById('badge-aprobados').textContent = aprobados.length;
             document.getElementById('count-guardados').textContent = guardados.length;
-            document.getElementById('count-aprobados').textContent = aprobados.length;
             document.getElementById('count-rechazados').textContent = rechazados.length;
+            document.getElementById('count-aprobados').textContent = aprobados.length;
 
-            // Guardados
+            // Tabla Guardados (accion: Editar)
             const tbodyG = document.getElementById('tbody-guardados');
-            tbodyG.innerHTML = guardados.length === 0
-                ? '<tr><td colspan="6" class="empty-row">No hay requisiciones guardadas.</td></tr>'
-                : guardados.map(h => `
+            if (guardados.length === 0) {
+                tbodyG.innerHTML = '<tr><td colspan="6" class="empty-row">No hay comprobaciones guardadas.</td></tr>';
+            } else {
+                tbodyG.innerHTML = guardados.map(h => `
                     <tr>
                         <td style="font-size:11px;">${formatDate(h.fechaRegistro)}</td>
                         <td class="folio-cell">${escapeHtml(h.folio)}</td>
                         <td>${escapeHtml(h.obra)}</td>
-                        <td>${escapeHtml(h.frente)}</td>
+                        <td class="amount-cell">${formatCurrency(h.total)}</td>
                         <td style="text-align:center;">${h.items ? h.items.length : 0}</td>
                         <td style="text-align:center;">
-                            <button class="btn-action-red" onclick="loadForEdit('${escapeHtml(h.folio)}')">
+                            <button class="btn-action-red" onclick="loadComprobacionForEdit('${escapeHtml(h.folio)}')">
                                 <i data-lucide="edit-3"></i> Editar
                             </button>
                         </td>
                     </tr>
                 `).join('');
+            }
 
-            // Aprobados
-            const tbodyA = document.getElementById('tbody-aprobados');
-            tbodyA.innerHTML = aprobados.length === 0
-                ? '<tr><td colspan="6" class="empty-row">No hay requisiciones aprobadas.</td></tr>'
-                : aprobados.map(h => `
+            // Tabla Rechazados (accion: Editar + observacion)
+            const tbodyR = document.getElementById('tbody-rechazados');
+            if (rechazados.length === 0) {
+                tbodyR.innerHTML = '<tr><td colspan="7" class="empty-row">No hay comprobaciones rechazadas.</td></tr>';
+            } else {
+                tbodyR.innerHTML = rechazados.map(h => `
                     <tr>
                         <td style="font-size:11px;">${formatDate(h.fechaRegistro)}</td>
                         <td class="folio-cell">${escapeHtml(h.folio)}</td>
                         <td>${escapeHtml(h.obra)}</td>
-                        <td>${escapeHtml(h.frente)}</td>
+                        <td class="amount-cell">${formatCurrency(h.total)}</td>
+                        <td style="text-align:center;">${h.items ? h.items.length : 0}</td>
+                        <td style="font-size:11px; color:var(--danger); font-weight:600;">${escapeHtml(h.observacionRechazo || 'Sin observación')}</td>
+                        <td style="text-align:center;">
+                            <button class="btn-action-red" onclick="loadComprobacionForEdit('${escapeHtml(h.folio)}')">
+                                <i data-lucide="edit-3"></i> Editar
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            // Tabla Aprobados (accion: Ver - solo lectura)
+            const tbodyA = document.getElementById('tbody-aprobados');
+            if (aprobados.length === 0) {
+                tbodyA.innerHTML = '<tr><td colspan="6" class="empty-row">No hay comprobaciones aprobadas.</td></tr>';
+            } else {
+                tbodyA.innerHTML = aprobados.map(h => `
+                    <tr>
+                        <td style="font-size:11px;">${formatDate(h.fechaRegistro)}</td>
+                        <td class="folio-cell">${escapeHtml(h.folio)}</td>
+                        <td>${escapeHtml(h.obra)}</td>
+                        <td class="amount-cell">${formatCurrency(h.total)}</td>
                         <td style="text-align:center;">${h.items ? h.items.length : 0}</td>
                         <td style="text-align:center;">
-                            <button class="btn-action-red" onclick="loadForView('${escapeHtml(h.folio)}')">
+                            <button class="btn-action-red" onclick="loadComprobacionView('${escapeHtml(h.folio)}')">
                                 <i data-lucide="eye"></i> Ver
                             </button>
                         </td>
                     </tr>
                 `).join('');
-
-            // Rechazados
-            const tbodyR = document.getElementById('tbody-rechazados');
-            tbodyR.innerHTML = rechazados.length === 0
-                ? '<tr><td colspan="7" class="empty-row">No hay requisiciones rechazadas.</td></tr>'
-                : rechazados.map(h => `
-                    <tr>
-                        <td style="font-size:11px;">${formatDate(h.fechaRegistro)}</td>
-                        <td class="folio-cell">${escapeHtml(h.folio)}</td>
-                        <td>${escapeHtml(h.obra)}</td>
-                        <td>${escapeHtml(h.frente)}</td>
-                        <td style="text-align:center;">${h.items ? h.items.length : 0}</td>
-                        <td style="font-size:11px; color:var(--danger); font-weight:600;">${escapeHtml(h.observacionRechazo || 'Sin observación')}</td>
-                        <td style="text-align:center;">
-                            <button class="btn-action-red" onclick="loadForEdit('${escapeHtml(h.folio)}')">
-                                <i data-lucide="edit-3"></i> Editar
-                            </button>
-                        </td>
-                    </tr>
-                `).join('');
+            }
             lucide.createIcons();
         }
 
-        function loadForEdit(folio) {
+        // Cargar comprobacion en el tab Nuevo para editar
+        function loadComprobacionForEdit(folio) {
             const h = historial.find(x => x.folio === folio);
-            if (!h) { showToast('No se encontró la requisición.', 'error'); return; }
+            if (!h) { showToast('No se encontró la comprobación.', 'error'); return; }
+            // Cambiar a tab Nuevo
             switchTab('nuevo');
+            // Llenar campos
             editingFolio = folio;
             document.getElementById('input-folio').value = h.folio;
-            document.getElementById('input-contrato').value = h.contrato || '';
             document.getElementById('input-obra').value = h.obra || '';
-            document.getElementById('input-frente').value = h.frente || '';
-            document.getElementById('input-fecha-req').value = h.fechaReq || '';
-            document.getElementById('input-fecha-necesidad').value = h.fechaNecesidad || '';
-            document.getElementById('input-notas').value = h.notas || '';
-            items = (h.items || []).map(i => ({...i, id: newItemId()}));
+            document.getElementById('input-fecha-inicio').value = h.fechaInicio || '';
+            document.getElementById('input-fecha-fin').value = h.fechaFin || '';
+            updatePeriodo();
+            document.getElementById('input-monto-recibido').value = h.recibido || 0;
+            document.getElementById('input-metodo').value = h.metodo || 'Efectivo';
+            // Cargar items
+            items = (h.items || []).map(i => ({
+                id: newItemId(),
+                tipo: i.tipo || 'Factura',
+                folio: i.folio || '',
+                fecha: i.fecha || '',
+                proveedor: i.proveedor || '',
+                concepto: i.concepto || '',
+                importe: parseFloat(i.importe) || 0,
+                observacion: i.observacion || '',
+                pdfFactura: null, pdfFacturaName: null,
+                xmlFactura: null, xmlFacturaName: null,
+                fotoNota: null, fotoNotaName: null
+            }));
             renderItems();
+            updateSummary();
+            // Limpiar firma (no podemos restaurar la firma del historial)
+            // Scroll arriba
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            showToast('Requisición ' + folio + ' cargada para edición.', 'success');
+            showToast('Comprobación ' + folio + ' cargada para edición.', 'success');
         }
 
-        function loadForView(folio) {
+        // Cargar comprobacion en modo solo lectura
+        let viewMode = false;
+        function loadComprobacionView(folio) {
             const h = historial.find(x => x.folio === folio);
-            if (!h) { showToast('No se encontró la requisición.', 'error'); return; }
+            if (!h) { showToast('No se encontró la comprobación.', 'error'); return; }
             switchTab('nuevo');
             viewMode = true;
             editingFolio = folio;
             document.getElementById('input-folio').value = h.folio;
-            document.getElementById('input-contrato').value = h.contrato || '';
             document.getElementById('input-obra').value = h.obra || '';
-            document.getElementById('input-frente').value = h.frente || '';
-            document.getElementById('input-fecha-req').value = h.fechaReq || '';
-            document.getElementById('input-fecha-necesidad').value = h.fechaNecesidad || '';
-            document.getElementById('input-notas').value = h.notas || '';
-            items = (h.items || []).map(i => ({...i, id: newItemId()}));
+            document.getElementById('input-fecha-inicio').value = h.fechaInicio || '';
+            document.getElementById('input-fecha-fin').value = h.fechaFin || '';
+            updatePeriodo();
+            document.getElementById('input-monto-recibido').value = h.recibido || 0;
+            document.getElementById('input-metodo').value = h.metodo || 'Efectivo';
+            items = (h.items || []).map(i => ({
+                id: newItemId(),
+                tipo: i.tipo || 'Factura',
+                folio: i.folio || '',
+                fecha: i.fecha || '',
+                proveedor: i.proveedor || '',
+                concepto: i.concepto || '',
+                importe: parseFloat(i.importe) || 0,
+                observacion: i.observacion || '',
+                pdfFactura: null, pdfFacturaName: null,
+                xmlFactura: null, xmlFacturaName: null,
+                fotoNota: null, fotoNotaName: null
+            }));
             renderItems();
-            document.querySelectorAll('#content-nuevo input, #content-nuevo select, #content-nuevo textarea, #content-nuevo button').forEach(el => {
-                if (el.id !== 'btn-cancel') { el.disabled = true; el.dataset.wasDisabled = 'true'; }
+            updateSummary();
+            // Deshabilitar todos los inputs y botones
+            document.querySelectorAll('#content-nuevo input, #content-nuevo select, #content-nuevo button').forEach(el => {
+                if (el.id !== 'btn-cancel') {
+                    el.disabled = true;
+                    el.dataset.wasDisabled = 'true';
+                }
             });
+            // Mostrar aviso
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            showToast('Requisición ' + folio + ' cargada en modo solo lectura.', 'info');
+            showToast('Comprobación ' + folio + ' cargada en modo solo lectura.', 'info');
         }
 
+        // Salir del modo vista/edicion y volver a nuevo
         function exitEditMode() {
             editingFolio = null;
             viewMode = false;
+            // Rehabilitar inputs
             document.querySelectorAll('#content-nuevo [data-was-disabled]').forEach(el => {
                 el.disabled = false;
                 delete el.dataset.wasDisabled;
             });
         }
 
+        // Cambiar de tab
         function switchTab(tabName) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
@@ -1107,105 +2054,160 @@ function fyttsa_applyPrivilegeMenu() {
                 exitEditMode();
                 resetForm();
             }
-            if (tabName !== 'nuevo') renderTabsTables();
+            if (tabName !== 'nuevo') {
+                renderTabsTables();
+            }
         }
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', () => switchTab(btn.dataset.tab));
         });
 
+        (async function() {
+            await loadHistorial();
+            renderTabsTables();
+            updateFolioInput();
+        })();
+
         // =====================================================
-        // VALIDAR Y GUARDAR
+        // 7. VALIDAR Y GUARDAR
         // =====================================================
         function validateForm() {
             const errors = [];
-            if (!document.getElementById('input-contrato').value.trim()) errors.push('El número de contrato es obligatorio.');
-            if (!document.getElementById('input-obra').value.trim()) errors.push('La obra es obligatoria.');
-            if (!document.getElementById('input-frente').value.trim()) errors.push('El frente de trabajo es obligatorio.');
-            if (!document.getElementById('input-fecha-req').value) errors.push('La fecha de requisición es obligatoria.');
-            if (!document.getElementById('input-fecha-necesidad').value) errors.push('La fecha de necesidad es obligatoria.');
-            if (items.length === 0) errors.push('Debe agregar al menos un material.');
+            const obra = document.getElementById('input-obra').value.trim();
+            const fechaIni = document.getElementById('input-fecha-inicio').value;
+            const fechaFin = document.getElementById('input-fecha-fin').value;
+            if (!obra) errors.push('El nombre de la obra es obligatorio.');
+            if (!fechaIni) errors.push('La fecha de inicio es obligatoria.');
+            if (!fechaFin) errors.push('La fecha final es obligatoria.');
+            if (fechaIni && fechaFin && new Date(fechaIni) > new Date(fechaFin)) {
+                errors.push('La fecha de inicio no puede ser mayor a la fecha final.');
+            }
+            if (items.length === 0) errors.push('Debe agregar al menos un comprobante.');
             items.forEach((item, idx) => {
-                if (!item.descripcion) errors.push(`Material ${idx + 1}: falta la descripción.`);
-                if (!item.cantidad || item.cantidad <= 0) errors.push(`Material ${idx + 1}: cantidad inválida.`);
+                if (!item.folio) errors.push(`Comprobante ${idx + 1}: falta el folio.`);
+                if (!item.fecha) errors.push(`Comprobante ${idx + 1}: falta la fecha.`);
+                if (!item.proveedor) errors.push(`Comprobante ${idx + 1}: falta el proveedor.`);
+                if (!item.concepto) errors.push(`Comprobante ${idx + 1}: falta el concepto.`);
+                if (!item.importe || item.importe <= 0) errors.push(`Comprobante ${idx + 1}: importe inválido.`);
             });
             return errors;
         }
-
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('toast');
+            const msgEl = document.getElementById('toast-msg');
+            // Limpiar contenido y crear icono nuevo
+            const iconName = type === 'success' ? 'check-circle' : (type === 'error' ? 'alert-circle' : 'info');
+            toast.innerHTML = `<i data-lucide="${iconName}"></i><span id="toast-msg">${escapeHtml(msg)}</span>`;
+            toast.className = 'toast ' + type;
+            lucide.createIcons();
+            toast.classList.add('show');
+            clearTimeout(window._toastTimer);
+            window._toastTimer = setTimeout(() => toast.classList.remove('show'), 3500);
+        }
         document.getElementById('btn-save').addEventListener('click', () => {
             const errors = validateForm();
-            if (errors.length > 0) { showToast('Faltan datos: ' + errors[0], 'error'); return; }
+            if (errors.length > 0) {
+                showToast('Faltan datos: ' + errors[0], 'error');
+                return;
+            }
             const folio = document.getElementById('input-folio').value || generateFolio();
+            const total = items.reduce((acc, i) => acc + (parseFloat(i.importe) || 0), 0);
+            const recibido = parseFloat(document.getElementById('input-monto-recibido').value) || 0;
             const registro = {
                 folio,
-                contrato: document.getElementById('input-contrato').value.trim(),
                 obra: document.getElementById('input-obra').value.trim(),
-                frente: document.getElementById('input-frente').value.trim(),
-                fechaReq: document.getElementById('input-fecha-req').value,
-                fechaNecesidad: document.getElementById('input-fecha-necesidad').value,
-                notas: document.getElementById('input-notas').value.trim(),
+                fechaInicio: document.getElementById('input-fecha-inicio').value,
+                fechaFin: document.getElementById('input-fecha-fin').value,
+                periodo: document.getElementById('input-periodo').value,
                 items: items.map(i => ({
-                    descripcion: i.descripcion, unidad: i.unidad, cantidad: i.cantidad,
-                    codigo: i.codigo, observacion: i.observacion, enInventario: !!i.enInventario
+                    tipo: i.tipo,
+                    folio: i.folio,
+                    fecha: i.fecha,
+                    proveedor: i.proveedor,
+                    concepto: i.concepto,
+                    importe: i.importe,
+                    observacion: i.observacion,
+                    tienePdfFactura: !!i.pdfFactura,
+                    tieneXmlFactura: !!i.xmlFactura,
+                    tieneFotoNota: !!i.fotoNota
                 })),
+                total,
+                facturado: items.filter(i => i.tipo === 'Factura').reduce((a, i) => a + (parseFloat(i.importe) || 0), 0),
+                noFacturado: items.filter(i => i.tipo === 'Nota').reduce((a, i) => a + (parseFloat(i.importe) || 0), 0),
+                recibido,
+                devolucion: recibido - total,
+                metodo: document.getElementById('input-metodo').value,
                 usuario: getUserName(),
                 fechaRegistro: new Date().toISOString(),
                 status: 'guardado'
             };
+            // Si estamos editando, reemplazar; si no, agregar
             const idx = historial.findIndex(h => h.folio === folio);
             if (idx >= 0) {
-                registro.observacionRechazo = historial[idx].observacionRechazo;
+                // Conservar observacionRechazo si tenia y status no era aprobado
+                const oldObs = historial[idx].observacionRechazo;
+                registro.observacionRechazo = oldObs;
                 historial[idx] = registro;
             } else {
                 historial.push(registro);
             }
             saveHistorial();
             renderTabsTables();
-            showToast('Requisición ' + folio + ' guardada correctamente.', 'success');
+            showToast('Comprobación ' + folio + ' guardada correctamente.', 'success');
         });
-
         document.getElementById('btn-submit').addEventListener('click', () => {
             const errors = validateForm();
-            if (errors.length > 0) { showToast('Faltan datos: ' + errors[0], 'error'); return; }
-            showToast('Requisición firmada y enviada a almacén.', 'success');
+            if (errors.length > 0) {
+                showToast('Faltan datos: ' + errors[0], 'error');
+                return;
+            }
+            showToast('Comprobación firmada y enviada a contabilidad.', 'success');
             setTimeout(() => {
-                if (confirm('¿Deseas limpiar el formulario para una nueva requisición?')) resetForm();
+                if (confirm('¿Deseas limpiar el formulario para una nueva comprobación?')) {
+                    resetForm();
+                }
             }, 1500);
         });
-
         document.getElementById('btn-cancel').addEventListener('click', () => {
-            if (viewMode) { exitEditMode(); resetForm(); showToast('Saliendo del modo solo lectura.', 'info'); return; }
+            if (viewMode) {
+                // Salir del modo solo lectura
+                exitEditMode();
+                resetForm();
+                showToast('Saliendo del modo solo lectura.', 'info');
+                return;
+            }
             if (editingFolio) {
-                if (confirm('¿Cancelar la edición? Los cambios no guardados se perderán.')) { exitEditMode(); resetForm(); }
+                if (confirm('¿Cancelar la edición? Los cambios no guardados se perderán.')) {
+                    exitEditMode();
+                    resetForm();
+                }
             } else {
-                if (confirm('¿Cancelar la requisición actual? Se perderán los datos no guardados.')) resetForm();
+                if (confirm('¿Cancelar la comprobación actual? Se perderán los datos no guardados.')) {
+                    resetForm();
+                }
             }
         });
-
         function resetForm() {
             editingFolio = null;
             viewMode = false;
             items = [];
-            document.getElementById('input-contrato').value = '';
             document.getElementById('input-obra').value = '';
-            document.getElementById('input-frente').value = '';
-            document.getElementById('input-fecha-req').valueAsDate = new Date();
-            document.getElementById('input-fecha-necesidad').value = '';
-            document.getElementById('input-notas').value = '';
-            document.querySelectorAll('#content-nuevo [data-was-disabled]').forEach(el => { el.disabled = false; delete el.dataset.wasDisabled; });
+            document.getElementById('input-fecha-inicio').value = '';
+            document.getElementById('input-fecha-fin').value = '';
+            document.getElementById('input-periodo').value = '';
+            document.getElementById('input-monto-recibido').value = '0';
+            document.getElementById('input-metodo').value = 'Efectivo';
+            // Rehabilitar inputs (en caso de haber salido del modo vista)
+            document.querySelectorAll('#content-nuevo [data-was-disabled]').forEach(el => {
+                el.disabled = false;
+                delete el.dataset.wasDisabled;
+            });
             addItem(false);
+            updateSummary();
             updateFolioInput();
         }
 
-        // =====================================================
-        // INICIALIZAR
-        // =====================================================
-        (async function() {
-            await loadInventario();
-            await loadHistorial();
-            renderTabsTables();
-            updateFolioInput();
-            lucide.createIcons();
-        })();
+        lucide.createIcons();
     </script>
 </body>
 </html>
