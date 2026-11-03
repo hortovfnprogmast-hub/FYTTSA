@@ -42,8 +42,7 @@
             flex-shrink: 0;
         }
         .header-left { display: flex; align-items: center; gap: 15px; }
-        .menu-btn { background: none; border: none; cursor: pointer; color: var(--text-main); padding: 8px; font-size: 22px; min-width: 40px; min-height: 40px; display: flex; align-items: center; justify-content: center; }
-        .menu-btn i { width: 22px; height: 22px; }
+        .menu-btn { background: none; border: none; cursor: pointer; color: var(--text-main); padding: 5px; }
         .header-title { margin: 0; font-size: 15px; font-weight: 700; color: var(--primary-blue); display: none; }
         @media (min-width: 768px) { .header-title { display: block; } }
         .header-right { display: flex; align-items: center; gap: 12px; }
@@ -1089,6 +1088,7 @@ function fyttsa_applyPrivilegeMenu() {
             <img src="https://i.ibb.co/x8Bw8KR8/MARFIL-1.jpg" alt="Logo" height="35" style="border-radius: 8px;">
         </div>
     </header>
+    <script>try{lucide.createIcons()}catch(e){}</script>
 
     <div class="main-layout">
         <aside class="sidebar" id="sidebar"></aside>
@@ -1909,7 +1909,6 @@ function fyttsa_applyPrivilegeMenu() {
             renderItems();
             updateSummary();
             // Limpiar firma (no podemos restaurar la firma del historial)
-            clearSignature();
             // Scroll arriba
             window.scrollTo({ top: 0, behavior: 'smooth' });
             showToast('Comprobación ' + folio + ' cargada para edición.', 'success');
@@ -1945,7 +1944,6 @@ function fyttsa_applyPrivilegeMenu() {
             }));
             renderItems();
             updateSummary();
-            clearSignature();
             // Deshabilitar todos los inputs y botones
             document.querySelectorAll('#content-nuevo input, #content-nuevo select, #content-nuevo button').forEach(el => {
                 if (el.id !== 'btn-cancel') {
