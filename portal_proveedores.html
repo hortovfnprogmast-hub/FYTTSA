@@ -510,6 +510,7 @@ function fyttsa_applyPrivilegeMenu() {
             <img src="https://i.ibb.co/x8Bw8KR8/MARFIL-1.jpg" alt="Logo" height="35" style="border-radius:8px">
         </div>
     </header>
+    <script>try{lucide.createIcons()}catch(e){}</script>
     <div class="main-layout">
         <aside class="sidebar" id="sidebar"></aside>
         <main class="content">
@@ -673,7 +674,7 @@ function fyttsa_applyPrivilegeMenu() {
 
     <script>
         // MENU
-        fetch('menu.html').then(r=>r.text()).then(h=>{document.getElementById('sidebar').innerHTML=h;lucide.createIcons();
+        fetch('menu.html?v=' + Date.now()).then(r=>r.text()).then(h=>{document.getElementById('sidebar').innerHTML=h;lucide.createIcons();
                 fyttsa_applyPrivilegeMenu();const l=document.getElementById('link-presupuesto');if(l)l.classList.add('active')}).catch(e=>console.error(e));
         document.getElementById('toggle-menu').addEventListener('click',()=>document.getElementById('sidebar').classList.toggle('open'));
         (function(){const n=localStorage.getItem('nombre')||'';if(n)document.getElementById('user-initial').textContent=n.charAt(0).toUpperCase();else setTimeout(arguments.callee,1500)})();
