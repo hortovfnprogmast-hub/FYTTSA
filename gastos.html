@@ -73,6 +73,30 @@
             flex: 1; padding: 30px; overflow-y: auto;
         }
         @media (max-width: 768px) { .content { padding: 20px; } }
+        @media (max-width: 768px) {
+            /* Tabs en grid horizontal del mismo ancho */
+            .tabs-bar { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; border-bottom: none; padding-bottom: 0; }
+            .tab-btn { width: 100%; justify-content: center; padding: 8px 4px; font-size: 11px; }
+            .tab-btn i { width: 14px; height: 14px; }
+            .tab-badge { min-width: 18px; height: 18px; font-size: 10px; }
+            /* Botones de accion: full width, sin sobresalir */
+            .form-actions { flex-direction: column; gap: 8px; }
+            .form-actions .btn-primary, .form-actions .btn-secondary { width: 100%; justify-content: center; box-sizing: border-box; font-size: 14px; padding: 12px 14px; }
+            /* Formulario: una columna */
+            .form-grid { grid-template-columns: 1fr !important; }
+            /* KPIs: 2 columnas */
+            .kpi-grid { grid-template-columns: 1fr 1fr !important; }
+            .kpi-value { font-size: 16px; }
+            /* Cards mas compactas */
+            .card { padding: 16px; }
+            .card-title { font-size: 13px; }
+            /* Upload buttons full width */
+            .btn-upload-file { width: 100%; }
+            /* Tabla responsive */
+            .data-table { font-size: 12px; }
+            .data-table th { padding: 8px 6px; font-size: 10px; }
+            .data-table td { padding: 8px 6px; }
+        }
 
         .page-title {
             display: flex; align-items: center; gap: 12px;
