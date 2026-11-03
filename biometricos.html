@@ -7,14 +7,11 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
         :root {
-            --primary-blue: #152B71; --light-blue: #eef2ff; --bg-color: #f8fafc;
+            --primary-blue: #000000; --light-blue: #e8e8e8; --bg-color: #f8fafc;
             --text-main: #1e293b; --text-muted: #64748b; --border-color: #e2e8f0;
             --success-bg: #f0fdf4; --success-text: #166534; --danger: #dc2626;
         }
@@ -37,7 +34,7 @@
         .sidebar .section-title { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin: 10px 15px; padding-bottom: 0; border-bottom: none; display: block; }
         .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 15px; color: var(--text-main); text-decoration: none; font-size: 14px; font-weight: 500; border-radius: 8px; margin-bottom: 2px; transition: all 0.2s; }
         .nav-item:hover { background-color: var(--bg-color); }
-        .nav-item.active { background-color: var(--light-blue); color: var(--primary-blue); font-weight: 700; border-left: 4px solid var(--primary-blue); }
+        .nav-item.active { background-color: #e8e8e8 !important; color: #000000 !important; font-weight: 700 !important; border-left: 4px solid #000000 !important; border-radius: 8px !important; }
         .nav-item.active i { color: var(--primary-blue); }
 
         .content { flex: 1; padding: 20px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
@@ -73,18 +70,22 @@
         .fab-download:hover { transform: translateY(-5px); background-color: #b91c1c; }
         @media (max-width: 768px) { .fab-download { bottom: 20px; right: 20px; padding: 14px 20px; font-size: 14px; } }
     </style>
+
+    <!-- Firebase SDK + FYTTSA shared data helper -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="fyttsa-data.js"></script>
 </head>
 <body>
 
     <header class="header">
         <div class="header-left">
             <button class="menu-btn" id="toggle-menu"><i data-lucide="menu"></i></button>
-            <img src="https://i.ibb.co/fdMsnKTg/LOGO2.png" alt="Logo" style="height: 35px; object-fit: contain;">
-            <h1 class="header-title">Biométricos</h1>
+            <h1 class="header-title">FYTTSA</h1>
         </div>
         <div class="header-right">
             <div class="user-initial" id="user-initial">U</div>
-            <img src="https://i.ibb.co/jv9mNxYr/LOGO1.png" alt="User" height="35" style="border-radius:4px;">
+            <img src="https://i.ibb.co/x8Bw8KR8/MARFIL-1.jpg" alt="User" height="35" style="border-radius:4px;">
         </div>
     </header>
 
@@ -170,6 +171,7 @@
 
         fetch('menu.html').then(res => res.text()).then(html => {
             document.getElementById('sidebar').innerHTML = html; lucide.createIcons();
+                fyttsa_applyPrivilegeMenu();
             const linkInicio = document.getElementById('link-inicio'); if(linkInicio) linkInicio.classList.remove('active');
             const linkBiometricos = document.getElementById('link-biometricos'); if(linkBiometricos) linkBiometricos.classList.add('active');
         });
@@ -313,18 +315,18 @@
 
             const crearHoja = (titulo, tbodyId) => `
                 <div style="padding: 20px 30px; background: white; font-family: 'Inter', sans-serif;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #152B71; padding-bottom: 10px; margin-bottom: 15px;">
-                        <img src="https://i.ibb.co/fdMsnKTg/LOGO2.png" style="height: 40px;">
-                        <div style="text-align: center; color: #152B71;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000000; padding-bottom: 10px; margin-bottom: 15px;">
+                        <img src="https://i.ibb.co/x8Bw8KR8/MARFIL-1.jpg" style="height: 40px;">
+                        <div style="text-align: center; color: #000000;">
                             <h2 style="margin: 0; font-size: 18px; font-weight: 800; text-transform: uppercase;">BIOMÉTRICO</h2>
                             <h3 style="margin: 3px 0 0 0; font-size: 14px; color: #1e293b; font-weight: 700;">${nombreUsuario}</h3>
                         </div>
-                        <img src="https://i.ibb.co/jv9mNxYr/LOGO1.png" style="height: 40px; border-radius: 4px;">
+                        <img src="https://i.ibb.co/x8Bw8KR8/MARFIL-1.jpg" style="height: 40px; border-radius: 4px;">
                     </div>
-                    <h3 style="color: #152B71; font-size: 14px; margin-bottom: 10px; font-weight: bold;">${titulo}</h3>
+                    <h3 style="color: #000000; font-size: 14px; margin-bottom: 10px; font-weight: bold;">${titulo}</h3>
                     <table style="width: 100%; border-collapse: collapse; font-size: 9px; margin-bottom: 10px;">
                         <thead>
-                            <tr style="background-color: #eef2ff; color: #152B71; text-transform: uppercase;">
+                            <tr style="background-color: #e8e8e8; color: #000000; text-transform: uppercase;">
                                 <th style="padding: 7px 4px; border: 1px solid #e2e8f0; text-align: center;">#</th>
                                 <th style="padding: 7px 4px; border: 1px solid #e2e8f0; text-align: center;">Día / Fecha</th>
                                 <th style="padding: 7px 4px; border: 1px solid #e2e8f0; text-align: center;">Sitio / Obra</th>
@@ -349,8 +351,8 @@
             const celdas = pdfWrap.querySelectorAll('td');
             celdas.forEach(td => { td.style.padding = '5px 4px'; td.style.border = '1px solid #e2e8f0'; td.style.textAlign = 'center'; td.style.fontSize = '9px'; if(td.querySelector('.cell-empty')) { td.style.color = '#cbd5e1'; } });
             pdfWrap.querySelectorAll('.cell-fecha').forEach(td => { td.style.color = '#64748b'; td.style.setProperty('font-size', '9px', 'important'); });
-            pdfWrap.querySelectorAll('.cell-dia').forEach(td => { td.style.fontWeight = 'bold'; td.style.color = '#152B71'; td.style.setProperty('font-size', '9px', 'important'); });
-            pdfWrap.querySelectorAll('.cell-horas-jor').forEach(span => { span.style.color = '#152B71'; span.style.fontWeight = 'bold'; });
+            pdfWrap.querySelectorAll('.cell-dia').forEach(td => { td.style.fontWeight = 'bold'; td.style.color = '#000000'; td.style.setProperty('font-size', '9px', 'important'); });
+            pdfWrap.querySelectorAll('.cell-horas-jor').forEach(span => { span.style.color = '#000000'; span.style.fontWeight = 'bold'; });
             pdfWrap.querySelectorAll('.cell-horas-te').forEach(span => { span.style.color = '#0f766e'; span.style.fontWeight = 'bold'; });
             pdfWrap.querySelectorAll('.row-active').forEach(tr => { tr.style.backgroundColor = '#f0fdf4'; tr.querySelectorAll('td').forEach(td => { if(!td.querySelector('.cell-empty')) td.style.color = '#166534'; }); });
 
