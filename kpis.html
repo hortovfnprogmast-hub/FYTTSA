@@ -113,6 +113,28 @@
         .worker-avg-value { font-size: 32px; font-weight: 800; color: var(--primary-blue); line-height: 1; }
         .worker-avg-label { font-size: 10px; color: var(--text-muted); font-weight: 800; text-transform: uppercase; margin-top: 6px; letter-spacing: 0.4px; }
 
+        /* Period selector */
+        .period-selector {
+            display: flex; gap: 6px; padding: 6px;
+            background: var(--bg-color); border-radius: 12px;
+            border: 1px solid var(--border-color);
+            width: fit-content;
+        }
+        .period-btn {
+            background: transparent; border: none;
+            padding: 9px 18px; border-radius: 8px;
+            font-size: 12px; font-weight: 700; color: var(--text-muted);
+            cursor: pointer; font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .period-btn:hover { color: var(--text-main); }
+        .period-btn.active {
+            background: var(--primary-blue); color: white;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+        .period-btn i { width: 14px; height: 14px; }
+
         /* KPI grid */
         .kpi-grid {
             display: grid;
@@ -168,58 +190,163 @@
         .chart-title i { width: 18px; height: 18px; color: var(--primary-blue); }
         .chart-wrap { position: relative; height: 280px; }
 
-        /* Tables */
-        .table-responsive {
+        /* =====================================================
+           KPI EXCEL-STYLE TABLE (read-only)
+           Two-row header for semanal (months row + weeks row).
+           Single-row header for mensual / anual.
+           ===================================================== */
+        .kpi-excel-wrap {
             width: 100%; overflow-x: auto;
-            border-radius: 14px; border: 1px solid var(--border-color);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
             background: white;
+            scroll-behavior: smooth;
+            max-height: 70vh; overflow-y: auto;
         }
-        .data-table {
+        .kpi-excel-table {
             width: 100%; border-collapse: collapse;
-            min-width: 800px;
+            font-size: 12px;
+            table-layout: fixed;
         }
-        .data-table th {
+        .kpi-excel-table col.col-name   { width: 240px; }
+        .kpi-excel-table col.col-via    { width: 130px; }
+        .kpi-excel-table col.col-corte  { width: 110px; }
+        .kpi-excel-table col.col-peso   { width: 55px; }
+        .kpi-excel-table col.col-week   { width: 55px; }
+        .kpi-excel-table col.col-period { width: 110px; }
+
+        /* Header — sticky so weeks/months stay visible when scrolling vertically */
+        .kpi-excel-table thead th {
+            position: sticky; top: 0; z-index: 5;
             background: var(--primary-blue); color: white;
-            text-transform: uppercase; font-size: 10.5px; font-weight: 800;
-            padding: 12px 10px; text-align: left;
+            padding: 8px 4px; text-align: center;
+            font-size: 11px; font-weight: 800;
             border-right: 1px solid rgba(255,255,255,0.15);
-            letter-spacing: 0.4px; white-space: nowrap;
-        }
-        .data-table th:last-child { border-right: none; }
-        .data-table th.center { text-align: center; }
-        .data-table th.right { text-align: right; }
-        .data-table td {
-            padding: 11px 10px;
-            border-bottom: 1px solid var(--bg-color);
-            color: var(--text-main); font-size: 12.5px; font-weight: 500;
+            letter-spacing: 0.3px; white-space: nowrap;
             vertical-align: middle;
         }
-        .data-table tbody tr:last-child td { border-bottom: none; }
-        .data-table tbody tr:hover { background: var(--bg-color); }
-        .num-cell { text-align: right; font-weight: 700; }
-        .center-cell { text-align: center; }
-        .empty-row { text-align: center; color: var(--text-muted); font-style: italic; padding: 30px !important; }
+        .kpi-excel-table thead tr:first-child th:first-child,
+        .kpi-excel-table thead tr:first-child th:nth-child(2),
+        .kpi-excel-table thead tr:first-child th:nth-child(3),
+        .kpi-excel-table thead tr:first-child th:nth-child(4) { text-align: left; padding-left: 10px; }
+        .kpi-excel-table thead th:last-child { border-right: none; }
+        .kpi-excel-table thead th .period-label { display: block; font-size: 11px; line-height: 1.2; }
+        .kpi-excel-table thead th .period-sub { display: block; font-size: 9px; font-weight: 500; opacity: 0.75; margin-top: 2px; }
+        .kpi-excel-table thead th.current-week { background: #2d2d2d; box-shadow: inset 0 -3px 0 var(--success); }
 
-        .status-badge {
-            display: inline-flex; align-items: center; gap: 4px;
-            padding: 4px 10px; border-radius: 20px;
-            font-size: 10px; font-weight: 800; text-transform: uppercase;
-            letter-spacing: 0.3px;
+        /* Months row (only in semanal mode) */
+        .kpi-excel-table thead tr.month-row th {
+            background: #1c1c1c; font-size: 10px; padding: 6px 4px;
+            font-weight: 800; text-transform: uppercase;
+            border-right: 1px solid rgba(255,255,255,0.1);
+            letter-spacing: 0.5px;
         }
-        .status-badge.good { background: #dcfce7; color: #166534; }
-        .status-badge.medium { background: #fef3c7; color: #92400e; }
-        .status-badge.bad { background: #fee2e2; color: #991b1b; }
+        .kpi-excel-table thead tr.month-row th.col-name-stub,
+        .kpi-excel-table thead tr.month-row th.col-via-stub,
+        .kpi-excel-table thead tr.month-row th.col-corte-stub,
+        .kpi-excel-table thead tr.month-row th.col-peso-stub {
+            background: var(--primary-blue);
+            position: sticky;
+            z-index: 6;
+        }
+        .kpi-excel-table thead tr.month-row th.col-name-stub { left: 0; }
+        .kpi-excel-table thead tr.month-row th.col-via-stub  { left: 240px; }
+        .kpi-excel-table thead tr.month-row th.col-corte-stub{ left: 370px; }
+        .kpi-excel-table thead tr.month-row th.col-peso-stub { left: 480px; }
 
-        .btn-action {
-            padding: 7px 12px; border-radius: 8px;
-            font-weight: 700; font-size: 11px; cursor: pointer; border: none;
-            font-family: 'Inter', sans-serif;
-            display: inline-flex; align-items: center; gap: 4px;
-            transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.3px;
+        /* Sticky left columns when scrolling horizontally (months row) */
+        .kpi-excel-table thead tr.week-row th.col-name,
+        .kpi-excel-table thead tr.week-row th.col-via,
+        .kpi-excel-table thead tr.week-row th.col-corte,
+        .kpi-excel-table thead tr.week-row th.col-peso {
+            position: sticky; z-index: 6;
         }
-        .btn-action i { width: 12px; height: 12px; }
-        .btn-view { background: white; color: var(--primary-blue); border: 1.5px solid var(--primary-blue); }
-        .btn-view:hover { background: var(--light-blue); }
+        .kpi-excel-table thead tr.week-row th.col-name  { left: 0; }
+        .kpi-excel-table thead tr.week-row th.col-via   { left: 240px; }
+        .kpi-excel-table thead tr.week-row th.col-corte { left: 370px; }
+        .kpi-excel-table thead tr.week-row th.col-peso  { left: 480px; }
+
+        .kpi-excel-table tbody td {
+            padding: 6px 8px;
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+            font-size: 12px;
+        }
+        .kpi-excel-table tbody td:last-child { border-right: none; }
+
+        /* Worker row */
+        .kpi-excel-table tr.worker-row td {
+            background: var(--light-blue);
+            font-weight: 800; font-size: 13px;
+            padding: 10px;
+            color: var(--primary-blue);
+        }
+        .kpi-excel-table tr.worker-row td.worker-cell .worker-cell-name {
+            font-size: 14px; font-weight: 800;
+        }
+        .kpi-excel-table tr.worker-row td.worker-cell .worker-cell-pos {
+            font-size: 11px; font-weight: 600; color: var(--text-muted); margin-top: 2px;
+        }
+        .kpi-excel-table tr.worker-row td.peso-cell,
+        .kpi-excel-table tr.worker-row td.overall-cell {
+            text-align: center; font-weight: 800; font-size: 13px;
+            color: var(--primary-blue);
+        }
+        .kpi-excel-table tr.worker-row td.overall-cell.current-week { background: #d4d4d4; }
+
+        /* % Inc row */
+        .kpi-excel-table tr.inc-row td {
+            background: #f1f1f1; font-style: italic;
+            font-size: 11px; color: var(--text-muted);
+            font-weight: 700; padding: 7px 10px;
+        }
+        .kpi-excel-table tr.inc-row td.inc-label-cell {
+            font-weight: 800; font-style: normal;
+            color: var(--primary-blue); font-size: 12px;
+        }
+        .kpi-excel-table tr.inc-row td.inc-cell {
+            text-align: center; font-weight: 800; font-style: normal;
+            color: var(--primary-blue); font-size: 12px;
+        }
+        .kpi-excel-table tr.inc-row td.inc-cell.current-week { background: #e8e8e8; }
+
+        /* Indicator rows */
+        .kpi-excel-table tr.indicator-row td { background: white; }
+        .kpi-excel-table tr.indicator-row:nth-child(even) td { background: #fafafa; }
+        .kpi-excel-table tr.indicator-row:hover td { background: #f0f7ff; }
+        .kpi-excel-table tr.indicator-row td.ind-name-cell { font-weight: 600; }
+        .kpi-excel-table tr.indicator-row td.peso-cell {
+            text-align: center; font-weight: 800; font-size: 12px;
+            color: var(--primary-blue);
+        }
+        .kpi-excel-table tr.indicator-row td.score-cell {
+            text-align: center; font-weight: 700; font-size: 11.5px;
+        }
+        .kpi-excel-table tr.indicator-row td.score-cell.score-good    { background-color: #dcfce7 !important; color: #166534; }
+        .kpi-excel-table tr.indicator-row td.score-cell.score-medium  { background-color: #fef3c7 !important; color: #92400e; }
+        .kpi-excel-table tr.indicator-row td.score-cell.score-bad     { background-color: #fee2e2 !important; color: #991b1b; }
+        .kpi-excel-table tr.indicator-row td.score-cell.current-week  { box-shadow: inset 0 -3px 0 var(--success); }
+        .kpi-excel-table tr.indicator-row td.score-cell.no-score      { color: var(--text-muted); font-weight: 500; }
+
+        /* Observations list */
+        .observations-list {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 14px;
+        }
+        .obs-card {
+            background: #fffbeb; border: 1px solid #fef3c7;
+            border-radius: 10px; padding: 14px 16px;
+        }
+        .obs-card-title {
+            font-size: 11px; font-weight: 800; color: #92400e;
+            text-transform: uppercase; letter-spacing: 0.3px;
+            margin-bottom: 6px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .obs-card-title i { width: 14px; height: 14px; }
+        .obs-card-text { font-size: 13px; color: #4d2b00; font-weight: 500; line-height: 1.5; }
+        .obs-card-text.empty { font-style: italic; color: #a98c5a; }
 
         /* Empty state */
         .empty-state {
@@ -230,72 +357,15 @@
         .empty-state h3 { font-size: 18px; font-weight: 700; color: var(--text-main); margin-bottom: 6px; }
         .empty-state p { font-size: 13px; }
 
-        /* Modal */
-        .modal-overlay {
-            display: none; position: fixed; inset: 0;
-            background: rgba(15, 23, 42, 0.82);
-            backdrop-filter: blur(6px);
-            z-index: 2000;
-            align-items: center; justify-content: center;
-            padding: 16px;
+        .status-badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 4px 10px; border-radius: 20px;
+            font-size: 10px; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
-        .modal-overlay.show { display: flex; }
-        .modal-box {
-            background: white; border-radius: 20px;
-            width: 100%; max-width: 760px; padding: 24px;
-            box-shadow: 0 30px 70px rgba(0,0,0,0.4);
-            animation: slideIn 0.3s cubic-bezier(.2,.8,.3,1);
-            max-height: 90vh; overflow-y: auto;
-        }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .modal-header {
-            display: flex; align-items: center; justify-content: space-between;
-            gap: 12px; margin-bottom: 16px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid var(--bg-color);
-        }
-        .modal-header-left { display: flex; align-items: center; gap: 12px; }
-        .modal-icon {
-            width: 44px; height: 44px; border-radius: 12px;
-            background: var(--light-blue); color: var(--primary-blue);
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0;
-        }
-        .modal-icon i { width: 24px; height: 24px; }
-        .modal-title { font-size: 16px; font-weight: 800; color: var(--text-main); }
-        .modal-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-        .modal-close {
-            background: none; border: none; cursor: pointer;
-            color: var(--text-muted); padding: 6px;
-        }
-        .modal-close i { width: 20px; height: 20px; }
-        .modal-close:hover { color: var(--danger); }
-
-        .modal-stat-row {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
-            margin-bottom: 18px;
-        }
-        @media (max-width: 600px) { .modal-stat-row { grid-template-columns: 1fr; } }
-        .modal-stat {
-            background: var(--bg-color); border-radius: 12px;
-            padding: 12px 14px; border: 1px solid var(--border-color);
-        }
-        .modal-stat-label { font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
-        .modal-stat-value { font-size: 16px; font-weight: 800; color: var(--primary-blue); margin-top: 4px; }
-
-        .observation-box {
-            background: #fffbeb; border: 1px solid #fef3c7;
-            border-radius: 12px; padding: 14px 16px;
-            margin-top: 18px;
-        }
-        .observation-box-title {
-            font-size: 11px; font-weight: 800; color: #92400e;
-            text-transform: uppercase; letter-spacing: 0.4px;
-            margin-bottom: 6px;
-            display: flex; align-items: center; gap: 6px;
-        }
-        .observation-box-title i { width: 14px; height: 14px; }
-        .observation-box-text { font-size: 13px; color: #4d2b00; font-weight: 500; line-height: 1.5; }
+        .status-badge.good { background: #dcfce7; color: #166534; }
+        .status-badge.medium { background: #fef3c7; color: #92400e; }
+        .status-badge.bad { background: #fee2e2; color: #991b1b; }
 
         /* Toast */
         .toast {
@@ -340,7 +410,6 @@ const FYTTSA_FIREBASE_CONFIG = {
     measurementId: "G-7PQ1R77YJ3"
 };
 
-// Initialize Firebase once
 let _fyttsaDb = null;
 let _fyttsaFirebaseReady = false;
 
@@ -357,112 +426,25 @@ function _fyttsaInitFirebase() {
     return false;
 }
 
-// Try to init immediately if firebase is already loaded
 if (typeof firebase !== 'undefined') {
     _fyttsaInitFirebase();
 }
 
-// Also try after window load (in case scripts load async)
 window.addEventListener('load', function() {
     if (!_fyttsaFirebaseReady && typeof firebase !== 'undefined') {
         _fyttsaInitFirebase();
     }
 });
 
-/**
- * Get the current user ID from localStorage.
- */
 function fyttsa_getUserId() {
     return localStorage.getItem('usuario') || null;
-}
-
-/**
- * Load data for the current user from Firestore.
- * Falls back to localStorage if Firestore is unavailable.
- */
-async function fyttsa_loadData(key) {
-    const userId = fyttsa_getUserId();
-
-    if (userId) {
-        if (!_fyttsaFirebaseReady && typeof firebase !== 'undefined') {
-            _fyttsaInitFirebase();
-        }
-        if (_fyttsaFirebaseReady) {
-            try {
-                const doc = await _fyttsaDb.collection('usuarios')
-                    .doc(userId)
-                    .collection('app_data')
-                    .doc(key)
-                    .get();
-                if (doc.exists && doc.data().value !== undefined) {
-                    return doc.data().value;
-                }
-            } catch (e) {
-                console.warn('[FYTTSA] Firestore load failed, falling back to localStorage:', e);
-            }
-        }
-    }
-
-    // Fallback to localStorage
-    try {
-        const raw = localStorage.getItem(key);
-        return raw ? JSON.parse(raw) : null;
-    } catch (e) {
-        return null;
-    }
-}
-
-/**
- * Save data for the current user to Firestore.
- * Also saves to localStorage as a cache/fallback.
- */
-async function fyttsa_saveData(key, value) {
-    const userId = fyttsa_getUserId();
-
-    try {
-        localStorage.setItem(key, JSON.stringify(value));
-    } catch (e) {
-        console.warn('[FYTTSA] localStorage save failed:', e);
-    }
-
-    if (userId) {
-        if (!_fyttsaFirebaseReady && typeof firebase !== 'undefined') {
-            _fyttsaInitFirebase();
-        }
-        if (_fyttsaFirebaseReady) {
-            try {
-                await _fyttsaDb.collection('usuarios')
-                    .doc(userId)
-                    .collection('app_data')
-                    .doc(key)
-                    .set({
-                        value: value,
-                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-            } catch (e) {
-                console.warn('[FYTTSA] Firestore save failed:', e);
-            }
-        }
-    }
-}
-
-/**
- * Save data synchronously to localStorage and fire async Firestore save.
- */
-function fyttsa_saveDataSync(key, value) {
-    try {
-        localStorage.setItem(key, JSON.stringify(value));
-    } catch (e) {
-        console.warn('[FYTTSA] localStorage save failed:', e);
-    }
-    fyttsa_saveData(key, value);
 }
 
 // =====================================================
 // PRIVILEGE-BASED MENU VISIBILITY + ACTIVE MENU STYLING
 // =====================================================
 // Privilegio 1 = see ALL menu sections
-// Privilegio 2 = see ONLY Inicio + Trabajador section (hide Obra, Control, Almacén)
+// Privilegio 2 = see ONLY Inicio + Trabajador section
 // =====================================================
 
 function _fyttsa_applyMenuVisibility() {
@@ -496,18 +478,9 @@ function _fyttsa_applyActiveStyle() {
     }
 }
 
-// Public function that pages call after loading menu.html
 function fyttsa_applyPrivilegeMenu() {
     _fyttsa_applyMenuVisibility();
 }
-
-// =====================================================
-// AUTO-SETUP: Runs automatically when the script loads.
-// Uses a MutationObserver to detect when the sidebar content
-// changes (i.e., when menu.html is loaded via fetch), then:
-//   1. Applies privilege-based menu visibility
-//   2. Starts an interval to apply active menu styling
-// =====================================================
 
 (function() {
     var styleIntervalStarted = false;
@@ -605,7 +578,7 @@ function fyttsa_applyPrivilegeMenu() {
                 <i data-lucide="target"></i>
                 Mis KPIs
             </h1>
-            <p class="page-subtitle">Seguimiento de tus indicadores de desempeño, evaluaciones semanales y observaciones del supervisor.</p>
+            <p class="page-subtitle">Seguimiento de tus indicadores de desempeño conforme al Excel "Equipo Construcción SCD Indicadores 2026 3Q".</p>
 
             <!-- Header worker card -->
             <div class="card" id="worker-header-card">
@@ -623,13 +596,36 @@ function fyttsa_applyPrivilegeMenu() {
                 </div>
             </div>
 
-            <!-- KPI Cards -->
+            <!-- KPI Table card -->
+            <div class="card" id="kpi-table-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 2px solid var(--light-blue); flex-wrap: wrap; gap: 12px;">
+                    <h3 class="card-title" style="margin: 0; border: none; padding: 0;">
+                        <i data-lucide="table"></i> Indicadores de Desempeño
+                    </h3>
+                    <div class="period-selector" id="period-selector">
+                        <button class="period-btn active" data-period="semanal"><i data-lucide="calendar"></i> Semanal</button>
+                        <button class="period-btn" data-period="mensual"><i data-lucide="calendar-days"></i> Mensual</button>
+                        <button class="period-btn" data-period="anual"><i data-lucide="calendar-range"></i> Anual</button>
+                    </div>
+                </div>
+                <div class="kpi-excel-wrap" id="kpi-excel-wrap">
+                    <table class="kpi-excel-table" id="kpi-table">
+                        <colgroup id="colgroup-kpi"></colgroup>
+                        <thead id="thead-kpi"></thead>
+                        <tbody id="tbody-kpi">
+                            <tr><td colspan="5" class="loading-row"><i data-lucide="loader-2"></i></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- KPI Cards (dashboard) -->
             <div class="kpi-grid" id="kpi-grid">
                 <div class="kpi-card info">
                     <div class="kpi-icon"><i data-lucide="trending-up"></i></div>
                     <div class="kpi-info">
-                        <div class="kpi-value" id="kpi-trimestral">—</div>
-                        <div class="kpi-label">Promedio Trimestral</div>
+                        <div class="kpi-value" id="kpi-periodo">—</div>
+                        <div class="kpi-label">Promedio del Periodo</div>
                     </div>
                 </div>
                 <div class="kpi-card success">
@@ -646,12 +642,19 @@ function fyttsa_applyPrivilegeMenu() {
                         <div class="kpi-label">Peor Semana</div>
                     </div>
                 </div>
+                <div class="kpi-card purple">
+                    <div class="kpi-icon"><i data-lucide="star"></i></div>
+                    <div class="kpi-info">
+                        <div class="kpi-value" id="kpi-mejor-ind">—</div>
+                        <div class="kpi-label">Mejor Indicador</div>
+                    </div>
+                </div>
             </div>
 
             <!-- Charts -->
             <div class="charts-grid">
                 <div class="chart-box">
-                    <div class="chart-title"><i data-lucide="line-chart"></i> Tendencia Semanal</div>
+                    <div class="chart-title"><i data-lucide="line-chart"></i> Tendencia del Promedio</div>
                     <div class="chart-wrap"><canvas id="chartTendencia"></canvas></div>
                 </div>
                 <div class="chart-box">
@@ -660,107 +663,16 @@ function fyttsa_applyPrivilegeMenu() {
                 </div>
             </div>
 
-            <!-- Detailed table -->
+            <!-- Observations -->
             <div class="card">
                 <h3 class="card-title">
-                    <i data-lucide="table"></i> Historial de Evaluaciones
+                    <i data-lucide="message-square"></i> Observaciones del Supervisor
                 </h3>
-                <div class="table-responsive">
-                    <table class="data-table" id="table-historial">
-                        <thead>
-                            <tr>
-                                <th class="center">Semana</th>
-                                <th>Periodo</th>
-                                <th>Mes</th>
-                                <th class="right">Promedio</th>
-                                <th class="center">Estatus</th>
-                                <th class="center">Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tbody-historial">
-                            <tr><td colspan="6" class="empty-row">Cargando evaluaciones...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Indicator definitions -->
-            <div class="card">
-                <h3 class="card-title">
-                    <i data-lucide="list-checks"></i> Definición de Indicadores
-                </h3>
-                <div class="table-responsive">
-                    <table class="data-table" id="table-defs">
-                        <thead>
-                            <tr>
-                                <th>Indicador</th>
-                                <th class="center">Peso (%)</th>
-                                <th>Entrega</th>
-                                <th>Destinatarios</th>
-                                <th>Plazo</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tbody-defs">
-                            <tr><td colspan="5" class="empty-row">Cargando indicadores...</td></tr>
-                        </tbody>
-                    </table>
+                <div class="observations-list" id="observations-list">
+                    <div style="color: var(--text-muted); font-size: 12px;">Cargando observaciones...</div>
                 </div>
             </div>
         </main>
-    </div>
-
-    <!-- Modal detalle -->
-    <div class="modal-overlay" id="modal-detalle">
-        <div class="modal-box">
-            <div class="modal-header">
-                <div class="modal-header-left">
-                    <div class="modal-icon"><i data-lucide="clipboard-list"></i></div>
-                    <div>
-                        <div class="modal-title" id="modal-detalle-title">Detalle de Evaluación</div>
-                        <div class="modal-subtitle" id="modal-detalle-subtitle">—</div>
-                    </div>
-                </div>
-                <button class="modal-close" onclick="cerrarModalDetalle()"><i data-lucide="x"></i></button>
-            </div>
-
-            <div class="modal-stat-row">
-                <div class="modal-stat">
-                    <div class="modal-stat-label">Semana</div>
-                    <div class="modal-stat-value" id="modal-stat-semana">—</div>
-                </div>
-                <div class="modal-stat">
-                    <div class="modal-stat-label">Periodo</div>
-                    <div class="modal-stat-value" id="modal-stat-periodo">—</div>
-                </div>
-                <div class="modal-stat">
-                    <div class="modal-stat-label">Promedio</div>
-                    <div class="modal-stat-value" id="modal-stat-promedio">—</div>
-                </div>
-            </div>
-
-            <div class="table-responsive">
-                <table class="data-table" id="table-detalle">
-                    <thead>
-                        <tr>
-                            <th>Indicador</th>
-                            <th class="center">Peso</th>
-                            <th class="center">Score</th>
-                            <th class="right">Aporte</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbody-detalle"></tbody>
-                </table>
-            </div>
-
-            <div class="observation-box">
-                <div class="observation-box-title"><i data-lucide="message-square"></i> Observación del Supervisor</div>
-                <div class="observation-box-text" id="modal-observacion">—</div>
-            </div>
-
-            <div style="display: flex; justify-content: flex-end; margin-top: 18px;">
-                <button class="btn-action btn-view" onclick="cerrarModalDetalle()"><i data-lucide="x"></i> Cerrar</button>
-            </div>
-        </div>
     </div>
 
     <!-- Toast -->
@@ -779,15 +691,23 @@ function fyttsa_applyPrivilegeMenu() {
         // State
         // =====================================================
         const WORKER_ID = localStorage.getItem('usuario') || 'SinID';
-        const WORKER_NAME = localStorage.getItem('nombre') || 'Trabajador';
+        const WORKER_NAME_FALLBACK = localStorage.getItem('nombre') || 'Trabajador';
 
-        let stateConfig = null;       // kpis_config doc
-        let stateEvals = [];          // kpis_eval docs array
+        // workerDoc: the full kpi_workers document for this user
+        let workerDoc = null;
+        // current period: 'semanal' | 'mensual' | 'anual'
+        let currentPeriod = 'semanal';
+
+        // Charts
         let trendChart = null;
         let radarChart = null;
 
         const COLOR_PRIMARIO = '#000000';
         const COLOR_PRIMARIO_BG = 'rgba(0, 0, 0, 0.15)';
+
+        // Constants for the 52-week Excel layout
+        const ALL_WEEKS = Array.from({ length: 52 }, (_, i) => i + 1); // [1..52]
+        const DEFAULT_FOCUS_WEEK = 27; // Default leftmost week shown on initial render
 
         // =====================================================
         // Helpers
@@ -803,80 +723,545 @@ function fyttsa_applyPrivilegeMenu() {
             setTimeout(() => t.classList.remove('show'), 3000);
         }
 
-        function formatPct(v) {
-            if (v === null || v === undefined || isNaN(v)) return '—';
-            return Number(v).toFixed(1) + '%';
-        }
-
-        function statusFor(avg) {
-            if (avg >= 75) return { cls: 'good', text: 'Bueno' };
-            if (avg >= 50) return { cls: 'medium', text: 'Regular' };
-            return { cls: 'bad', text: 'Bajo' };
-        }
-
         function escapeHtml(s) {
             if (s === null || s === undefined) return '';
             return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
         }
 
-        // =====================================================
-        // Data load
-        // =====================================================
-        async function loadAll() {
-            try {
-                const [configSnap, evalSnap] = await Promise.all([
-                    db.collection('kpis_config').doc(WORKER_ID).get(),
-                    db.collection('kpis_eval').where('workerId', '==', WORKER_ID).get()
-                ]);
+        function truncate(s, n) {
+            if (!s) return '—';
+            s = String(s);
+            return s.length > n ? s.substring(0, n) + '…' : s;
+        }
 
-                stateConfig = configSnap.exists ? configSnap.data() : null;
+        function statusFor(avgPct) {
+            if (avgPct >= 75) return { cls: 'good', text: 'Bueno' };
+            if (avgPct >= 50) return { cls: 'medium', text: 'Regular' };
+            return { cls: 'bad', text: 'Bajo' };
+        }
 
-                stateEvals = [];
-                evalSnap.forEach(doc => stateEvals.push(doc.data()));
-                stateEvals.sort((a, b) => (a.week || 0) - (b.week || 0));
+        // Week date calc — Week 1 starts Dec 29, 2025
+        function getWeekStart(weekNum) {
+            const base = new Date(2025, 11, 29);
+            const d = new Date(base);
+            d.setDate(base.getDate() + (weekNum - 1) * 7);
+            return d;
+        }
+        function getWeekRange(weekNum) {
+            const start = getWeekStart(weekNum);
+            const end = new Date(start);
+            end.setDate(start.getDate() + 6);
+            const month = getWeekMonth(weekNum);
+            const fmt = d => d.toLocaleDateString('en-GB');
+            return { start: fmt(start), end: fmt(end), month, startDate: start, endDate: end };
+        }
 
-                renderAll();
-            } catch (e) {
-                console.error('[KPIs] Error al cargar:', e);
-                showToast('Error al cargar KPIs: ' + e.message, 'error');
-                renderEmptyStates();
-            }
+        // Verbatim per spec — used for monthly grouping & month labels.
+        function getWeekMonth(weekNum) {
+            const start = new Date(2025, 11, 29);
+            start.setDate(start.getDate() + (weekNum - 1) * 7);
+            const end = new Date(start);
+            end.setDate(start.getDate() + 6);
+            const months = ['Diciembre','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+            return months[end.getMonth()];
+        }
+
+        function getCurrentWeek() {
+            const week1Start = new Date(2025, 11, 29);
+            const now = new Date();
+            const diffDays = Math.floor((now - week1Start) / (1000 * 60 * 60 * 24));
+            if (diffDays < 0) return null;
+            return Math.floor(diffDays / 7) + 1;
+        }
+
+        // Normalize a raw score to 0..1 decimal.
+        function normalizeScore(v) {
+            if (v === null || v === undefined || v === '') return null;
+            const s = String(v).trim().replace('%', '').replace(',', '.');
+            const n = Number(s);
+            if (isNaN(n)) return null;
+            if (n > 1) return n / 100;
+            return n;
+        }
+
+        // Simple (unweighted) average of indicator scores for a given week (0..1)
+        function computeWeekOverall(indicators, weekNum) {
+            const w = String(weekNum);
+            const scores = (indicators || [])
+                .map(ind => normalizeScore(ind.weeklyScores && ind.weeklyScores[w]))
+                .filter(v => v !== null);
+            if (!scores.length) return null;
+            return scores.reduce((a, b) => a + b, 0) / scores.length;
+        }
+
+        // Weighted average: sum(weight * score) / 100 -> 0..1
+        function computeWeekWeighted(indicators, weekNum) {
+            const w = String(weekNum);
+            let total = 0, totalWeight = 0;
+            (indicators || []).forEach(ind => {
+                const s = normalizeScore(ind.weeklyScores && ind.weeklyScores[w]);
+                const weight = Number(ind.weight) || 0;
+                if (s !== null && weight > 0) {
+                    total += s * weight;
+                    totalWeight += weight;
+                }
+            });
+            if (totalWeight === 0) return null;
+            return total / 100;
+        }
+
+        // Weeks that have at least one score across any indicator (used for stats).
+        function getActiveWeeks() {
+            if (!workerDoc || !workerDoc.indicators) return [];
+            const weeks = new Set();
+            workerDoc.indicators.forEach(ind => {
+                if (ind.weeklyScores) Object.keys(ind.weeklyScores).forEach(w => { if (w !== '') weeks.add(Number(w)); });
+            });
+            return [...weeks].sort((a, b) => a - b);
+        }
+
+        // Overall avg across all active weeks (weighted, 0..1)
+        function computeOverallAvg() {
+            const weeks = getActiveWeeks();
+            const vals = weeks.map(w => computeWeekWeighted(workerDoc.indicators || [], w)).filter(v => v !== null);
+            if (!vals.length) return null;
+            return vals.reduce((a, b) => a + b, 0) / vals.length;
+        }
+
+        // Monthly grouping of weeks: { monthName: [weekNum, ...] }, preserving chronological order.
+        function groupWeeksByMonth(weeks) {
+            const groups = {};
+            const order = [];
+            weeks.forEach(w => {
+                const m = getWeekMonth(w);
+                if (!groups[m]) { groups[m] = []; order.push(m); }
+                groups[m].push(w);
+            });
+            return { groups, order };
+        }
+
+        // % increment: compares a period's weighted avg to the previous period's.
+        // Returns null for the first period or when no comparable data.
+        function computeInc(currentVal, prevVal) {
+            if (currentVal === null || prevVal === null || prevVal === 0) return null;
+            return ((currentVal - prevVal) / prevVal) * 100; // percentage difference
         }
 
         // =====================================================
-        // Render
+        // Data load
+        // Lookup chain:
+        //   1. db.collection('kpi_workers').doc(usuario).get()
+        //   2. db.collection('kpi_workers').doc(slugifiedName).get()
+        //   3. db.collection('kpi_workers').where('workerName', '==', rawName).get()
+        //   4. empty state
+        // =====================================================
+        async function loadWorkerDoc() {
+            try {
+                // 1. By usuario ID
+                let snap = await db.collection('kpi_workers').doc(WORKER_ID).get();
+                if (snap.exists) {
+                    workerDoc = snap.data();
+                    renderAll();
+                    return;
+                }
+
+                // 2. By slugified worker name (fallback for older data)
+                const slug = slugifyName(WORKER_NAME_FALLBACK);
+                if (slug && slug !== WORKER_ID) {
+                    const snap2 = await db.collection('kpi_workers').doc(slug).get();
+                    if (snap2.exists) {
+                        workerDoc = snap2.data();
+                        renderAll();
+                        return;
+                    }
+                }
+
+                // 3. By workerName field query
+                if (WORKER_NAME_FALLBACK && WORKER_NAME_FALLBACK !== 'Trabajador') {
+                    const qSnap = await db.collection('kpi_workers')
+                        .where('workerName', '==', WORKER_NAME_FALLBACK)
+                        .limit(1)
+                        .get();
+                    if (!qSnap.empty) {
+                        workerDoc = qSnap.docs[0].data();
+                        renderAll();
+                        return;
+                    }
+                    // Also try with the slug as the workerName (control_kpis uses raw name as doc id,
+                    // but some legacy rows might have stored a slug)
+                    if (slug) {
+                        const qSnap2 = await db.collection('kpi_workers')
+                            .where('workerName', '==', slug)
+                            .limit(1)
+                            .get();
+                        if (!qSnap2.empty) {
+                            workerDoc = qSnap2.docs[0].data();
+                            renderAll();
+                            return;
+                        }
+                    }
+                }
+
+                // 4. No data
+                workerDoc = null;
+                renderEmptyState();
+            } catch (e) {
+                console.error('[Mis KPIs] Error al cargar:', e);
+                showToast('Error al cargar KPIs: ' + e.message, 'error');
+                renderEmptyState();
+            }
+        }
+
+        function slugifyName(name) {
+            if (!name) return '';
+            return String(name).toLowerCase()
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-z0-9]+/g, '_')
+                .replace(/^_+|_+$/g, '')
+                .substring(0, 60);
+        }
+
+        // =====================================================
+        // Render dispatch
         // =====================================================
         function renderAll() {
             renderHeader();
-            renderKpis();
+            renderTable();
+            renderKpiCards();
             renderCharts();
-            renderHistorial();
-            renderDefs();
+            renderObservations();
             lucide.createIcons();
         }
 
         function renderHeader() {
-            const name = stateConfig?.workerName || WORKER_NAME;
-            const pos = stateConfig?.position || 'Sin puesto asignado';
+            const name = workerDoc?.workerName || WORKER_NAME_FALLBACK;
+            const pos = workerDoc?.position || 'Sin puesto asignado';
             document.getElementById('worker-avatar').textContent = (name.charAt(0) || 'U').toUpperCase();
             document.getElementById('worker-name').textContent = name;
             document.getElementById('worker-position').textContent = pos;
             document.getElementById('worker-id').textContent = 'ID: ' + WORKER_ID;
 
-            const allAvgs = stateEvals.map(e => Number(e.weeklyAverage)).filter(v => !isNaN(v));
-            const overallAvg = allAvgs.length ? (allAvgs.reduce((a, b) => a + b, 0) / allAvgs.length) : null;
-            document.getElementById('worker-avg-value').textContent = overallAvg !== null ? overallAvg.toFixed(1) + '%' : '—';
+            const overall = computeOverallAvg();
+            document.getElementById('worker-avg-value').textContent = overall !== null ? (overall * 100).toFixed(1) + '%' : '—';
         }
 
-        function renderKpis() {
-            const avgs = stateEvals.map(e => Number(e.weeklyAverage)).filter(v => !isNaN(v));
-            const trimestral = avgs.length ? (avgs.slice(-12).reduce((a, b) => a + b, 0) / Math.min(12, avgs.length)) : null;
-            const mejor = avgs.length ? Math.max(...avgs) : null;
-            const peor = avgs.length ? Math.min(...avgs) : null;
+        // =====================================================
+        // Build the column model for the current period
+        // =====================================================
+        function buildColumns() {
+            const currentWk = getCurrentWeek();
 
-            document.getElementById('kpi-trimestral').textContent = trimestral !== null ? trimestral.toFixed(1) + '%' : '—';
-            document.getElementById('kpi-mejor').textContent = mejor !== null ? mejor.toFixed(1) + '%' : '—';
-            document.getElementById('kpi-peor').textContent = peor !== null ? peor.toFixed(1) + '%' : '—';
+            if (currentPeriod === 'semanal') {
+                // Always show all 52 weeks (Excel structure). Empty cells render as '—'.
+                return ALL_WEEKS.map(w => {
+                    const r = getWeekRange(w);
+                    return {
+                        key: 'w' + w,
+                        week: w,
+                        label: 'Sem ' + w,
+                        sub: r.start + ' al ' + r.end,
+                        month: r.month,
+                        isCurrent: currentWk === w
+                    };
+                });
+            }
+            if (currentPeriod === 'mensual') {
+                const weeks = getActiveWeeks();
+                if (!weeks.length) return [];
+                const { groups, order } = groupWeeksByMonth(weeks);
+                // Mark the column containing the current week as "current"
+                const curMonth = currentWk ? getWeekMonth(currentWk) : null;
+                return order.map(month => ({
+                    key: 'm' + month,
+                    month,
+                    weeks: groups[month],
+                    label: month,
+                    sub: groups[month].length + ' semanas',
+                    isCurrent: month === curMonth
+                }));
+            }
+            // anual: single column
+            return [{
+                key: 'anual',
+                label: 'Promedio Anual',
+                sub: 'Todas las semanas',
+                isCurrent: false
+            }];
+        }
+
+        // =====================================================
+        // Render Excel-style table (read-only)
+        // =====================================================
+        function renderTable() {
+            const thead = document.getElementById('thead-kpi');
+            const tbody = document.getElementById('tbody-kpi');
+            const colgroup = document.getElementById('colgroup-kpi');
+
+            if (!workerDoc || !workerDoc.indicators || !workerDoc.indicators.length) {
+                colgroup.innerHTML = '';
+                thead.innerHTML = '';
+                tbody.innerHTML = '<tr><td><div class="empty-state"><i data-lucide="inbox"></i><h3>Sin indicadores</h3><p>Tu supervisor aún no ha configurado tus KPIs.</p></div></td></tr>';
+                lucide.createIcons();
+                return;
+            }
+
+            const indicators = workerDoc.indicators;
+            const columns = buildColumns();
+
+            if (!columns.length) {
+                colgroup.innerHTML = '';
+                thead.innerHTML = '';
+                tbody.innerHTML = '<tr><td><div class="empty-state"><i data-lucide="calendar-x"></i><h3>Sin evaluaciones</h3><p>Aún no hay calificaciones registradas.</p></div></td></tr>';
+                lucide.createIcons();
+                return;
+            }
+
+            // ----- Colgroup -----
+            let colHtml = '<col class="col-name"><col class="col-via"><col class="col-corte"><col class="col-peso">';
+            const weekColClass = currentPeriod === 'semanal' ? 'col-week' : 'col-period';
+            columns.forEach(() => { colHtml += `<col class="${weekColClass}">`; });
+            colgroup.innerHTML = colHtml;
+
+            // ----- Header -----
+            let headHtml = '';
+            if (currentPeriod === 'semanal') {
+                // Two-row header: months row + weeks row
+                // Months row: first 4 cells are sticky stubs (rowspan=2), then grouped months
+                headHtml += '<tr class="month-row">';
+                headHtml += '<th rowspan="2" class="col-name-stub">Trabajador / Indicador</th>';
+                headHtml += '<th rowspan="2" class="col-via-stub">Vía</th>';
+                headHtml += '<th rowspan="2" class="col-corte-stub">Corte</th>';
+                headHtml += '<th rowspan="2" class="col-peso-stub">Peso</th>';
+                // Group consecutive weeks by month
+                let prevMonth = null;
+                let runStart = 0;
+                const monthThs = [];
+                for (let i = 0; i < columns.length; i++) {
+                    const m = columns[i].month;
+                    if (m !== prevMonth) {
+                        if (prevMonth !== null) {
+                            monthThs.push({ month: prevMonth, span: i - runStart });
+                        }
+                        runStart = i;
+                        prevMonth = m;
+                    }
+                }
+                if (prevMonth !== null) {
+                    monthThs.push({ month: prevMonth, span: columns.length - runStart });
+                }
+                monthThs.forEach(g => {
+                    headHtml += `<th colspan="${g.span}">${escapeHtml(g.month)}</th>`;
+                });
+                headHtml += '</tr>';
+
+                // Weeks row
+                headHtml += '<tr class="week-row">';
+                columns.forEach(c => {
+                    headHtml += `<th class="${c.isCurrent ? 'current-week' : ''}">
+                        <span class="period-label">${escapeHtml(c.label)}</span>
+                        <span class="period-sub">${escapeHtml(c.sub)}</span>
+                    </th>`;
+                });
+                headHtml += '</tr>';
+            } else {
+                // Single-row header
+                headHtml += '<tr>';
+                headHtml += '<th class="col-name">Trabajador / Indicador</th>';
+                headHtml += '<th class="col-via">Vía</th>';
+                headHtml += '<th class="col-corte">Corte</th>';
+                headHtml += '<th class="col-peso">Peso</th>';
+                columns.forEach(c => {
+                    headHtml += `<th class="${c.isCurrent ? 'current-week' : ''}">
+                        <span class="period-label">${escapeHtml(c.label)}</span>
+                        <span class="period-sub">${escapeHtml(c.sub)}</span>
+                    </th>`;
+                });
+                headHtml += '</tr>';
+            }
+            thead.innerHTML = headHtml;
+
+            // ----- Body -----
+            let bodyHtml = '';
+
+            // Row 1: Worker (overall simple average per period)
+            bodyHtml += '<tr class="worker-row">';
+            bodyHtml += `<td class="worker-cell">
+                <div class="worker-cell-name">${escapeHtml(workerDoc.workerName || WORKER_NAME_FALLBACK)}</div>
+                <div class="worker-cell-pos">${escapeHtml(workerDoc.position || '—')}</div>
+            </td>`;
+            bodyHtml += '<td></td>';
+            bodyHtml += '<td></td>';
+            bodyHtml += '<td class="peso-cell">100%</td>';
+            columns.forEach(c => {
+                let val;
+                if (currentPeriod === 'semanal') {
+                    val = computeWeekOverall(indicators, c.week);
+                } else if (currentPeriod === 'mensual') {
+                    const vals = c.weeks.map(w => computeWeekOverall(indicators, w)).filter(v => v !== null);
+                    val = vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length) : null;
+                } else {
+                    val = computeOverallAvg();
+                }
+                bodyHtml += `<td class="overall-cell${c.isCurrent ? ' current-week' : ''}">${val !== null ? (val * 100).toFixed(2) + '%' : '—'}</td>`;
+            });
+            bodyHtml += '</tr>';
+
+            // Row 2: % Inc (period-over-period increment using weighted avg)
+            bodyHtml += '<tr class="inc-row">';
+            bodyHtml += '<td class="inc-label-cell">% Inc</td>';
+            bodyHtml += '<td></td>';
+            bodyHtml += '<td></td>';
+            bodyHtml += '<td></td>';
+            // Pre-compute weighted averages per column for inc calc
+            const colWeighted = columns.map(c => {
+                if (currentPeriod === 'semanal') return computeWeekWeighted(indicators, c.week);
+                if (currentPeriod === 'mensual') {
+                    const vals = c.weeks.map(w => computeWeekWeighted(indicators, w)).filter(v => v !== null);
+                    return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length) : null;
+                }
+                return computeOverallAvg();
+            });
+            columns.forEach((c, i) => {
+                // Find previous non-null column (skip empties)
+                let prevIdx = i - 1;
+                while (prevIdx >= 0 && colWeighted[prevIdx] === null) prevIdx--;
+                const inc = computeInc(colWeighted[i], prevIdx >= 0 ? colWeighted[prevIdx] : null);
+                let display = '—';
+                if (inc !== null && !isNaN(inc) && isFinite(inc)) {
+                    const sign = inc >= 0 ? '+' : '';
+                    display = sign + inc.toFixed(0) + '%';
+                }
+                bodyHtml += `<td class="inc-cell${c.isCurrent ? ' current-week' : ''}">${display}</td>`;
+            });
+            bodyHtml += '</tr>';
+
+            // Rows 3+: Each indicator
+            indicators.forEach((ind, idx) => {
+                bodyHtml += `<tr class="indicator-row" data-idx="${idx}">`;
+                bodyHtml += `<td class="ind-name-cell">${escapeHtml(ind.name || '—')}</td>`;
+                bodyHtml += `<td>${escapeHtml(ind.via || '—')}</td>`;
+                bodyHtml += `<td>${escapeHtml(ind.corte || '—')}</td>`;
+                bodyHtml += `<td class="peso-cell">${Number(ind.weight) || 0}%</td>`;
+
+                // Pre-compute per-column values for indicator (for inc display if needed)
+                columns.forEach(c => {
+                    let normalized;
+                    if (currentPeriod === 'semanal') {
+                        const rawScore = ind.weeklyScores ? ind.weeklyScores[String(c.week)] : undefined;
+                        normalized = normalizeScore(rawScore);
+                    } else if (currentPeriod === 'mensual') {
+                        const vals = c.weeks.map(w => normalizeScore(ind.weeklyScores && ind.weeklyScores[String(w)])).filter(v => v !== null);
+                        normalized = vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length) : null;
+                    } else {
+                        const allWeeks = getActiveWeeks();
+                        const vals = allWeeks.map(w => normalizeScore(ind.weeklyScores && ind.weeklyScores[String(w)])).filter(v => v !== null);
+                        normalized = vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length) : null;
+                    }
+                    let scoreClass = 'no-score';
+                    if (normalized !== null) {
+                        if (normalized >= 0.75) scoreClass = 'score-good';
+                        else if (normalized >= 0.5) scoreClass = 'score-medium';
+                        else scoreClass = 'score-bad';
+                    }
+                    const display = normalized !== null ? (normalized * 100).toFixed(0) + '%' : '—';
+                    bodyHtml += `<td class="score-cell ${scoreClass}${c.isCurrent ? ' current-week' : ''}">${display}</td>`;
+                });
+                bodyHtml += '</tr>';
+            });
+
+            tbody.innerHTML = bodyHtml;
+            lucide.createIcons();
+
+            // Default horizontal scroll to show weeks 27-40 in semanal mode
+            if (currentPeriod === 'semanal') {
+                scrollToDefaultWeek();
+            }
+        }
+
+        // Position the horizontal scroll so the default-focus week is visible at the left.
+        function scrollToDefaultWeek() {
+            const wrap = document.getElementById('kpi-excel-wrap');
+            if (!wrap) return;
+            // Compute pixel offset of the start of the focus week column
+            const leftColsWidth = 240 + 130 + 110 + 55; // name + via + corte + peso
+            const weekWidth = 55;
+            const targetScroll = leftColsWidth + (DEFAULT_FOCUS_WEEK - 1) * weekWidth;
+            // Use rAF to ensure layout is settled
+            requestAnimationFrame(() => { wrap.scrollLeft = targetScroll; });
+        }
+
+        // =====================================================
+        // KPI cards (dashboard)
+        //   1. Promedio del periodo   (depends on selected period)
+        //   2. Mejor Semana           (always: best individual week)
+        //   3. Peor Semana            (always: worst individual week)
+        //   4. Mejor Indicador        (always: best indicator avg)
+        // =====================================================
+        function renderKpiCards() {
+            const weeks = getActiveWeeks();
+            if (!weeks.length || !workerDoc) {
+                document.getElementById('kpi-periodo').textContent = '—';
+                document.getElementById('kpi-mejor').textContent = '—';
+                document.getElementById('kpi-peor').textContent = '—';
+                document.getElementById('kpi-mejor-ind').textContent = '—';
+                return;
+            }
+            const indicators = workerDoc.indicators || [];
+
+            // ----- Card 1: Promedio del periodo -----
+            let periodVals;
+            if (currentPeriod === 'semanal') {
+                periodVals = weeks.map(w => computeWeekWeighted(indicators, w));
+            } else if (currentPeriod === 'mensual') {
+                const { groups, order } = groupWeeksByMonth(weeks);
+                periodVals = order.map(month => {
+                    const ws = groups[month];
+                    const vals = ws.map(w => computeWeekWeighted(indicators, w)).filter(v => v !== null);
+                    return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length) : null;
+                });
+            } else {
+                periodVals = [computeOverallAvg()];
+            }
+            const validVals = periodVals.filter(v => v !== null);
+            const periodAvg = validVals.length ? (validVals.reduce((a, b) => a + b, 0) / validVals.length) : null;
+
+            // ----- Cards 2 & 3: Mejor / Peor Semana (always by individual week) -----
+            const weeklyWeighted = weeks.map(w => ({ week: w, val: computeWeekWeighted(indicators, w) }))
+                                         .filter(o => o.val !== null);
+            let bestWeek = null, worstWeek = null;
+            weeklyWeighted.forEach(o => {
+                if (bestWeek === null || o.val > bestWeek.val) bestWeek = o;
+                if (worstWeek === null || o.val < worstWeek.val) worstWeek = o;
+            });
+            const bestLabel = bestWeek ? ('Sem ' + bestWeek.week + ' (' + (bestWeek.val * 100).toFixed(0) + '%)') : '—';
+            const worstLabel = worstWeek ? ('Sem ' + worstWeek.week + ' (' + (worstWeek.val * 100).toFixed(0) + '%)') : '—';
+
+            // ----- Card 4: Mejor Indicador -----
+            let bestIndName = '—', bestIndAvg = -1;
+            indicators.forEach(ind => {
+                const scores = weeks.map(w => normalizeScore(ind.weeklyScores && ind.weeklyScores[String(w)])).filter(v => v !== null);
+                if (!scores.length) return;
+                const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+                if (avg > bestIndAvg) { bestIndAvg = avg; bestIndName = ind.name || '—'; }
+            });
+
+            document.getElementById('kpi-periodo').textContent = periodAvg !== null ? (periodAvg * 100).toFixed(1) + '%' : '—';
+            document.getElementById('kpi-mejor').textContent = bestLabel;
+            document.getElementById('kpi-peor').textContent = worstLabel;
+            document.getElementById('kpi-mejor-ind').textContent = bestIndAvg >= 0 ? truncate(bestIndName, 18) + ' (' + (bestIndAvg * 100).toFixed(0) + '%)' : '—';
+        }
+
+        // =====================================================
+        // Charts
+        // =====================================================
+        function initChartLib() {
+            if (typeof Chart === 'undefined') {
+                setTimeout(renderCharts, 200);
+                return;
+            }
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            Chart.defaults.color = '#64748b';
+            Chart.defaults.font.size = 11;
         }
 
         function renderCharts() {
@@ -887,57 +1272,80 @@ function fyttsa_applyPrivilegeMenu() {
             const canvas1 = document.getElementById('chartTendencia');
             const canvas2 = document.getElementById('chartRadar');
             if (!canvas1 || !canvas2) return;
-
-            // Trend line chart
-            const labels = stateEvals.map(e => 'S' + (e.week || '?'));
-            const data = stateEvals.map(e => Number(e.weeklyAverage) || 0);
-
-            if (labels.length === 0) {
-                drawEmptyChartMessage(canvas1, 'Sin evaluaciones para mostrar tendencia.');
-            } else {
-                trendChart = new Chart(canvas1, {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Promedio Semanal',
-                            data: data,
-                            borderColor: COLOR_PRIMARIO,
-                            backgroundColor: COLOR_PRIMARIO_BG,
-                            fill: true, tension: 0.35,
-                            pointBackgroundColor: COLOR_PRIMARIO,
-                            pointRadius: 5, pointHoverRadius: 7,
-                            borderWidth: 3
-                        }]
-                    },
-                    options: {
-                        responsive: true, maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: { callbacks: { label: ctx => 'Promedio: ' + ctx.parsed.y.toFixed(1) + '%' } }
-                        },
-                        scales: {
-                            y: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%' } },
-                            x: { ticks: { font: { size: 10 } } }
-                        }
-                    }
-                });
+            if (!workerDoc || !workerDoc.indicators || !workerDoc.indicators.length) {
+                drawEmptyChartMessage(canvas1, 'Sin datos para mostrar.');
+                drawEmptyChartMessage(canvas2, 'Sin datos para mostrar.');
+                return;
+            }
+            const indicators = workerDoc.indicators;
+            const weeks = getActiveWeeks();
+            if (!weeks.length) {
+                drawEmptyChartMessage(canvas1, 'Sin evaluaciones para mostrar.');
+                drawEmptyChartMessage(canvas2, 'Sin indicadores configurados.');
+                return;
             }
 
-            // Radar - average score by indicator
-            const indicators = stateConfig?.indicators || [];
-            const indicatorNames = indicators.map(i => i.name);
-            const indicatorAvg = indicatorNames.map(name => {
-                const scores = stateEvals.map(ev => {
-                    const s = (ev.scores || []).find(x => x.indicatorName === name);
-                    return s ? Number(s.score) : null;
-                }).filter(v => v !== null && !isNaN(v));
-                if (!scores.length) return 0;
-                const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
-                return avg * 100;
+            // ----- Trend line -----
+            let labels, data;
+            if (currentPeriod === 'semanal') {
+                labels = weeks.map(w => 'S' + w);
+                data = weeks.map(w => {
+                    const v = computeWeekWeighted(indicators, w);
+                    return v !== null ? Number((v * 100).toFixed(1)) : null;
+                });
+            } else if (currentPeriod === 'mensual') {
+                const { groups, order } = groupWeeksByMonth(weeks);
+                labels = order;
+                data = order.map(month => {
+                    const ws = groups[month];
+                    const vals = ws.map(w => computeWeekWeighted(indicators, w)).filter(v => v !== null);
+                    if (!vals.length) return null;
+                    return Number((vals.reduce((a, b) => a + b, 0) / vals.length * 100).toFixed(1));
+                });
+            } else {
+                labels = ['Anual'];
+                const o = computeOverallAvg();
+                data = [o !== null ? Number((o * 100).toFixed(1)) : null];
+            }
+
+            trendChart = new Chart(canvas1, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Promedio',
+                        data: data,
+                        borderColor: COLOR_PRIMARIO,
+                        backgroundColor: COLOR_PRIMARIO_BG,
+                        fill: true, tension: 0.35,
+                        pointBackgroundColor: COLOR_PRIMARIO,
+                        pointRadius: 5, pointHoverRadius: 7,
+                        borderWidth: 3,
+                        spanGaps: true
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { callbacks: { label: ctx => 'Promedio: ' + (ctx.parsed.y !== null ? ctx.parsed.y.toFixed(1) + '%' : '—') } }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%' } },
+                        x: { ticks: { font: { size: 10 } } }
+                    }
+                }
             });
 
-            if (indicatorNames.length === 0) {
+            // ----- Radar: avg score per indicator -----
+            const indicatorNames = indicators.map(i => i.name || '—');
+            const indicatorAvg = indicators.map(ind => {
+                const scores = weeks.map(w => normalizeScore(ind.weeklyScores && ind.weeklyScores[String(w)])).filter(v => v !== null);
+                if (!scores.length) return 0;
+                return Number((scores.reduce((a, b) => a + b, 0) / scores.length * 100).toFixed(1));
+            });
+
+            if (!indicatorNames.length) {
                 drawEmptyChartMessage(canvas2, 'Sin indicadores configurados.');
             } else {
                 radarChart = new Chart(canvas2, {
@@ -977,132 +1385,107 @@ function fyttsa_applyPrivilegeMenu() {
             ctx.fillText(msg, w / 2, h / 2);
         }
 
-        function initChartLib() {
-            if (typeof Chart === 'undefined') {
-                setTimeout(renderCharts, 200);
+        // =====================================================
+        // Observations
+        // =====================================================
+        function renderObservations() {
+            const list = document.getElementById('observations-list');
+            if (!workerDoc || !workerDoc.observations) {
+                list.innerHTML = '<div class="obs-card"><div class="obs-card-title"><i data-lucide="inbox"></i> Sin observaciones</div><div class="obs-card-text empty">Tu supervisor aún no ha registrado observaciones.</div></div>';
+                lucide.createIcons();
                 return;
             }
-            Chart.defaults.font.family = "'Inter', sans-serif";
-            Chart.defaults.color = '#64748b';
-            Chart.defaults.font.size = 11;
-        }
+            // Pull all observation keys (from observations object), but also include weeks that have data
+            // so observations appear even if their week has no scores.
+            const obs = workerDoc.observations;
+            const obsWeeks = Object.keys(obs)
+                .map(k => Number(k))
+                .filter(k => !isNaN(k) && obs[String(k)] && String(obs[String(k)]).trim())
+                .sort((a, b) => a - b);
 
-        function renderHistorial() {
-            const tbody = document.getElementById('tbody-historial');
-            if (!stateEvals.length) {
-                tbody.innerHTML = '<tr><td colspan="6" class="empty-row">No hay evaluaciones registradas todavía.</td></tr>';
+            if (!obsWeeks.length) {
+                list.innerHTML = '<div class="obs-card"><div class="obs-card-title"><i data-lucide="inbox"></i> Sin observaciones</div><div class="obs-card-text empty">Tu supervisor aún no ha registrado observaciones.</div></div>';
+                lucide.createIcons();
                 return;
             }
-            const rows = stateEvals.slice().reverse().map(ev => {
-                const avg = Number(ev.weeklyAverage) || 0;
-                const st = statusFor(avg);
-                return `<tr>
-                    <td class="center-cell"><strong>S${ev.week || '?'}</strong></td>
-                    <td>${escapeHtml(ev.weekRange || '—')}</td>
-                    <td>${escapeHtml(ev.month || '—')}</td>
-                    <td class="num-cell">${avg.toFixed(1)}%</td>
-                    <td class="center-cell"><span class="status-badge ${st.cls}">${st.text}</span></td>
-                    <td class="center-cell">
-                        <button class="btn-action btn-view" onclick="abrirDetalle(${JSON.stringify(ev).replace(/"/g, '&quot;')})">
-                            <i data-lucide="eye"></i> Ver detalle
-                        </button>
-                    </td>
-                </tr>`;
+            list.innerHTML = obsWeeks.map(w => {
+                const r = getWeekRange(w);
+                const text = String(obs[String(w)]).trim();
+                return `<div class="obs-card">
+                    <div class="obs-card-title"><i data-lucide="calendar"></i> Semana ${w} — ${escapeHtml(r.month)} (${escapeHtml(r.start)} al ${escapeHtml(r.end)})</div>
+                    <div class="obs-card-text">${escapeHtml(text)}</div>
+                </div>`;
             }).join('');
-            tbody.innerHTML = rows;
-        }
-
-        function renderDefs() {
-            const tbody = document.getElementById('tbody-defs');
-            if (!stateConfig || !stateConfig.indicators || !stateConfig.indicators.length) {
-                tbody.innerHTML = '<tr><td colspan="5" class="empty-row">No hay indicadores configurados. Contacta a tu supervisor.</td></tr>';
-                return;
-            }
-            tbody.innerHTML = stateConfig.indicators.map(ind => `
-                <tr>
-                    <td><strong>${escapeHtml(ind.name)}</strong></td>
-                    <td class="center-cell">${ind.weight || 0}%</td>
-                    <td>${escapeHtml(ind.deliveryMethod || '—')}</td>
-                    <td>${escapeHtml(ind.recipients || '—')}</td>
-                    <td>${escapeHtml(ind.deadline || '—')}</td>
-                </tr>
-            `).join('');
-        }
-
-        function renderEmptyStates() {
-            document.getElementById('tbody-historial').innerHTML = '<tr><td colspan="6" class="empty-row">No se pudieron cargar las evaluaciones.</td></tr>';
-            document.getElementById('tbody-defs').innerHTML = '<tr><td colspan="5" class="empty-row">No se pudo cargar la configuración de KPIs.</td></tr>';
-            document.getElementById('worker-name').textContent = WORKER_NAME;
-            document.getElementById('worker-position').textContent = 'Sin conexión';
-        }
-
-        // =====================================================
-        // Modal detalle
-        // =====================================================
-        function abrirDetalle(evalObj) {
-            const ev = typeof evalObj === 'string' ? JSON.parse(evalObj.replace(/&quot;/g, '"')) : evalObj;
-            document.getElementById('modal-detalle-title').textContent = 'Semana ' + (ev.week || '?');
-            document.getElementById('modal-detalle-subtitle').textContent = (ev.workerName || WORKER_NAME) + ' • ' + (ev.weekRange || '—');
-            document.getElementById('modal-stat-semana').textContent = 'S' + (ev.week || '?');
-            document.getElementById('modal-stat-periodo').textContent = ev.weekRange || '—';
-            const avg = Number(ev.weeklyAverage) || 0;
-            document.getElementById('modal-stat-promedio').textContent = avg.toFixed(1) + '%';
-
-            const scores = ev.scores || [];
-            const tbody = document.getElementById('tbody-detalle');
-            if (!scores.length) {
-                tbody.innerHTML = '<tr><td colspan="4" class="empty-row">Sin indicadores en esta evaluación.</td></tr>';
-            } else {
-                tbody.innerHTML = scores.map(s => {
-                    const w = Number(s.weight) || 0;
-                    const sc = Number(s.score) || 0;
-                    const aporte = w * sc;
-                    return `<tr>
-                        <td><strong>${escapeHtml(s.indicatorName)}</strong></td>
-                        <td class="center-cell">${w}%</td>
-                        <td class="center-cell">${(sc * 100).toFixed(0)}%</td>
-                        <td class="num-cell">${aporte.toFixed(1)}</td>
-                    </tr>`;
-                }).join('');
-            }
-
-            const obs = ev.observation && String(ev.observation).trim();
-            document.getElementById('modal-observacion').textContent = obs || 'Sin observaciones registradas para esta semana.';
-            const evalBy = ev.evaluatedBy ? ' • Por: ' + ev.evaluatedBy : '';
-            document.getElementById('modal-observacion').title = evalBy;
-
-            document.getElementById('modal-detalle').classList.add('show');
             lucide.createIcons();
         }
 
-        function cerrarModalDetalle() {
-            document.getElementById('modal-detalle').classList.remove('show');
+        // =====================================================
+        // Empty state
+        // =====================================================
+        function renderEmptyState() {
+            document.getElementById('worker-avatar').textContent = (WORKER_NAME_FALLBACK.charAt(0) || 'U').toUpperCase();
+            document.getElementById('worker-name').textContent = WORKER_NAME_FALLBACK;
+            document.getElementById('worker-position').textContent = 'Sin configuración de KPIs';
+            document.getElementById('worker-id').textContent = 'ID: ' + WORKER_ID;
+            document.getElementById('worker-avg-value').textContent = '—';
+            document.getElementById('kpi-periodo').textContent = '—';
+            document.getElementById('kpi-mejor').textContent = '—';
+            document.getElementById('kpi-peor').textContent = '—';
+            document.getElementById('kpi-mejor-ind').textContent = '—';
+            const tbody = document.getElementById('tbody-kpi');
+            const thead = document.getElementById('thead-kpi');
+            const colgroup = document.getElementById('colgroup-kpi');
+            colgroup.innerHTML = '';
+            thead.innerHTML = '';
+            tbody.innerHTML = '<tr><td><div class="empty-state"><i data-lucide="inbox"></i><h3>Sin KPIs configurados</h3><p>Tu supervisor aún no ha configurado tus indicadores de desempeño. Vuelve más tarde.</p></div></td></tr>';
+            document.getElementById('observations-list').innerHTML = '<div class="obs-card"><div class="obs-card-title"><i data-lucide="inbox"></i> Sin observaciones</div><div class="obs-card-text empty">No hay observaciones registradas.</div></div>';
+            const c1 = document.getElementById('chartTendencia');
+            const c2 = document.getElementById('chartRadar');
+            if (c1) drawEmptyChartMessage(c1, 'Sin datos para mostrar.');
+            if (c2) drawEmptyChartMessage(c2, 'Sin datos para mostrar.');
+            lucide.createIcons();
         }
 
-        // Close modal on overlay click
-        document.getElementById('modal-detalle').addEventListener('click', function(e) {
-            if (e.target === this) cerrarModalDetalle();
-        });
+        // =====================================================
+        // Period selector
+        // =====================================================
+        function setPeriod(p) {
+            currentPeriod = p;
+            document.querySelectorAll('.period-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.period === p);
+            });
+            renderTable();
+            renderKpiCards();
+            renderCharts();
+            lucide.createIcons();
+        }
 
         // =====================================================
         // Init
         // =====================================================
         document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('user-initial').innerText = (WORKER_NAME.charAt(0) || 'U').toUpperCase();
+            document.getElementById('user-initial').innerText = (WORKER_NAME_FALLBACK.charAt(0) || 'U').toUpperCase();
 
-            fetch('menu.html').then(res => res.text()).then(html => {
+            // Sidebar (cache-buster)
+            fetch('menu.html?v=' + Date.now()).then(res => res.text()).then(html => {
                 document.getElementById('sidebar').innerHTML = html;
                 lucide.createIcons();
                 fyttsa_applyPrivilegeMenu();
                 const linkInicio = document.getElementById('link-inicio'); if (linkInicio) linkInicio.classList.remove('active');
                 const linkKpis = document.getElementById('link-kpis'); if (linkKpis) linkKpis.classList.add('active');
+            }).catch(err => {
+                console.error('[Mis KPIs] Error al cargar menú:', err);
             });
 
             document.getElementById('toggle-menu').addEventListener('click', () => {
                 document.getElementById('sidebar').classList.toggle('open');
             });
 
-            loadAll();
+            document.querySelectorAll('.period-btn').forEach(btn => {
+                btn.addEventListener('click', () => setPeriod(btn.dataset.period));
+            });
+
+            loadWorkerDoc();
         });
     </script>
 </body>
