@@ -177,6 +177,7 @@
             align-items: center;
             width: 180px;
             position: relative;
+            margin: 0 6px;
         }
         /* Vertical drop line from horizontal line to each Level 2 card */
         .org-subgroup::before {
@@ -189,14 +190,16 @@
             height: 35px;
             background: #cbd5e1;
         }
-        /* Level 3 children: centered under parent */
+        /* Level 3 children: horizontal row centered under parent */
         .org-subgroup-children {
             display: flex;
+            flex-direction: row;
             justify-content: center;
             gap: 10px;
             padding-top: 35px;
             position: relative;
-            flex-wrap: wrap;
+            width: max-content;
+            max-width: none;
         }
         /* Horizontal line above Level 3 siblings */
         .org-subgroup-children::before {
