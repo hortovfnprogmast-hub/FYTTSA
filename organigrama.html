@@ -137,52 +137,61 @@
             min-width: 38px;
         }
 
-        /* Org tree CSS structure */
-        .org-tree, .org-tree ul { display: flex; justify-content: center; }
-        .org-tree { padding: 0; }
-        .org-tree ul {
-            position: relative;
-            padding-top: 25px;
-            list-style: none;
-            margin: 0;
+        /* Org tree - flat layout for proper centering */
+        .org-tree {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
         }
-        .org-tree li {
-            list-style: none;
+        .org-level {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 12px;
             position: relative;
-            padding: 25px 8px 0 8px;
+            padding-top: 30px;
         }
-        /* horizontal line above each li (siblings) */
-        .org-tree li::before, .org-tree li::after {
+        .org-level::before {
             content: '';
             position: absolute;
-            top: 0; right: 50%;
-            border-top: 2px solid #cbd5e1;
-            width: 50%; height: 25px;
+            top: 0;
+            left: 50%;
+            width: 2px;
+            height: 30px;
+            background: #cbd5e1;
         }
-        .org-tree li::after {
-            right: auto; left: 50%;
-            border-left: 2px solid #cbd5e1;
+        .org-level:first-child { padding-top: 0; }
+        .org-level:first-child::before { display: none; }
+        .org-connector {
+            width: 2px;
+            height: 30px;
+            background: #cbd5e1;
+            margin: 0 auto;
         }
-        .org-tree li:only-child::after, .org-tree li:only-child::before { display: none; }
-        .org-tree li:only-child { padding-top: 0; }
-        .org-tree li:first-child::before, .org-tree li:last-child::after { border: 0 none; }
-        .org-tree li:last-child::before {
-            border-right: 2px solid #cbd5e1;
-            border-radius: 0 6px 0 0;
+        .org-subgroup {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        .org-tree li:first-child::after { border-radius: 6px 0 0 0; }
-        /* vertical connector from parent to child container */
-        .org-tree ul ul::before {
+        .org-subgroup-children {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding-top: 30px;
+            position: relative;
+            flex-wrap: wrap;
+            max-width: 100%;
+        }
+        .org-subgroup-children::before {
             content: '';
             position: absolute;
-            top: 0; left: 50%;
-            border-left: 2px solid #cbd5e1;
-            width: 0; height: 25px;
+            top: 0;
+            left: 50%;
+            width: 2px;
+            height: 30px;
+            background: #cbd5e1;
         }
-        /* root: no lines above */
-        .org-tree > .org-root > ul::before { display: none; }
-        .org-tree > .org-root::before,
-        .org-tree > .org-root::after { display: none; }
 
         /* Node card */
         .org-node {
@@ -817,7 +826,7 @@ function fyttsa_applyPrivilegeMenu() {
         }
 
         // =====================================================
-        // Render tree (recursive)
+        // Render tree (flat layout for proper centering)
         // =====================================================
         function renderTree() {
             const canvas = document.getElementById('org-canvas');
@@ -826,36 +835,55 @@ function fyttsa_applyPrivilegeMenu() {
                 canvas.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:60px 20px;font-weight:600;">No hay datos de organigrama.</div>';
                 return;
             }
+
             const treeWrap = document.createElement('div');
             treeWrap.className = 'org-tree';
-            // If multiple roots, wrap each in its own root UL
-            const rootUl = document.createElement('ul');
-            rootUl.style.paddingLeft = '0';
-            rootUl.style.paddingRight = '0';
-            rootNodes.forEach(r => {
-                const li = buildNodeLi(r, true);
-                rootUl.appendChild(li);
-            });
-            treeWrap.appendChild(rootUl);
+
+            // Level 1: Root (Guillermo Sanchez) - centered at top
+            const root = rootNodes[0];
+            const rootCard = buildNodeCard(root);
+            treeWrap.appendChild(rootCard);
+
+            // Level 2: Directors (children of root) - row centered below root
+            const level2 = childrenMap[root.id] || [];
+            if (level2.length > 0) {
+                // Connector line from root to level 2
+                const connector1 = document.createElement('div');
+                connector1.className = 'org-connector';
+                treeWrap.appendChild(connector1);
+
+                const level2Row = document.createElement('div');
+                level2Row.className = 'org-level';
+
+                level2.forEach(node => {
+                    // Each level 2 node is a subgroup (card + optional children below)
+                    const subgroup = document.createElement('div');
+                    subgroup.className = 'org-subgroup';
+                    subgroup.appendChild(buildNodeCard(node));
+
+                    // Level 3: children of this node (e.g., Daniel Conde's team)
+                    const level3 = childrenMap[node.id] || [];
+                    if (level3.length > 0) {
+                        const childrenWrap = document.createElement('div');
+                        childrenWrap.className = 'org-subgroup-children';
+                        level3.forEach(child => {
+                            childrenWrap.appendChild(buildNodeCard(child));
+                        });
+                        subgroup.appendChild(childrenWrap);
+                    }
+
+                    level2Row.appendChild(subgroup);
+                });
+
+                treeWrap.appendChild(level2Row);
+            }
+
             canvas.appendChild(treeWrap);
         }
 
         function buildNodeLi(node, isRoot) {
-            const li = document.createElement('li');
-            if (isRoot) li.classList.add('org-root');
-            // Node card
-            const card = buildNodeCard(node);
-            li.appendChild(card);
-            // Children
-            const kids = childrenMap[node.id] || [];
-            if (kids.length > 0) {
-                const ul = document.createElement('ul');
-                kids.forEach(k => {
-                    ul.appendChild(buildNodeLi(k, false));
-                });
-                li.appendChild(ul);
-            }
-            return li;
+            // Kept for compatibility but not used in flat layout
+            return buildNodeCard(node);
         }
 
         function buildNodeCard(node) {
