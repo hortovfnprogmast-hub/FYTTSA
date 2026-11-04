@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Organigrama | FYTTSA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        :root {
+            --primary-blue: #000000;
+            --light-blue: #e8e8e8;
+            --bg-color: #f8fafc;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #404040;
+            --purple: #8b5cf6;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            display: flex; flex-direction: column;
+            height: 100vh; overflow: hidden;
+        }
+        .header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 20px; background: white;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 50; flex-shrink: 0;
+        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .menu-btn { background: none; border: none; cursor: pointer; color: var(--text-main); padding: 5px; }
+        .header-title { margin: 0; font-size: 15px; font-weight: 700; color: var(--primary-blue); display: none; }
+        @media (min-width: 768px) { .header-title { display: block; } }
+        .header-right { display: flex; align-items: center; gap: 12px; }
+        .user-initial {
+            width: 35px; height: 35px; border-radius: 50%;
+            background-color: var(--primary-blue); color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 16px;
+        }
+        .main-layout { display: flex; flex: 1; overflow: hidden; }
+        .sidebar {
+            width: 260px; background: white;
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto; transition: transform 0.3s ease;
+            display: flex; flex-direction: column; flex-shrink: 0;
+        }
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; height: calc(100vh - 60px); transform: translateX(-100%); z-index: 40; }
+            .sidebar.open { transform: translateX(0); }
+            .header-title { display: none; }
+        }
+        .sidebar-nav { padding: 15px 10px; }
+        .sidebar-section { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
+        .sidebar-section:last-child { border-bottom: none; }
+        .sidebar .section-title { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin: 10px 15px; display: block; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 15px; color: var(--text-main); text-decoration: none; font-size: 14px; font-weight: 500; border-radius: 10px; margin-bottom: 2px; transition: all 0.2s; }
+        .nav-item:hover { background-color: var(--bg-color); }
+        .nav-item.active { background-color: #e8e8e8 !important; color: #000000 !important; font-weight: 700 !important; border-left: 4px solid #000000 !important; border-radius: 8px !important; }
+        .nav-item.active i { color: var(--primary-blue); }
+        .content { flex: 1; padding: 30px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        @media (max-width: 768px) { .content { padding: 20px; } }
+        .page-title { display: flex; align-items: center; gap: 12px; font-size: 22px; font-weight: 800; color: var(--primary-blue); margin-bottom: 8px; }
+        .page-title i { width: 28px; height: 28px; }
+        .page-subtitle { color: var(--text-muted); font-size: 13px; margin-bottom: 20px; }
+
+        .logo-wrap {
+            display: flex; justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        /* Org chart canvas (zoom/pan container) */
+        .org-viewport {
+            position: relative;
+            width: 100%;
+            height: calc(100vh - 250px);
+            min-height: 400px;
+            background-color: #fafafa;
+            background-image:
+                linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
+            background-size: 24px 24px;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: grab;
+            touch-action: none;
+        }
+        .org-viewport.dragging { cursor: grabbing; }
+        .org-canvas {
+            position: absolute;
+            top: 0; left: 0;
+            transform-origin: 0 0;
+            transform: translate(0px, 0px) scale(1);
+            padding: 40px 20px;
+            min-width: 100%;
+            min-height: 100%;
+            will-change: transform;
+        }
+
+        /* Zoom controls */
+        .zoom-controls {
+            position: absolute;
+            bottom: 16px;
+            right: 16px;
+            display: flex; flex-direction: column;
+            gap: 6px;
+            z-index: 10;
+            background: white;
+            padding: 8px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.10);
+        }
+        .zoom-btn {
+            width: 38px; height: 38px;
+            background: white; color: var(--text-main);
+            border: 1px solid var(--border-color);
+            border-radius: 8px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.15s; font-size: 16px; font-weight: 700;
+            padding: 0;
+        }
+        .zoom-btn:hover { background: var(--light-blue); border-color: var(--primary-blue); }
+        .zoom-btn i { width: 18px; height: 18px; }
+        .zoom-level {
+            font-size: 11px; font-weight: 800;
+            color: var(--text-muted); text-align: center;
+            padding: 4px 0; border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            margin: 2px 0;
+            min-width: 38px;
+        }
+
+        /* Org tree CSS structure */
+        .org-tree, .org-tree ul { display: flex; justify-content: center; }
+        .org-tree { padding: 0; }
+        .org-tree ul {
+            position: relative;
+            padding-top: 25px;
+            list-style: none;
+            margin: 0;
+        }
+        .org-tree li {
+            list-style: none;
+            position: relative;
+            padding: 25px 8px 0 8px;
+        }
+        /* horizontal line above each li (siblings) */
+        .org-tree li::before, .org-tree li::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 50%;
+            border-top: 2px solid #cbd5e1;
+            width: 50%; height: 25px;
+        }
+        .org-tree li::after {
+            right: auto; left: 50%;
+            border-left: 2px solid #cbd5e1;
+        }
+        .org-tree li:only-child::after, .org-tree li:only-child::before { display: none; }
+        .org-tree li:only-child { padding-top: 0; }
+        .org-tree li:first-child::before, .org-tree li:last-child::after { border: 0 none; }
+        .org-tree li:last-child::before {
+            border-right: 2px solid #cbd5e1;
+            border-radius: 0 6px 0 0;
+        }
+        .org-tree li:first-child::after { border-radius: 6px 0 0 0; }
+        /* vertical connector from parent to child container */
+        .org-tree ul ul::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 50%;
+            border-left: 2px solid #cbd5e1;
+            width: 0; height: 25px;
+        }
+        /* root: no lines above */
+        .org-tree > .org-root > ul::before { display: none; }
+        .org-tree > .org-root::before,
+        .org-tree > .org-root::after { display: none; }
+
+        /* Node card */
+        .org-node {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            width: 180px;
+            min-height: 110px;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 10px 11px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+            cursor: pointer;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+            text-align: center;
+            position: relative;
+            vertical-align: top;
+        }
+        .org-node:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 18px rgba(0,0,0,0.10);
+            border-color: var(--primary-blue);
+        }
+        .org-node.level-0 {
+            border: 2px solid var(--primary-blue);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.10);
+            background: #fff;
+        }
+        .org-node.level-0:hover {
+            box-shadow: 0 10px 22px rgba(0,0,0,0.18);
+        }
+        .node-photo {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 7px;
+            border: 2px solid var(--light-blue);
+            background: var(--bg-color);
+        }
+        .node-initials {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: var(--primary-blue);
+            color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 16px;
+            margin-bottom: 7px;
+            border: 2px solid var(--light-blue);
+            flex-shrink: 0;
+        }
+        .node-name {
+            font-size: 13px; font-weight: 700;
+            color: var(--text-main);
+            line-height: 1.2;
+            word-break: break-word;
+        }
+        .node-position {
+            font-size: 11px; color: var(--text-muted);
+            margin-top: 4px;
+            line-height: 1.25;
+            font-weight: 500;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.55);
+            display: none;
+            align-items: center; justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        .modal-overlay.show { display: flex; animation: fadeIn 0.18s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .modal-card {
+            background: white;
+            border-radius: 18px;
+            padding: 28px;
+            max-width: 360px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: scaleIn 0.2s ease;
+        }
+        @keyframes scaleIn { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-photo {
+            width: 110px; height: 110px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 16px;
+            border: 4px solid var(--light-blue);
+            background: var(--bg-color);
+            display: block;
+        }
+        .modal-initials {
+            width: 110px; height: 110px;
+            border-radius: 50%;
+            background: var(--primary-blue);
+            color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 40px;
+            margin: 0 auto 16px;
+            border: 4px solid var(--light-blue);
+        }
+        .modal-name {
+            font-size: 20px; font-weight: 800;
+            color: var(--primary-blue);
+            margin-bottom: 6px;
+            word-break: break-word;
+        }
+        .modal-position {
+            font-size: 13px; color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .modal-reports {
+            font-size: 11px; color: var(--text-muted);
+            font-weight: 500;
+            margin-top: 8px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+        }
+        .modal-close {
+            margin-top: 18px;
+            background: var(--light-blue);
+            color: var(--primary-blue);
+            border: none;
+            padding: 10px 24px;
+            border-radius: 10px;
+            font-weight: 700; font-size: 13px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.15s;
+        }
+        .modal-close:hover { background: var(--primary-blue); color: #fff; }
+
+        /* Loading state */
+        .org-loading {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--text-muted);
+            font-size: 14px; font-weight: 600;
+            text-align: center;
+            display: flex; flex-direction: column;
+            align-items: center; gap: 10px;
+        }
+        .org-loading i { width: 32px; height: 32px; animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* Hint */
+        .pan-hint {
+            position: absolute;
+            top: 16px; left: 16px;
+            background: rgba(255,255,255,0.92);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 8px 12px;
+            font-size: 11px; color: var(--text-muted);
+            font-weight: 600;
+            display: flex; align-items: center; gap: 6px;
+            z-index: 10;
+            pointer-events: none;
+        }
+        .pan-hint i { width: 14px; height: 14px; }
+        @media (max-width: 600px) { .pan-hint { display: none; } }
+
+        /* Toast */
+        .toast {
+            position: fixed; top: 20px; right: 20px;
+            background: var(--text-main); color: white;
+            padding: 14px 20px; border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 9999;
+            display: flex; align-items: center; gap: 10px;
+            font-size: 13px; font-weight: 600;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.error { background: var(--danger); }
+        .toast.success { background: var(--success); }
+        .toast i { width: 18px; height: 18px; }
+    </style>
+
+    <!-- Firebase SDK + FYTTSA shared data helper -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script>
+// =====================================================
+// FYTTSA Shared Data Helper
+// Centralizes Firebase Firestore sync for cross-device data sharing.
+// All user-specific data is stored under: usuarios/{userId}/app_data/{key}
+// Falls back to localStorage if Firebase is unavailable or no user.
+// =====================================================
+
+const FYTTSA_FIREBASE_CONFIG = {
+    apiKey: "AIzaSyD9Ihkh0NaP5vVbKntobmVTb53T0yDAZjU",
+    authDomain: "fyttsa-ae508.firebaseapp.com",
+    projectId: "fyttsa-ae508",
+    storageBucket: "fyttsa-ae508.firebasestorage.app",
+    messagingSenderId: "860564632264",
+    appId: "1:860564632264:web:30edf5a8f837e284ab2bfd",
+    measurementId: "G-7PQ1R77YJ3"
+};
+
+// Initialize Firebase once
+let _fyttsaDb = null;
+let _fyttsaFirebaseReady = false;
+
+function _fyttsaInitFirebase() {
+    if (typeof firebase === 'undefined') return false;
+    if (!firebase.apps.length) {
+        firebase.initializeApp(FYTTSA_FIREBASE_CONFIG);
+    }
+    if (firebase.firestore) {
+        _fyttsaDb = firebase.firestore();
+        _fyttsaFirebaseReady = true;
+        return true;
+    }
+    return false;
+}
+
+// Try to init immediately if firebase is already loaded
+if (typeof firebase !== 'undefined') {
+    _fyttsaInitFirebase();
+}
+
+// Also try after window load (in case scripts load async)
+window.addEventListener('load', function() {
+    if (!_fyttsaFirebaseReady && typeof firebase !== 'undefined') {
+        _fyttsaInitFirebase();
+    }
+});
+
+/**
+ * Get the current user ID from localStorage.
+ */
+function fyttsa_getUserId() {
+    return localStorage.getItem('usuario') || null;
+}
+
+/**
+ * Load data for the current user from Firestore.
+ * Falls back to localStorage if Firestore is unavailable.
+ */
+async function fyttsa_loadData(key) {
+    const userId = fyttsa_getUserId();
+
+    if (userId) {
+        if (!_fyttsaFirebaseReady && typeof firebase !== 'undefined') {
+            _fyttsaInitFirebase();
+        }
+        if (_fyttsaFirebaseReady) {
+            try {
+                const doc = await _fyttsaDb.collection('usuarios')
+                    .doc(userId)
+                    .collection('app_data')
+                    .doc(key)
+                    .get();
+                if (doc.exists && doc.data().value !== undefined) {
+                    return doc.data().value;
+                }
+            } catch (e) {
+                console.warn('[FYTTSA] Firestore load failed, falling back to localStorage:', e);
+            }
+        }
+    }
+
+    // Fallback to localStorage
+    try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+        return null;
+    }
+}
+
+/**
+ * Save data for the current user to Firestore.
+ * Also saves to localStorage as a cache/fallback.
+ */
+async function fyttsa_saveData(key, value) {
+    const userId = fyttsa_getUserId();
+
+    try {
+        localStorage.setItem(key, JSON.stringify(value));
+    } catch (e) {
+        console.warn('[FYTTSA] localStorage save failed:', e);
+    }
+
+    if (userId) {
+        if (!_fyttsaFirebaseReady && typeof firebase !== 'undefined') {
+            _fyttsaInitFirebase();
+        }
+        if (_fyttsaFirebaseReady) {
+            try {
+                await _fyttsaDb.collection('usuarios')
+                    .doc(userId)
+                    .collection('app_data')
+                    .doc(key)
+                    .set({
+                        value: value,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+            } catch (e) {
+                console.warn('[FYTTSA] Firestore save failed:', e);
+            }
+        }
+    }
+}
+
+/**
+ * Save data synchronously to localStorage and fire async Firestore save.
+ */
+function fyttsa_saveDataSync(key, value) {
+    try {
+        localStorage.setItem(key, JSON.stringify(value));
+    } catch (e) {
+        console.warn('[FYTTSA] localStorage save failed:', e);
+    }
+    fyttsa_saveData(key, value);
+}
+
+// =====================================================
+// PRIVILEGE-BASED MENU VISIBILITY + ACTIVE MENU STYLING
+// =====================================================
+// Privilegio 1 = see ALL menu sections
+// Privilegio 2 = see ONLY Inicio + Trabajador section (hide Obra, Control, Almacén)
+// =====================================================
+
+function _fyttsa_applyMenuVisibility() {
+    var privilegio = String(localStorage.getItem('privilegio') || '1').trim();
+    var sidebar = document.getElementById('sidebar');
+    if (!sidebar) return;
+
+    if (privilegio === '2') {
+        var sections = sidebar.querySelectorAll('.sidebar-section');
+        sections.forEach(function(sec) {
+            var title = sec.querySelector('.section-title');
+            if (title) {
+                var titleText = title.textContent.trim();
+                if (titleText !== 'Trabajador') {
+                    sec.style.display = 'none';
+                }
+            }
+        });
+    }
+}
+
+function _fyttsa_applyActiveStyle() {
+    var activeItem = document.querySelector('.nav-item.active');
+    if (activeItem) {
+        activeItem.style.setProperty('background-color', '#e8e8e8', 'important');
+        activeItem.style.setProperty('color', '#000000', 'important');
+        activeItem.style.setProperty('font-weight', '700', 'important');
+        activeItem.style.setProperty('border-left', '4px solid #000000', 'important');
+        activeItem.style.setProperty('border-radius', '8px', 'important');
+        activeItem.style.setProperty('padding', '10px 15px', 'important');
+    }
+}
+
+// Public function that pages call after loading menu.html
+function fyttsa_applyPrivilegeMenu() {
+    _fyttsa_applyMenuVisibility();
+}
+
+// =====================================================
+// AUTO-SETUP: Runs automatically when the script loads.
+// Uses a MutationObserver to detect when the sidebar content
+// changes (i.e., when menu.html is loaded via fetch), then:
+//   1. Applies privilege-based menu visibility
+//   2. Starts an interval to apply active menu styling
+// =====================================================
+
+(function() {
+    var styleIntervalStarted = false;
+
+    function startActiveStyleInterval() {
+        if (styleIntervalStarted) return;
+        styleIntervalStarted = true;
+
+        _fyttsa_applyActiveStyle();
+
+        var intervalId = setInterval(function() {
+            _fyttsa_applyActiveStyle();
+        }, 200);
+
+        setTimeout(function() {
+            clearInterval(intervalId);
+        }, 20000);
+    }
+
+    function setupSidebarObserver() {
+        var sidebar = document.getElementById('sidebar');
+        if (!sidebar) {
+            setTimeout(setupSidebarObserver, 100);
+            return;
+        }
+
+        _fyttsa_applyMenuVisibility();
+        startActiveStyleInterval();
+
+        if (typeof MutationObserver !== 'undefined') {
+            var observer = new MutationObserver(function(mutations) {
+                _fyttsa_applyMenuVisibility();
+                _fyttsa_applyActiveStyle();
+            });
+            observer.observe(sidebar, {
+                childList: true,
+                subtree: true,
+                attributes: true,
+                attributeFilter: ['class']
+            });
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            setupSidebarObserver();
+            setTimeout(function() {
+                _fyttsa_applyMenuVisibility();
+                _fyttsa_applyActiveStyle();
+                startActiveStyleInterval();
+            }, 500);
+            setTimeout(function() {
+                _fyttsa_applyMenuVisibility();
+                _fyttsa_applyActiveStyle();
+            }, 1500);
+        });
+    } else {
+        setupSidebarObserver();
+        setTimeout(function() {
+            _fyttsa_applyMenuVisibility();
+            _fyttsa_applyActiveStyle();
+            startActiveStyleInterval();
+        }, 500);
+        setTimeout(function() {
+            _fyttsa_applyMenuVisibility();
+            _fyttsa_applyActiveStyle();
+        }, 1500);
+    }
+
+    window.addEventListener('load', function() {
+        _fyttsa_applyMenuVisibility();
+        _fyttsa_applyActiveStyle();
+        startActiveStyleInterval();
+    });
+})();
+    </script>
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <button class="menu-btn" id="toggle-menu"><i data-lucide="menu"></i></button>
+            <h1 class="header-title">FYTTSA</h1>
+        </div>
+        <div class="header-right">
+            <div class="user-initial" id="user-initial">U</div>
+            <img src="https://i.ibb.co/x8Bw8KR8/MARFIL-1.jpg" alt="Logo" height="35" style="border-radius: 8px;">
+        </div>
+    </header>
+    <script>try{lucide.createIcons()}catch(e){}</script>
+    <div class="main-layout">
+        <aside class="sidebar" id="sidebar"></aside>
+        <main class="content" id="content">
+            <div class="logo-wrap">
+                <img src="https://i.ibb.co/n8MqC6Bn/MARFIL.jpg" alt="Marfil Constructora" style="width: 156px; margin-bottom: 15px; border-radius: 16px;">
+            </div>
+            <h1 class="page-title"><i data-lucide="git-fork"></i> Organigrama</h1>
+            <p class="page-subtitle">Estructura organizativa de FYTTSA — Soluciones Constructivas y Durables S.A. de C.V. Usa los controles para hacer zoom y desplazar el organigrama.</p>
+
+            <div class="org-viewport" id="org-viewport">
+                <div class="pan-hint">
+                    <i data-lucide="move"></i> Arrastra para mover · Rueda para zoom
+                </div>
+                <div class="org-loading" id="org-loading">
+                    <i data-lucide="loader-2"></i>
+                    <span>Cargando organigrama...</span>
+                </div>
+                <div class="org-canvas" id="org-canvas"></div>
+
+                <div class="zoom-controls">
+                    <button class="zoom-btn" id="zoom-in" title="Acercar"><i data-lucide="plus"></i></button>
+                    <div class="zoom-level" id="zoom-level">100%</div>
+                    <button class="zoom-btn" id="zoom-out" title="Alejar"><i data-lucide="minus"></i></button>
+                    <button class="zoom-btn" id="zoom-reset" title="Ajustar a pantalla"><i data-lucide="maximize"></i></button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal-card">
+            <div id="modal-photo-wrap"></div>
+            <div class="modal-name" id="modal-name"></div>
+            <div class="modal-position" id="modal-position"></div>
+            <div class="modal-reports" id="modal-reports"></div>
+            <button class="modal-close" id="modal-close">Cerrar</button>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"><i data-lucide="info"></i><span id="toast-msg">Mensaje</span></div>
+
+    <script>
+        // =====================================================
+        // MENU
+        // =====================================================
+        fetch('menu.html?v=' + Date.now())
+            .then(r => r.text())
+            .then(html => {
+                document.getElementById('sidebar').innerHTML = html;
+                lucide.createIcons();
+                fyttsa_applyPrivilegeMenu();
+                const l = document.getElementById('link-organigrama');
+                if (l) l.classList.add('active');
+            })
+            .catch(e => console.error('Error cargando el menú:', e));
+
+        document.getElementById('toggle-menu').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('open');
+        });
+
+        // Apply user name initial
+        (function applyUserInitial() {
+            const n = localStorage.getItem('nombre') || '';
+            const el = document.getElementById('user-initial');
+            if (n) el.textContent = n.charAt(0).toUpperCase();
+            else setTimeout(applyUserInitial, 1500);
+        })();
+
+        // =====================================================
+        // Constants
+        // =====================================================
+        const DEFAULT_ORG_DATA = [
+            { id: "1", name: "Guillermo Sánchez", position: "Director General", parentId: null, photo: "" },
+            { id: "2", name: "José Daniel Conde", position: "Director de Construcción", parentId: "1", photo: "" },
+            { id: "3", name: "Brayan Gerardo Oviedo", position: "Residente de Obra Jr.", parentId: "2", photo: "" },
+            { id: "4", name: "Julio César Gódinez", position: "Residente de Obra Jr.", parentId: "2", photo: "" },
+            { id: "5", name: "Luis Fernando López", position: "Residente de Obra Jr.", parentId: "2", photo: "" },
+            { id: "6", name: "Alma Rosa Onofre", position: "Asistente Administrativo Contable", parentId: "2", photo: "" },
+            { id: "7", name: "Bryan Isai Vargas", position: "Residente de Obra Jr.", parentId: "2", photo: "" },
+            { id: "8", name: "Xenia Aztan Medrano", position: "Asistente Administrativo Contable", parentId: "2", photo: "" },
+            { id: "9", name: "Adriana López", position: "Compras Construcción", parentId: "2", photo: "" },
+            { id: "10", name: "Pedro Ángel González", position: "Residente de Obra Sr.", parentId: "2", photo: "" },
+            { id: "11", name: "José Eduardo Trejo", position: "Residente de Obra Jr.", parentId: "2", photo: "" },
+            { id: "12", name: "David Sosa", position: "Jefe de Almacén Construcción", parentId: "2", photo: "" },
+            { id: "13", name: "Juan Manuel Alvarado", position: "Operador CEDIS", parentId: "12", photo: "" },
+            { id: "14", name: "José Pablo Morales", position: "Operador CEDIS", parentId: "12", photo: "" },
+            { id: "15", name: "Ana Perla Pérez", position: "Asistente de Almacén Construcción", parentId: "12", photo: "" },
+            { id: "16", name: "Salomón Ascencio", position: "Asistente de Almacén Construcción", parentId: "12", photo: "" }
+        ];
+
+        // =====================================================
+        // State
+        // =====================================================
+        let orgNodes = [];        // flat array
+        let nodeMap = {};         // id -> node
+        let childrenMap = {};     // parentId -> [nodes]
+        let rootNodes = [];       // nodes with parentId null
+
+        // =====================================================
+        // Helpers
+        // =====================================================
+        function escapeHtml(s) {
+            if (s === null || s === undefined) return '';
+            return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        }
+        function escapeAttr(s) { return escapeHtml(s); }
+
+        function getInitials(name) {
+            if (!name) return '?';
+            const parts = String(name).trim().split(/\s+/).filter(Boolean);
+            if (parts.length === 0) return '?';
+            if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+            // First letter of first name + first letter of last name
+            return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+        }
+
+        function showToast(msg, type) {
+            const t = document.getElementById('toast');
+            t.className = 'toast ' + (type || '');
+            document.getElementById('toast-msg').textContent = msg;
+            const iconEl = t.querySelector('i');
+            iconEl.setAttribute('data-lucide', type === 'error' ? 'alert-triangle' : (type === 'success' ? 'check-circle' : 'info'));
+            lucide.createIcons();
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3500);
+        }
+
+        // =====================================================
+        // Build hierarchy maps
+        // =====================================================
+        function buildMaps(nodes) {
+            orgNodes = nodes || [];
+            nodeMap = {};
+            childrenMap = {};
+            rootNodes = [];
+            orgNodes.forEach(n => {
+                nodeMap[n.id] = n;
+            });
+            orgNodes.forEach(n => {
+                const pid = n.parentId;
+                if (pid === null || pid === undefined || pid === '' || !nodeMap[pid]) {
+                    // Treat as root if parent missing
+                    if (pid === null || pid === undefined || pid === '') {
+                        rootNodes.push(n);
+                    } else {
+                        // orphan: attach to root
+                        n.parentId = null;
+                        rootNodes.push(n);
+                    }
+                } else {
+                    if (!childrenMap[pid]) childrenMap[pid] = [];
+                    childrenMap[pid].push(n);
+                }
+            });
+        }
+
+        // Compute level (depth) for each node starting from roots
+        function computeLevels() {
+            const visit = (node, level) => {
+                node.level = level;
+                const kids = childrenMap[node.id] || [];
+                kids.forEach(k => visit(k, level + 1));
+            };
+            rootNodes.forEach(r => visit(r, 0));
+        }
+
+        // =====================================================
+        // Render tree (recursive)
+        // =====================================================
+        function renderTree() {
+            const canvas = document.getElementById('org-canvas');
+            canvas.innerHTML = '';
+            if (rootNodes.length === 0) {
+                canvas.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:60px 20px;font-weight:600;">No hay datos de organigrama.</div>';
+                return;
+            }
+            const treeWrap = document.createElement('div');
+            treeWrap.className = 'org-tree';
+            // If multiple roots, wrap each in its own root UL
+            const rootUl = document.createElement('ul');
+            rootUl.style.paddingLeft = '0';
+            rootUl.style.paddingRight = '0';
+            rootNodes.forEach(r => {
+                const li = buildNodeLi(r, true);
+                rootUl.appendChild(li);
+            });
+            treeWrap.appendChild(rootUl);
+            canvas.appendChild(treeWrap);
+        }
+
+        function buildNodeLi(node, isRoot) {
+            const li = document.createElement('li');
+            if (isRoot) li.classList.add('org-root');
+            // Node card
+            const card = buildNodeCard(node);
+            li.appendChild(card);
+            // Children
+            const kids = childrenMap[node.id] || [];
+            if (kids.length > 0) {
+                const ul = document.createElement('ul');
+                kids.forEach(k => {
+                    ul.appendChild(buildNodeLi(k, false));
+                });
+                li.appendChild(ul);
+            }
+            return li;
+        }
+
+        function buildNodeCard(node) {
+            const card = document.createElement('div');
+            card.className = 'org-node level-' + (node.level || 0);
+            card.setAttribute('data-id', node.id);
+            // Photo or initials
+            if (node.photo) {
+                const img = document.createElement('img');
+                img.className = 'node-photo';
+                img.src = node.photo;
+                img.alt = escapeAttr(node.name);
+                img.onerror = function() {
+                    // Replace with initials fallback
+                    const ph = document.createElement('div');
+                    ph.className = 'node-initials';
+                    ph.textContent = getInitials(node.name);
+                    img.replaceWith(ph);
+                };
+                card.appendChild(img);
+            } else {
+                const ph = document.createElement('div');
+                ph.className = 'node-initials';
+                ph.textContent = getInitials(node.name);
+                card.appendChild(ph);
+            }
+            const nameEl = document.createElement('div');
+            nameEl.className = 'node-name';
+            nameEl.textContent = node.name || 'Sin nombre';
+            card.appendChild(nameEl);
+            const posEl = document.createElement('div');
+            posEl.className = 'node-position';
+            posEl.textContent = node.position || '';
+            card.appendChild(posEl);
+            // Click handler
+            card.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openNodeModal(node);
+            });
+            return card;
+        }
+
+        // =====================================================
+        // Modal
+        // =====================================================
+        function openNodeModal(node) {
+            const overlay = document.getElementById('modal-overlay');
+            const photoWrap = document.getElementById('modal-photo-wrap');
+            photoWrap.innerHTML = '';
+            if (node.photo) {
+                const img = document.createElement('img');
+                img.className = 'modal-photo';
+                img.src = node.photo;
+                img.alt = escapeAttr(node.name);
+                img.onerror = function() {
+                    const ph = document.createElement('div');
+                    ph.className = 'modal-initials';
+                    ph.textContent = getInitials(node.name);
+                    img.replaceWith(ph);
+                };
+                photoWrap.appendChild(img);
+            } else {
+                const ph = document.createElement('div');
+                ph.className = 'modal-initials';
+                ph.textContent = getInitials(node.name);
+                photoWrap.appendChild(ph);
+            }
+            document.getElementById('modal-name').textContent = node.name || 'Sin nombre';
+            document.getElementById('modal-position').textContent = node.position || '';
+            const reportsEl = document.getElementById('modal-reports');
+            const parent = node.parentId ? nodeMap[node.parentId] : null;
+            const kids = childrenMap[node.id] || [];
+            let parts = [];
+            if (parent) parts.push('Reporta a: ' + parent.name);
+            if (kids.length > 0) parts.push(kids.length + ' persona(s) a cargo');
+            reportsEl.textContent = parts.join(' · ');
+            reportsEl.style.display = parts.length ? '' : 'none';
+            overlay.classList.add('show');
+        }
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.remove('show');
+        }
+        document.getElementById('modal-close').addEventListener('click', closeModal);
+        document.getElementById('modal-overlay').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('modal-overlay')) closeModal();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // =====================================================
+        // Zoom & Pan
+        // =====================================================
+        let zoomLevel = 1;
+        let panX = 0;
+        let panY = 0;
+        const MIN_ZOOM = 0.25;
+        const MAX_ZOOM = 3;
+
+        const viewport = document.getElementById('org-viewport');
+        const canvas = document.getElementById('org-canvas');
+
+        function updateTransform() {
+            canvas.style.transform = `translate(${panX}px, ${panY}px) scale(${zoomLevel})`;
+            const lvl = Math.round(zoomLevel * 100);
+            document.getElementById('zoom-level').textContent = lvl + '%';
+        }
+
+        function setZoom(newZoom, centerX, centerY) {
+            newZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, newZoom));
+            if (centerX === undefined || centerY === undefined) {
+                const rect = viewport.getBoundingClientRect();
+                centerX = rect.width / 2;
+                centerY = rect.height / 2;
+            }
+            // Keep the point under the cursor stationary
+            const ratio = newZoom / zoomLevel;
+            panX = centerX - (centerX - panX) * ratio;
+            panY = centerY - (centerY - panY) * ratio;
+            zoomLevel = newZoom;
+            updateTransform();
+        }
+
+        function zoomIn() { setZoom(zoomLevel + 0.15); }
+        function zoomOut() { setZoom(zoomLevel - 0.15); }
+        function zoomReset() {
+            // Fit to screen: reset and center horizontally
+            zoomLevel = 1; panX = 0; panY = 0;
+            updateTransform();
+            // After render, recompute to fit width
+            setTimeout(() => fitToScreen(), 50);
+        }
+        function fitToScreen() {
+            const vRect = viewport.getBoundingClientRect();
+            const cWidth = canvas.scrollWidth;
+            const cHeight = canvas.scrollHeight;
+            if (cWidth === 0 || cHeight === 0) return;
+            const scaleX = (vRect.width - 40) / cWidth;
+            const scaleY = (vRect.height - 40) / cHeight;
+            let z = Math.min(scaleX, scaleY, 1);
+            z = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, z));
+            zoomLevel = z;
+            // Center
+            panX = (vRect.width - cWidth * z) / 2;
+            panY = (vRect.height - cHeight * z) / 2;
+            if (panX < 10) panX = 10;
+            if (panY < 10) panY = 10;
+            updateTransform();
+        }
+
+        document.getElementById('zoom-in').addEventListener('click', zoomIn);
+        document.getElementById('zoom-out').addEventListener('click', zoomOut);
+        document.getElementById('zoom-reset').addEventListener('click', zoomReset);
+
+        // Wheel zoom
+        viewport.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const rect = viewport.getBoundingClientRect();
+            const cx = e.clientX - rect.left;
+            const cy = e.clientY - rect.top;
+            const delta = e.deltaY > 0 ? -0.12 : 0.12;
+            setZoom(zoomLevel + delta, cx, cy);
+        }, { passive: false });
+
+        // Mouse drag pan
+        let isDragging = false;
+        let startX = 0, startY = 0;
+        let startPanX = 0, startPanY = 0;
+
+        viewport.addEventListener('mousedown', (e) => {
+            // Ignore if clicking a node (let card click fire)
+            if (e.target.closest('.org-node')) return;
+            isDragging = true;
+            startX = e.clientX; startY = e.clientY;
+            startPanX = panX; startPanY = panY;
+            viewport.classList.add('dragging');
+        });
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            panX = startPanX + (e.clientX - startX);
+            panY = startPanY + (e.clientY - startY);
+            updateTransform();
+        });
+        window.addEventListener('mouseup', () => {
+            if (isDragging) {
+                isDragging = false;
+                viewport.classList.remove('dragging');
+            }
+        });
+
+        // Touch: pinch zoom + drag pan
+        let touchState = null; // { mode: 'pan'|'pinch', startDist, startZoom, startX, startY, startPanX, startPanY, cx, cy }
+        viewport.addEventListener('touchstart', (e) => {
+            if (e.target.closest('.org-node')) return; // let card click fire
+            if (e.touches.length === 1) {
+                touchState = {
+                    mode: 'pan',
+                    startX: e.touches[0].clientX,
+                    startY: e.touches[0].clientY,
+                    startPanX: panX,
+                    startPanY: panY
+                };
+            } else if (e.touches.length === 2) {
+                const dx = e.touches[0].clientX - e.touches[1].clientX;
+                const dy = e.touches[0].clientY - e.touches[1].clientY;
+                const dist = Math.hypot(dx, dy);
+                const rect = viewport.getBoundingClientRect();
+                const cx = ((e.touches[0].clientX + e.touches[1].clientX) / 2) - rect.left;
+                const cy = ((e.touches[0].clientY + e.touches[1].clientY) / 2) - rect.top;
+                touchState = {
+                    mode: 'pinch',
+                    startDist: dist,
+                    startZoom: zoomLevel,
+                    cx: cx,
+                    cy: cy,
+                    startPanX: panX,
+                    startPanY: panY
+                };
+            }
+        }, { passive: true });
+        viewport.addEventListener('touchmove', (e) => {
+            if (!touchState) return;
+            e.preventDefault();
+            if (touchState.mode === 'pan' && e.touches.length === 1) {
+                panX = touchState.startPanX + (e.touches[0].clientX - touchState.startX);
+                panY = touchState.startPanY + (e.touches[0].clientY - touchState.startY);
+                updateTransform();
+            } else if (touchState.mode === 'pinch' && e.touches.length === 2) {
+                const dx = e.touches[0].clientX - e.touches[1].clientX;
+                const dy = e.touches[0].clientY - e.touches[1].clientY;
+                const dist = Math.hypot(dx, dy);
+                if (touchState.startDist > 0) {
+                    const ratio = dist / touchState.startDist;
+                    const newZoom = touchState.startZoom * ratio;
+                    // Zoom around center of pinch, preserving startPan
+                    const vRect = viewport.getBoundingClientRect();
+                    // Translate canvas point under center to keep stationary
+                    // Compute new pan so that pinch center stays put
+                    const startZoom = touchState.startZoom;
+                    const cx = touchState.cx;
+                    const cy = touchState.cy;
+                    // World point at start: worldX = (cx - startPanX) / startZoom
+                    const worldX = (cx - touchState.startPanX) / startZoom;
+                    const worldY = (cy - touchState.startPanY) / startZoom;
+                    zoomLevel = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, newZoom));
+                    panX = cx - worldX * zoomLevel;
+                    panY = cy - worldY * zoomLevel;
+                    updateTransform();
+                }
+            }
+        }, { passive: false });
+        viewport.addEventListener('touchend', () => {
+            touchState = null;
+        });
+
+        // =====================================================
+        // Data load
+        // =====================================================
+        async function loadOrgData() {
+            const loading = document.getElementById('org-loading');
+            try {
+                if (!_fyttsaFirebaseReady && typeof firebase !== 'undefined') {
+                    _fyttsaInitFirebase();
+                }
+                let nodes = null;
+                if (_fyttsaFirebaseReady) {
+                    try {
+                        const doc = await _fyttsaDb.collection('org_chart').doc('main').get();
+                        if (doc.exists && doc.data().nodes) {
+                            nodes = doc.data().nodes;
+                        }
+                    } catch (e) {
+                        console.warn('[Organigrama] Firestore load failed, using defaults:', e);
+                    }
+                }
+                if (!nodes || !Array.isArray(nodes) || nodes.length === 0) {
+                    nodes = JSON.parse(JSON.stringify(DEFAULT_ORG_DATA));
+                }
+                // Sanitize: ensure each node has id, name, parentId, photo
+                nodes = nodes.map(n => ({
+                    id: String(n.id),
+                    name: n.name || '',
+                    position: n.position || '',
+                    parentId: (n.parentId === null || n.parentId === undefined) ? null : String(n.parentId),
+                    photo: n.photo || ''
+                }));
+                buildMaps(nodes);
+                computeLevels();
+                renderTree();
+                loading.style.display = 'none';
+                lucide.createIcons();
+                // Initial fit
+                setTimeout(() => fitToScreen(), 100);
+            } catch (e) {
+                console.error('[Organigrama] loadOrgData error:', e);
+                loading.style.display = 'none';
+                // Fallback to defaults
+                const nodes = JSON.parse(JSON.stringify(DEFAULT_ORG_DATA));
+                buildMaps(nodes);
+                computeLevels();
+                renderTree();
+                lucide.createIcons();
+                showToast('No se pudo cargar el organigrama desde la nube. Mostrando datos locales.', 'error');
+                setTimeout(() => fitToScreen(), 100);
+            }
+        }
+
+        // =====================================================
+        // Init
+        // =====================================================
+        window.addEventListener('load', () => {
+            loadOrgData();
+            // Recompute fit on resize
+            window.addEventListener('resize', () => {
+                // Light debounce
+                clearTimeout(window._orgResizeT);
+                window._orgResizeT = setTimeout(() => fitToScreen(), 200);
+            });
+        });
+
+        // Try initial load immediately as well (in case 'load' already fired)
+        if (document.readyState === 'complete') {
+            setTimeout(loadOrgData, 50);
+        }
+        lucide.createIcons();
+    </script>
+</body>
+</html>
