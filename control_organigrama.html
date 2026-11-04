@@ -172,35 +172,33 @@
         .pan-hint i { width: 14px; height: 14px; }
         @media (max-width: 600px) { .pan-hint { display: none; } }
 
-        /* Org tree - flat layout for proper centering */
+        /* Org tree - flat layout with connecting lines */
         .org-tree {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 0;
         }
         .org-level {
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            gap: 12px;
             position: relative;
-            padding-top: 30px;
+            padding-top: 35px;
         }
         .org-level::before {
             content: '';
             position: absolute;
             top: 0;
             left: 50%;
-            width: 2px;
-            height: 30px;
+            transform: translateX(-50%);
+            width: var(--line-width, 100%);
+            max-width: 100%;
+            height: 2px;
             background: #cbd5e1;
         }
-        .org-level:first-child { padding-top: 0; }
-        .org-level:first-child::before { display: none; }
         .org-connector {
             width: 2px;
-            height: 30px;
+            height: 35px;
             background: #cbd5e1;
             margin: 0 auto;
         }
@@ -208,25 +206,52 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            width: 180px;
+            position: relative;
+        }
+        .org-subgroup::before {
+            content: '';
+            position: absolute;
+            top: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 35px;
+            background: #cbd5e1;
         }
         .org-subgroup-children {
             display: flex;
             justify-content: center;
             gap: 10px;
-            padding-top: 30px;
+            padding-top: 35px;
             position: relative;
             flex-wrap: wrap;
-            max-width: 100%;
         }
         .org-subgroup-children::before {
             content: '';
             position: absolute;
             top: 0;
             left: 50%;
-            width: 2px;
-            height: 30px;
+            transform: translateX(-50%);
+            width: 100%;
+            height: 2px;
             background: #cbd5e1;
         }
+        .org-subgroup-children > .org-node {
+            position: relative;
+        }
+        .org-subgroup-children > .org-node::before {
+            content: '';
+            position: absolute;
+            top: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 35px;
+            background: #cbd5e1;
+        }
+        .org-subgroup-children:has(> .org-node:only-child)::before { display: none; }
+        .org-subgroup-children > .org-node:only-child::before { display: none; }
 
         .org-node {
             display: inline-flex;
@@ -1074,6 +1099,19 @@ function fyttsa_applyPrivilegeMenu() {
                 });
 
                 treeWrap.appendChild(level2Row);
+
+                // Calculate horizontal line width (from first to last card center)
+                setTimeout(() => {
+                    const subgroups = level2Row.querySelectorAll('.org-subgroup');
+                    if (subgroups.length >= 2) {
+                        const first = subgroups[0].getBoundingClientRect();
+                        const last = subgroups[subgroups.length - 1].getBoundingClientRect();
+                        const firstCenter = first.left + first.width / 2;
+                        const lastCenter = last.left + last.width / 2;
+                        const lineWidth = lastCenter - firstCenter;
+                        level2Row.style.setProperty('--line-width', lineWidth + 'px');
+                    }
+                }, 50);
             }
 
             canvas.appendChild(treeWrap);
