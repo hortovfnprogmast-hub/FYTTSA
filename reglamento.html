@@ -1,1 +1,786 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reglamento Interno | FYTTSA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        :root{--primary-blue:#000000;--light-blue:#e8e8e8;--bg-color:#f8fafc;--text-main:#1e293b;--text-muted:#64748b;--border-color:#e2e8f0;--success:#10b981;--warning:#f59e0b;--danger:#ef4444;--info:#404040;--purple:#8b5cf6}
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:'Inter',sans-serif;background:var(--bg-color);display:flex;flex-direction:column;height:100vh;overflow:hidden}
+        .header{display:flex;justify-content:space-between;align-items:center;padding:10px 20px;background:#fff;border-bottom:1px solid var(--border-color);z-index:50;flex-shrink:0}
+        .header-left{display:flex;align-items:center;gap:15px}
+        .menu-btn{background:none;border:none;cursor:pointer;color:var(--text-main);padding:5px}
+        .header-title{margin:0;font-size:15px;font-weight:700;color:var(--primary-blue);display:none}
+        @media(min-width:768px){.header-title{display:block}}
+        .header-right{display:flex;align-items:center;gap:12px}
+        .user-initial{width:35px;height:35px;border-radius:50%;background:var(--primary-blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:16px}
+        .main-layout{display:flex;flex:1;overflow:hidden}
+        .sidebar{width:260px;background:#fff;border-right:1px solid var(--border-color);overflow-y:auto;transition:transform .3s;display:flex;flex-direction:column;flex-shrink:0}
+        @media(max-width:768px){.sidebar{position:fixed;height:calc(100vh - 60px);transform:translateX(-100%);z-index:40}.sidebar.open{transform:translateX(0)}.header-title{display:none}}
+        .sidebar-nav{padding:15px 10px}
+        .sidebar-section{margin-bottom:15px;padding-bottom:10px;border-bottom:1px solid var(--border-color)}
+        .sidebar-section:last-child{border-bottom:none}
+        .sidebar .section-title{font-size:11px;font-weight:800;color:var(--text-muted);text-transform:uppercase;margin:10px 15px;display:block}
+        .nav-item{display:flex;align-items:center;gap:12px;padding:10px 15px;color:var(--text-main);text-decoration:none;font-size:14px;font-weight:500;border-radius:10px;margin-bottom:2px;transition:all .2s}
+        .nav-item:hover{background-color:var(--bg-color)}
+        .nav-item.active { background-color: #e8e8e8 !important; color: #000000 !important; font-weight: 700 !important; border-left: 4px solid #000000 !important; border-radius: 8px !important; }
+        .nav-item.active i{color:var(--primary-blue)}
+        .content{flex:1;padding:30px;overflow-y:auto;scroll-behavior:smooth}
+        @media(max-width:768px){.content{padding:20px}}
+        .page-title{display:flex;align-items:center;gap:12px;font-size:22px;font-weight:800;color:var(--primary-blue);margin-bottom:8px}
+        .page-title i{width:28px;height:28px}
+        .page-subtitle{color:var(--text-muted);font-size:13px;margin-bottom:20px}
 
+        /* Progress bar */
+        .progress-wrap{position:sticky;top:0;background:transparent;padding:12px 0 10px;z-index:10;margin-bottom:16px;border-bottom:1px solid transparent}
+        .progress-bar-outer{height:4px;background:transparent;border-radius:2px;overflow:hidden;position:relative}
+        .progress-bar-inner{height:100%;background:linear-gradient(90deg,var(--success),#34d399);border-radius:2px;width:0%;transition:width .3s ease}
+        .progress-label{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:11px;color:var(--text-muted);font-weight:700}
+        .progress-section{color:var(--primary-blue);font-weight:800;font-size:13px}
+        .progress-pct{font-size:20px;font-weight:800;color:var(--success);min-width:60px;text-align:right}
+
+        /* Sections */
+        .reg-section{background:#fff;border-radius:20px;padding:28px;border:1px solid var(--border-color);box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:24px;scroll-margin-top:120px}
+        .reg-section.read{border-left:4px solid var(--success)}
+        .reg-section.current{border-left:4px solid var(--primary-blue);box-shadow:0 4px 20px rgba(0, 0, 0,.12)}
+        .reg-section h2{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:800;color:var(--primary-blue);margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid var(--light-blue)}
+        .reg-section h2 i{width:22px;height:22px}
+        .reg-section h3{font-size:15px;font-weight:800;color:var(--text-main);margin:18px 0 8px;padding-left:12px;border-left:4px solid var(--primary-blue)}
+        .reg-section p{font-size:13.5px;line-height:1.65;color:var(--text-main);margin-bottom:10px}
+        .reg-section ul{margin:0 0 12px 0;padding-left:22px}
+        .reg-section ul li{font-size:13px;line-height:1.6;color:var(--text-main);margin-bottom:5px}
+        .reg-section ul li strong{color:var(--primary-blue)}
+        .reg-section .intro-box{background:var(--light-blue);border:1px solid #cccccc;border-radius:12px;padding:14px 16px;font-size:13px;color:var(--primary-blue);margin-bottom:16px;line-height:1.5}
+        .reg-section .intro-box strong{font-weight:800}
+
+        /* Step indicator */
+        .steps-row{display:flex;gap:16px;align-items:center;margin-bottom:20px;flex-wrap:wrap}
+        .step-item{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--text-muted)}
+        .step-dot{width:24px;height:24px;border-radius:50%;background:var(--bg-color);color:var(--text-muted);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;transition:all .25s}
+        .step-dot.done{background:var(--success);color:#fff}
+        .step-dot.current{background:var(--primary-blue);color:#fff;box-shadow:0 0 0 4px rgba(0, 0, 0,.15)}
+        .step-item.done{color:var(--success)}
+        .step-item.current{color:var(--primary-blue)}
+
+        /* End marker */
+        .end-marker{text-align:center;padding:16px;margin:20px 0 8px;background:#f1f5f9;border-radius:12px;color:var(--text-muted);font-size:13px;font-weight:700;transition:all .35s;border:2px dashed #cbd5e1}
+        .end-marker.read{background:#dcfce7;color:#166534;border-color:#86efac}
+        .end-marker i{width:18px;height:18px;vertical-align:-3px;margin-right:6px}
+
+        /* Signature */
+        .sig-card{background:#fff;border-radius:20px;padding:28px;border:1px solid var(--border-color);box-shadow:0 4px 12px rgba(0,0,0,.04);margin-bottom:24px}
+        .sig-card h3{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:800;color:var(--primary-blue);margin-bottom:18px;padding-bottom:12px;border-bottom:2px solid var(--light-blue)}
+        .sig-card h3 i{width:22px;height:22px}
+        .sig-section{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center;padding:20px;background:linear-gradient(135deg,#e8e8e8 0%,#f8fafc 100%);border-radius:16px;border:1px solid #cccccc}
+        @media(max-width:768px){.sig-section{grid-template-columns:1fr}}
+        .sig-user-info{display:flex;align-items:center;gap:14px}
+        .sig-avatar{width:56px;height:56px;border-radius:50%;background:var(--primary-blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;flex-shrink:0}
+        .sig-user-detail{display:flex;flex-direction:column}
+        .sig-user-label{font-size:11px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+        .sig-user-name{font-size:16px;color:var(--primary-blue);font-weight:800;margin-top:2px}
+        .sig-user-role{font-size:12px;color:var(--text-muted);margin-top:2px}
+        .sig-box{position:relative;background:#fff;border:2px dashed var(--border-color);border-radius:12px;padding:12px;min-height:100px;display:flex;align-items:center;justify-content:center}
+        .sig-box.signed{border-color:var(--primary-blue);border-style:solid}
+        #sig-canvas{display:block;width:100%;height:100px;cursor:crosshair;touch-action:none}
+        .sig-hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#cbd5e1;font-size:13px;font-style:italic;pointer-events:none;text-align:center}
+        .sig-hint i{width:16px;height:16px;vertical-align:-3px;margin-right:4px}
+        .sig-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}
+        .btn-mini{padding:6px 12px;font-size:11px;border-radius:8px;border:none;cursor:pointer;font-weight:700;font-family:'Inter',sans-serif;display:inline-flex;align-items:center;gap:4px}
+        .btn-mini i{width:12px;height:12px}
+        .btn-mini-clear{background:#fee2e2;color:var(--danger)}
+        .btn-mini-clear:hover{background:var(--danger);color:#fff}
+        .btn-mini-clear:disabled{background:#f1f5f9;color:#cbd5e1;cursor:not-allowed}
+
+        /* Buttons */
+        .btn{padding:12px 22px;border-radius:12px;font-weight:700;font-size:13.5px;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:8px;border:none;font-family:'Inter',sans-serif}
+        .btn i{width:16px;height:16px}
+        .btn-accept{background:var(--primary-blue);color:#fff}
+        .btn-accept:disabled{background:#cbd5e1;color:#94a3b8;cursor:not-allowed}
+        .btn-accept:not(:disabled):hover{background:#1a1a1a;transform:translateY(-2px);box-shadow:0 8px 18px rgba(0, 0, 0,.3)}
+        .btn-decline{background:#fef2f2;color:var(--danger);border:2px solid #fecaca}
+        .btn-decline:hover{background:var(--danger);color:#fff;border-color:var(--danger)}
+        .btn-decline:disabled{background:#f1f5f9;color:#cbd5e1;border-color:#e2e8f0;cursor:not-allowed}
+        .actions-bar{display:flex;gap:12px;justify-content:center;margin-top:24px;flex-wrap:wrap}
+
+        /* Toast */
+        .toast{position:fixed;top:20px;right:20px;background:var(--text-main);color:#fff;padding:14px 20px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.2);z-index:9999;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;transform:translateX(120%);transition:transform .3s}
+        .toast.show{transform:translateX(0)}
+        .toast.success{background:var(--success)}
+        .toast.error{background:var(--danger)}
+        .toast i{width:18px;height:18px}
+    </style>
+
+    <!-- Firebase SDK + FYTTSA shared data helper -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script>
+// =====================================================
+// FYTTSA Shared Data Helper
+// Centralizes Firebase Firestore sync for cross-device data sharing.
+// All user-specific data is stored under: usuarios/{userId}/app_data/{key}
+// Falls back to localStorage if Firebase is unavailable or no user.
+// =====================================================
+
+const FYTTSA_FIREBASE_CONFIG = {
+    apiKey: "AIzaSyD9Ihkh0NaP5vVbKntobmVTb53T0yDAZjU",
+    authDomain: "fyttsa-ae508.firebaseapp.com",
+    projectId: "fyttsa-ae508",
+    storageBucket: "fyttsa-ae508.firebasestorage.app",
+    messagingSenderId: "860564632264",
+    appId: "1:860564632264:web:30edf5a8f837e284ab2bfd",
+    measurementId: "G-7PQ1R77YJ3"
+};
+
+// Initialize Firebase once
+let _fyttsaDb = null;
+let _fyttsaFirebaseReady = false;
+
+function _fyttsaInitFirebase() {
+    if (typeof firebase === 'undefined') return false;
+    if (!firebase.apps.length) {
+        firebase.initializeApp(FYTTSA_FIREBASE_CONFIG);
+    }
+    if (firebase.firestore) {
+        _fyttsaDb = firebase.firestore();
+        _fyttsaFirebaseReady = true;
+        return true;
+    }
+    return false;
+}
+
+// Try to init immediately if firebase is already loaded
+if (typeof firebase !== 'undefined') {
+    _fyttsaInitFirebase();
+}
+
+// Also try after window load (in case scripts load async)
+window.addEventListener('load', function() {
+    if (!_fyttsaFirebaseReady && typeof firebase !== 'undefined') {
+        _fyttsaInitFirebase();
+    }
+});
+
+/**
+ * Get the current user ID from localStorage.
+ */
+function fyttsa_getUserId() {
+    return localStorage.getItem('usuario') || null;
+}
+
+/**
+ * Load data for the current user from Firestore.
+ * Falls back to localStorage if Firestore is unavailable.
+ */
+async function fyttsa_loadData(key) {
+    const userId = fyttsa_getUserId();
+
+    if (userId) {
+        if (!_fyttsaFirebaseReady && typeof firebase !== 'undefined') {
+            _fyttsaInitFirebase();
+        }
+        if (_fyttsaFirebaseReady) {
+            try {
+                const doc = await _fyttsaDb.collection('usuarios')
+                    .doc(userId)
+                    .collection('app_data')
+                    .doc(key)
+                    .get();
+                if (doc.exists && doc.data().value !== undefined) {
+                    return doc.data().value;
+                }
+            } catch (e) {
+                console.warn('[FYTTSA] Firestore load failed, falling back to localStorage:', e);
+            }
+        }
+    }
+
+    // Fallback to localStorage
+    try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+        return null;
+    }
+}
+
+/**
+ * Save data for the current user to Firestore.
+ * Also saves to localStorage as a cache/fallback.
+ */
+async function fyttsa_saveData(key, value) {
+    const userId = fyttsa_getUserId();
+
+    try {
+        localStorage.setItem(key, JSON.stringify(value));
+    } catch (e) {
+        console.warn('[FYTTSA] localStorage save failed:', e);
+    }
+
+    if (userId) {
+        if (!_fyttsaFirebaseReady && typeof firebase !== 'undefined') {
+            _fyttsaInitFirebase();
+        }
+        if (_fyttsaFirebaseReady) {
+            try {
+                await _fyttsaDb.collection('usuarios')
+                    .doc(userId)
+                    .collection('app_data')
+                    .doc(key)
+                    .set({
+                        value: value,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+            } catch (e) {
+                console.warn('[FYTTSA] Firestore save failed:', e);
+            }
+        }
+    }
+}
+
+/**
+ * Save data synchronously to localStorage and fire async Firestore save.
+ */
+function fyttsa_saveDataSync(key, value) {
+    try {
+        localStorage.setItem(key, JSON.stringify(value));
+    } catch (e) {
+        console.warn('[FYTTSA] localStorage save failed:', e);
+    }
+    fyttsa_saveData(key, value);
+}
+
+// =====================================================
+// PRIVILEGE-BASED MENU VISIBILITY + ACTIVE MENU STYLING
+// =====================================================
+// Privilegio 1 = see ALL menu sections
+// Privilegio 2 = see ONLY Inicio + Trabajador section (hide Obra, Control, Almacén)
+// =====================================================
+
+function _fyttsa_applyMenuVisibility() {
+    var privilegio = String(localStorage.getItem('privilegio') || '1').trim();
+    var sidebar = document.getElementById('sidebar');
+    if (!sidebar) return;
+
+    // Allowed sections per role. Inicio link is always visible.
+    var allowedByRole = {
+        '1': ['Trabajador', 'Proveedor', 'Obra', 'Control', 'Almacén'],
+        '2': ['Trabajador'],
+        '3': ['Proveedor']
+    };
+    var allowed = allowedByRole[privilegio] || allowedByRole['1'];
+
+    var sections = sidebar.querySelectorAll('.sidebar-section');
+    sections.forEach(function(sec) {
+        var sectionName = (sec.getAttribute('data-section') || '').trim();
+        if (!sectionName) {
+            var t = sec.querySelector('.section-title');
+            if (t) sectionName = t.textContent.trim();
+        }
+        sec.style.display = (allowed.indexOf(sectionName) !== -1) ? '' : 'none';
+    });
+}
+
+function _fyttsa_applyActiveStyle() {
+    var activeItem = document.querySelector('.nav-item.active');
+    if (activeItem) {
+        activeItem.style.setProperty('background-color', '#e8e8e8', 'important');
+        activeItem.style.setProperty('color', '#000000', 'important');
+        activeItem.style.setProperty('font-weight', '700', 'important');
+        activeItem.style.setProperty('border-left', '4px solid #000000', 'important');
+        activeItem.style.setProperty('border-radius', '8px', 'important');
+        activeItem.style.setProperty('padding', '10px 15px', 'important');
+    }
+}
+
+// Public function that pages call after loading menu.html
+function fyttsa_applyPrivilegeMenu() {
+    _fyttsa_applyMenuVisibility();
+}
+
+// =====================================================
+// AUTO-SETUP: Runs automatically when the script loads.
+// Uses a MutationObserver to detect when the sidebar content
+// changes (i.e., when menu.html is loaded via fetch), then:
+//   1. Applies privilege-based menu visibility
+//   2. Starts an interval to apply active menu styling
+// This ensures the menu is always correct regardless of
+// when fyttsa_applyPrivilegeMenu() is called.
+// =====================================================
+
+(function() {
+    var styleIntervalStarted = false;
+
+    function startActiveStyleInterval() {
+        if (styleIntervalStarted) return;
+        styleIntervalStarted = true;
+
+        // Apply immediately
+        _fyttsa_applyActiveStyle();
+
+        // Then check every 200ms for 20 seconds
+        var intervalId = setInterval(function() {
+            _fyttsa_applyActiveStyle();
+        }, 200);
+
+        setTimeout(function() {
+            clearInterval(intervalId);
+        }, 20000);
+    }
+
+    function setupSidebarObserver() {
+        var sidebar = document.getElementById('sidebar');
+        if (!sidebar) {
+            // Sidebar not yet in DOM, retry shortly
+            setTimeout(setupSidebarObserver, 100);
+            return;
+        }
+
+        // Apply immediately in case menu is already loaded
+        _fyttsa_applyMenuVisibility();
+        startActiveStyleInterval();
+
+        // Watch for changes to sidebar content (when menu.html is loaded via fetch)
+        if (typeof MutationObserver !== 'undefined') {
+            var observer = new MutationObserver(function(mutations) {
+                _fyttsa_applyMenuVisibility();
+                _fyttsa_applyActiveStyle();
+            });
+            observer.observe(sidebar, {
+                childList: true,
+                subtree: true,
+                attributes: true,
+                attributeFilter: ['class']
+            });
+        }
+    }
+
+    // Start when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            setupSidebarObserver();
+            // Also retry after a delay in case DOMContentLoaded already fired
+            setTimeout(function() {
+                _fyttsa_applyMenuVisibility();
+                _fyttsa_applyActiveStyle();
+                startActiveStyleInterval();
+            }, 500);
+            setTimeout(function() {
+                _fyttsa_applyMenuVisibility();
+                _fyttsa_applyActiveStyle();
+            }, 1500);
+        });
+    } else {
+        // DOM already ready
+        setupSidebarObserver();
+        setTimeout(function() {
+            _fyttsa_applyMenuVisibility();
+            _fyttsa_applyActiveStyle();
+            startActiveStyleInterval();
+        }, 500);
+        setTimeout(function() {
+            _fyttsa_applyMenuVisibility();
+            _fyttsa_applyActiveStyle();
+        }, 1500);
+    }
+
+    // Also run on window load (final safety net)
+    window.addEventListener('load', function() {
+        _fyttsa_applyMenuVisibility();
+        _fyttsa_applyActiveStyle();
+        startActiveStyleInterval();
+    });
+})();
+
+    </script>
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <button class="menu-btn" id="toggle-menu"><i data-lucide="menu"></i></button>
+            <h1 class="header-title">FYTTSA</h1>
+        </div>
+        <div class="header-right">
+            <div class="user-initial" id="user-initial">U</div>
+            <img src="https://i.ibb.co/x8Bw8KR8/MARFIL-1.jpg" alt="Logo" height="35" style="border-radius:8px">
+        </div>
+    </header>
+    <script>try{lucide.createIcons()}catch(e){}</script>
+    <div class="main-layout">
+        <aside class="sidebar" id="sidebar"></aside>
+        <main class="content" id="content">
+            <h1 class="page-title"><i data-lucide="scroll-text"></i> Reglamento Interno para Residentes de Obra</h1>
+            <p class="page-subtitle">Soluciones Constructivas y Durables S.A. de C.V. — Lee completo el reglamento y fírmalo electrónicamente.</p>
+
+            <!-- Progress -->
+            <div class="progress-wrap">
+                <div class="progress-bar-outer"><div class="progress-bar-inner" id="prog-bar"></div></div>
+                <div class="progress-label">
+                    <span>&nbsp;</span>
+                    <div style="display:flex;align-items:center;gap:10px">
+                        <span class="progress-section" id="prog-section">Iniciando lectura...</span>
+                        <span class="progress-pct" id="prog-pct">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Steps -->
+            <div class="steps-row">
+                <div class="step-item" id="step1"><div class="step-dot current" id="step1-dot">1</div> Leer reglamento</div>
+                <div class="step-item" id="step2"><div class="step-dot" id="step2-dot">2</div> Firma electrónica</div>
+            </div>
+
+            <div id="reg-content">
+                <!-- Section: Declaracion -->
+                <div class="reg-section" id="sec-0">
+                    <h2><i data-lucide="file-text"></i> Declaración de Compromiso</h2>
+                    <div class="intro-box">
+                        Yo, <strong id="user-name-display">[nombre del residente]</strong>, en mi carácter de Residente de Obra, me comprometo a cumplir y hacer cumplir el presente reglamento, desempeñando mis funciones con responsabilidad, disciplina, liderazgo y profesionalismo para garantizar la correcta ejecución de los proyectos.
+                    </div>
+                </div>
+
+                <!-- Section 1 -->
+                <div class="reg-section" id="sec-1">
+                    <h2><i data-lucide="clipboard-check"></i> 1. Supervisión y Control de Obra</h2>
+                    <p>El Residente de Obra deberá:</p>
+                    <ul>
+                        <li>Supervisar permanentemente la ejecución de los trabajos.</li>
+                        <li>Verificar cumplimiento de: <strong>Planos, especificaciones, programas de obra, alcances autorizados.</strong></li>
+                        <li>Resolver oportunamente dudas y problemas técnicos.</li>
+                        <li>Conocer integralmente el proyecto: planos, procedimientos, bitácoras, alcances contratados.</li>
+                        <li>Revisar antes de iniciar obra: planos autorizados, catálogo de conceptos, programas de ejecución, presupuesto y suministros.</li>
+                        <li>Verificar: niveles, plomos, alineaciones, preparación de colados.</li>
+                        <li>Aplicar controles para evitar desperdicios y errores.</li>
+                        <li>Registrar en bitácora cualquier cambio o modificación antes de ejecutarlo.</li>
+                    </ul>
+                </div>
+
+                <!-- Section 2 -->
+                <div class="reg-section" id="sec-2">
+                    <h2><i data-lucide="settings"></i> 2. Administración y Operación</h2>
+                    <p>El Residente de Obra deberá:</p>
+                    <ul>
+                        <li>Ser el primero en llegar a la obra.</li>
+                        <li>Coordinar al personal en los frentes correctos de trabajo.</li>
+                        <li>Evitar tiempos muertos e improductividad.</li>
+                        <li>Supervisar: <strong>limpieza, almacén, vigilancia.</strong></li>
+                        <li>Ajustar la cantidad de personal según necesidades de obra.</li>
+                        <li>Garantizar el buen uso de: <strong>herramienta, equipo, maquinaria.</strong></li>
+                        <li>Verificar limpieza y resguardo de equipo al finalizar jornada.</li>
+                    </ul>
+                </div>
+
+                <!-- Section 3 -->
+                <div class="reg-section" id="sec-3">
+                    <h2><i data-lucide="message-square"></i> 3. Comunicación y Seguimiento</h2>
+                    <p>El Residente de Obra deberá:</p>
+                    <ul>
+                        <li>Mantener comunicación constante con oficina y equipo operativo.</li>
+                        <li>Confirmar y dar seguimiento a instrucciones y acuerdos.</li>
+                        <li>Reportar avances de obra tres veces al día.</li>
+                        <li>Enviar diariamente: <strong>lista de asistencia, evidencia fotográfica.</strong></li>
+                        <li>Reportar: viajes de material, retiros, movimientos relevantes.</li>
+                    </ul>
+                </div>
+
+                <!-- Section 4 -->
+                <div class="reg-section" id="sec-4">
+                    <h2><i data-lucide="wallet"></i> 4. Requisiciones y Control Financiero</h2>
+                    <p>El Residente de Obra deberá:</p>
+                    <ul>
+                        <li>Realizar directamente las requisiciones de material.</li>
+                        <li>Solicitar materiales con mínimo <strong>48 horas de anticipación.</strong></li>
+                        <li>Utilizar caja chica únicamente para gastos menores y urgentes.</li>
+                        <li>Comprobar gastos de caja chica en máximo <strong>3 días.</strong></li>
+                        <li>Revisar y validar: <strong>estimaciones, pagos, nóminas.</strong></li>
+                        <li>Verificar presupuesto antes de autorizar cambios o gastos adicionales.</li>
+                        <li>Reportar semanalmente el avance del proyecto asignado, comparando el progreso real contra el programa de obra (proyectado). En caso de existir atrasos o desviaciones, deberá informar las causas que los originan, el impacto esperado en tiempo y costos, así como las acciones correctivas para mitigarlos.</li>
+                    </ul>
+                </div>
+
+                <!-- Section 5 -->
+                <div class="reg-section" id="sec-5">
+                    <h2><i data-lucide="folder-open"></i> 5. Control Documental</h2>
+                    <p>El Residente de Obra deberá:</p>
+                    <ul>
+                        <li>Realizar minutas durante toda la obra independiente a la nota de bitácora.</li>
+                        <li>Mantener desde el inicio: <strong>carpeta de obra, planos actualizados, documentación técnica.</strong></li>
+                        <li>Mantener actualizados: <strong>reportes, bitácoras, minutas, evidencia fotográfica, remisiones y controles de material.</strong></li>
+                        <li>Actualizar documentación durante toda la obra.</li>
+                        <li>Resguardar correctamente la bitácora de obra.</li>
+                        <li>Entregar al cierre: <strong>planos finales, manuales, garantías, documentación de cierre.</strong></li>
+                    </ul>
+                </div>
+
+                <!-- Section 6 -->
+                <div class="reg-section" id="sec-6">
+                    <h2><i data-lucide="shield-check"></i> 6. Seguridad y Cumplimiento</h2>
+                    <p>El Residente de Obra deberá:</p>
+                    <ul>
+                        <li>Garantizar el cumplimiento de normas de seguridad.</li>
+                        <li>Exigir el uso obligatorio de <strong>equipo de protección personal.</strong></li>
+                        <li>Verificar que el personal cuente con: <strong>alta ante IMSS, accesos autorizados, documentación requerida.</strong></li>
+                        <li>Garantizar presencia del responsable eléctrico en inspecciones especializadas.</li>
+                    </ul>
+                </div>
+
+                <!-- Section 7 -->
+                <div class="reg-section" id="sec-7">
+                    <h2><i data-lucide="users"></i> 7. Desempeño y Conducta</h2>
+                    <p>El Residente de Obra deberá actuar con:</p>
+                    <ul>
+                        <li><strong>Liderazgo, disciplina, sentido de urgencia, responsabilidad, enfoque a resultados.</strong></li>
+                    </ul>
+                    <p>Teniendo como prioridad:</p>
+                    <ul>
+                        <li>Cumplimiento de programas, control de costos, calidad de ejecución, seguridad, productividad continua.</li>
+                    </ul>
+                    <p>El Residente de Obra es responsable de mantener el orden, la coordinación y un ambiente de trabajo profesional entre todas las personas relacionadas con la obra. Ante cualquier conflicto, deberá actuar con imparcialidad y criterio profesional para su atención y resolución.</p>
+                    <p>Existe <strong>cero tolerancia</strong> a la violencia, amenazas, hostigamiento, discriminación o cualquier falta de respeto. El Residente será responsable de intervenir y dar seguimiento a cualquier situación que afecte la convivencia, seguridad o desempeño del equipo.</p>
+                </div>
+
+                <!-- Medidas disciplinarias -->
+                <div class="reg-section" id="sec-8">
+                    <h2><i data-lucide="alert-triangle"></i> Medidas Disciplinarias</h2>
+                    <p>El incumplimiento de este reglamento podrá generar:</p>
+                    <ul>
+                        <li><strong>Reportes administrativos.</strong></li>
+                        <li><strong>Sanciones internas.</strong></li>
+                        <li><strong>Suspensión de funciones.</strong></li>
+                        <li><strong>Terminación de la relación laboral o contractual.</strong></li>
+                    </ul>
+                </div>
+
+                <!-- End marker -->
+                <div class="end-marker" id="end-marker">
+                    <i data-lucide="check-circle-2"></i> Fin del reglamento. Ya puedes proceder a firmar.
+                </div>
+            </div>
+
+            <!-- Signature -->
+            <div class="sig-card" id="sig-card">
+                <h3><i data-lucide="pen-tool"></i> Firma de Aceptación</h3>
+                <div class="sig-section">
+                    <div class="sig-user-info">
+                        <div class="sig-avatar" id="sig-avatar">U</div>
+                        <div class="sig-user-detail">
+                            <span class="sig-user-label">Firma como:</span>
+                            <span class="sig-user-name" id="sig-user-name">Cargando...</span>
+                            <span class="sig-user-role">Residente de Obra</span>
+                            <span class="sig-user-role" style="margin-top:4px;font-size:11px" id="sig-date">—</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="sig-box" id="sig-box">
+                            <canvas id="sig-canvas"></canvas>
+                            <div class="sig-hint" id="sig-hint"><i data-lucide="edit-3"></i>Firma aquí con el mouse o el dedo</div>
+                        </div>
+                        <div class="sig-actions">
+                            <button type="button" class="btn-mini btn-mini-clear" id="btn-clear-sig" disabled><i data-lucide="eraser"></i> Borrar firma</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="actions-bar">
+                    <button class="btn btn-decline" id="btn-decline"><i data-lucide="log-out"></i> Rechazar y cerrar sesión</button>
+                    <button class="btn btn-accept" id="btn-accept" disabled><i data-lucide="check-circle-2"></i> Aceptar y firmar</button>
+                </div>
+            </div>
+        </main>
+    </div>
+    <div class="toast" id="toast"><i data-lucide="check-circle"></i><span id="toast-msg">Mensaje</span></div>
+
+    <script>
+        // MENU (mismo formato que todas las paginas)
+        fetch('menu.html?v=' + Date.now()).then(r=>r.text()).then(html=>{document.getElementById('sidebar').innerHTML=html;lucide.createIcons();
+                fyttsa_applyPrivilegeMenu();const l=document.getElementById('link-reglamento');if(l)l.classList.add('active')}).catch(e=>console.error('Error cargando el menú:',e));
+        document.getElementById('toggle-menu').addEventListener('click',()=>document.getElementById('sidebar').classList.toggle('open'));
+
+        // Usuario
+        function getUserName(){return localStorage.getItem('nombre')||''}
+        function applyUserName(){
+            const n=getUserName();
+            if(n){
+                document.getElementById('sig-user-name').textContent=n;
+                document.getElementById('sig-avatar').textContent=n.charAt(0).toUpperCase();
+                document.getElementById('user-initial').textContent=n.charAt(0).toUpperCase();
+                document.getElementById('user-name-display').textContent=n;
+            }else{setTimeout(applyUserName,1500)}
+        }
+        applyUserName();
+        document.getElementById('sig-date').textContent=new Date().toLocaleDateString('es-MX',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+        // Helpers
+        function esc(s){if(s===null||s===undefined)return'';return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c])}
+        function toast(m,t='success'){const el=document.getElementById('toast');const ic=t==='success'?'check-circle':t==='error'?'alert-circle':'info';el.innerHTML=`<i data-lucide="${ic}"></i><span>${esc(m)}</span>`;el.className='toast '+t;lucide.createIcons();el.classList.add('show');clearTimeout(window._tt);window._tt=setTimeout(()=>el.classList.remove('show'),3500)}
+
+        // Progress tracking
+        const sections=Array.from(document.querySelectorAll('.reg-section'));
+        const endMarker=document.getElementById('end-marker');
+        const progBar=document.getElementById('prog-bar');
+        const progPct=document.getElementById('prog-pct');
+        const progSection=document.getElementById('prog-section');
+        const step1Dot=document.getElementById('step1-dot');
+        const step2Dot=document.getElementById('step2-dot');
+        const step1Item=document.getElementById('step1');
+        const step2Item=document.getElementById('step2');
+        const sectionTitles=['Declaración','1. Supervisión','2. Administración','3. Comunicación','4. Requisiciones','5. Control Documental','6. Seguridad','7. Desempeño','Medidas Disciplinarias'];
+        let readSections=new Set();
+        let scrolledToBottom=false;
+        let hasSignature=false;
+
+        const content=document.getElementById('content');
+        content.addEventListener('scroll',()=>{
+            const max=content.scrollHeight-content.clientHeight;
+            if(max<=0){
+                progBar.style.width='100%';progPct.textContent='100%';progSection.textContent='Completo';
+                if(!scrolledToBottom){scrolledToBottom=true;markStepDone(step1Dot,step1Item);markEndRead(true);checkReady()}
+                return
+            }
+            const pct=Math.min(100,Math.round((content.scrollTop/max)*100));
+            progBar.style.width=pct+'%';progPct.textContent=pct+'%';
+
+            // Detect current section
+            let currentIdx=-1;
+            for(let i=0;i<sections.length;i++){
+                const rect=sections[i].getBoundingClientRect();
+                if(rect.top<200&&rect.bottom>100){currentIdx=i;break}
+            }
+            // Mark sections as read
+            sections.forEach((sec,idx)=>{
+                if(idx<currentIdx&&!readSections.has(idx)){readSections.add(idx);sec.classList.add('read');sec.classList.remove('current')}
+            });
+            if(currentIdx>=0){
+                sections[currentIdx].classList.add('current');
+                progSection.textContent=sectionTitles[currentIdx]||'Leyendo...'
+            }
+            // Check bottom
+            const atBottom=pct>=98||(content.scrollTop+content.clientHeight>=content.scrollHeight-30);
+            if(atBottom&&!scrolledToBottom){
+                scrolledToBottom=true;
+                sections.forEach(s=>s.classList.add('read'));
+                markStepDone(step1Dot,step1Item);
+                markEndRead(true);
+                checkReady()
+            }
+        });
+
+        function markStepDone(dot,item){
+            dot.classList.add('done');
+            dot.classList.remove('current');
+            dot.innerHTML='<i data-lucide="check"></i>';
+            item.classList.add('done');
+            item.classList.remove('current');
+            step2Dot.classList.add('current');
+            step2Item.classList.add('current');
+            lucide.createIcons()
+        }
+        function markEndRead(read){if(read)endMarker.classList.add('read');else endMarker.classList.remove('read')}
+        function checkReady(){
+            const ready=scrolledToBottom&&hasSignature;
+            document.getElementById('btn-accept').disabled=!ready;
+            if(hasSignature)markStep2Done()
+        }
+        function markStep2Done(){step2Dot.classList.add('done');step2Dot.classList.remove('current');step2Dot.innerHTML='<i data-lucide="check"></i>';step2Item.classList.add('done');step2Item.classList.remove('current');lucide.createIcons()}
+
+        // Signature canvas
+        const sigCanvas=document.getElementById('sig-canvas');
+        const sigHint=document.getElementById('sig-hint');
+        const sigBox=document.getElementById('sig-box');
+        const clearSigBtn=document.getElementById('btn-clear-sig');
+
+        function initSig(){
+            const dpr=window.devicePixelRatio||1;
+            const rect=sigCanvas.getBoundingClientRect();
+            if(rect.width===0){setTimeout(initSig,200);return}
+            sigCanvas.width=Math.max(1,Math.floor(rect.width*dpr));
+            sigCanvas.height=Math.max(1,Math.floor(rect.height*dpr));
+            const ctx=sigCanvas.getContext('2d');
+            ctx.scale(dpr,dpr);
+            ctx.lineWidth=2.2;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#000000'
+        }
+        function bindSig(){
+            let drawing=false,lx=0,ly=0;
+            function gp(e){const r=sigCanvas.getBoundingClientRect();if(e.touches&&e.touches.length>0)return{x:e.touches[0].clientX-r.left,y:e.touches[0].clientY-r.top};return{x:e.clientX-r.left,y:e.clientY-r.top}}
+            function sd(e){e.preventDefault();drawing=true;const p=gp(e);lx=p.x;ly=p.y;if(sigHint)sigHint.style.display='none';const c=sigCanvas.getContext('2d');c.beginPath();c.moveTo(p.x,p.y);c.lineTo(p.x+.1,p.y+.1);c.stroke()}
+            function dr(e){if(!drawing)return;e.preventDefault();const c=sigCanvas.getContext('2d');const p=gp(e);c.beginPath();c.moveTo(lx,ly);c.lineTo(p.x,p.y);c.stroke();lx=p.x;ly=p.y;if(!hasSignature){hasSignature=true;sigBox.classList.add('signed');clearSigBtn.disabled=false;checkReady()}}
+            function ed(e){if(drawing&&e)e.preventDefault();drawing=false}
+            sigCanvas.addEventListener('mousedown',sd);sigCanvas.addEventListener('mousemove',dr);sigCanvas.addEventListener('mouseup',ed);sigCanvas.addEventListener('mouseleave',ed);
+            sigCanvas.addEventListener('touchstart',sd,{passive:false});sigCanvas.addEventListener('touchmove',dr,{passive:false});sigCanvas.addEventListener('touchend',ed,{passive:false})
+        }
+        function clearSig(){sigCanvas.getContext('2d').clearRect(0,0,sigCanvas.width,sigCanvas.height);hasSignature=false;sigBox.classList.remove('signed');if(sigHint)sigHint.style.display='';clearSigBtn.disabled=true;checkReady()}
+        clearSigBtn.addEventListener('click',clearSig);
+        window.addEventListener('load',()=>{setTimeout(()=>{initSig();bindSig()},100)});
+        window.addEventListener('resize',()=>{if(sigCanvas.offsetWidth>0){const old=hasSignature?sigCanvas.toDataURL():null;initSig();if(old){const img=new Image();img.onload=()=>{sigCanvas.getContext('2d').drawImage(img,0,0,sigCanvas.clientWidth,sigCanvas.clientHeight)};img.src=old}}});
+
+        // Buttons
+        const REG_KEY='fyttsa_reglamento_aceptado';
+        document.getElementById('btn-accept').addEventListener('click',()=>{
+            if(document.getElementById('btn-accept').disabled)return;
+            // Guardar aceptacion + firma como imagen
+            const firmaData=sigCanvas.toDataURL('image/png');
+            const data={
+                version:'v1.0',
+                usuario:getUserName(),
+                firma:firmaData,
+                fecha:new Date().toISOString()
+            };
+            fyttsa_saveDataSync(REG_KEY,data);
+            // Mostrar mensaje de exito y bloquear botones
+            toast('Reglamento firmado y guardado correctamente.','success');
+            document.getElementById('btn-accept').disabled=true;
+            document.getElementById('btn-accept').innerHTML='<i data-lucide="check-circle-2"></i> Firmado y guardado';
+            document.getElementById('btn-decline').disabled=true;
+            lucide.createIcons();
+        });
+        document.getElementById('btn-decline').addEventListener('click',()=>{
+            if(confirm('Si rechazas el reglamento, tu sesión se cerrará. ¿Deseas continuar?')){
+                localStorage.removeItem('usuario');localStorage.removeItem('nombre');localStorage.removeItem('privilegio');
+                window.location.href='index.html'
+            }
+        });
+
+        // =====================================================
+        // RESTAURAR FIRMA GUARDADA (al regresar a la pagina)
+        // =====================================================
+        async function restaurarFirmaGuardada(){
+            try{
+                const data=await fyttsa_loadData(REG_KEY);
+                if(data&&data.firma){
+                    // El usuario ya firmo anteriormente: restaurar la firma en el canvas
+                    setTimeout(()=>{
+                        const img=new Image();
+                        img.onload=()=>{
+                            const ctx=sigCanvas.getContext('2d');
+                            // Asegurar que el canvas este inicializado
+                            if(sigCanvas.width===0||sigCanvas.height===0){initSig()}
+                            ctx.drawImage(img,0,0,sigCanvas.clientWidth,sigCanvas.clientHeight);
+                            hasSignature=true;
+                            sigBox.classList.add('signed');
+                            clearSigBtn.disabled=false;
+                            // Marcar pasos como completados
+                            scrolledToBottom=true;
+                            markStepDone(step1Dot,step1Item);
+                            markEndRead(true);
+                            markStep2Done();
+                            // Bloquear botones
+                            document.getElementById('btn-accept').disabled=true;
+                            document.getElementById('btn-accept').innerHTML='<i data-lucide="check-circle-2"></i> Firmado y guardado';
+                            document.getElementById('btn-decline').disabled=true;
+                            // Ocultar el hint
+                            if(sigHint)sigHint.style.display='none';
+                            lucide.createIcons();
+                        };
+                        img.src=data.firma;
+                    },300);
+                }
+            }catch(e){console.warn('No se pudo restaurar la firma:',e)}
+        }
+        // Llamar despues de que el canvas este listo
+        window.addEventListener('load',()=>{setTimeout(restaurarFirmaGuardada,500)});
+
+        lucide.createIcons();
+    </script>
+</body>
+</html>
