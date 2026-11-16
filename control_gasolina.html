@@ -1,1 +1,1746 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Gasolina | FYTTSA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        :root {
+            --primary-blue: #000000;
+            --light-blue: #e8e8e8;
+            --bg-color: #f8fafc;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #404040;
+            --purple: #8b5cf6;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 20px; background: white;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 50; flex-shrink: 0;
+        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .menu-btn { background: none; border: none; cursor: pointer; color: var(--text-main); padding: 5px; }
+        .header-title { margin: 0; font-size: 15px; font-weight: 700; color: var(--primary-blue); display: none; }
+        @media (min-width: 768px) { .header-title { display: block; } }
+        .header-right { display: flex; align-items: center; gap: 12px; }
+        .user-initial {
+            width: 35px; height: 35px; border-radius: 50%;
+            background-color: var(--primary-blue); color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 16px;
+        }
+        .main-layout { display: flex; flex: 1; overflow: hidden; }
+        .sidebar {
+            width: 260px; background: white;
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto; transition: transform 0.3s ease;
+            display: flex; flex-direction: column;
+            flex-shrink: 0;
+        }
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; height: calc(100vh - 60px); transform: translateX(-100%); z-index: 40; }
+            .sidebar.open { transform: translateX(0); }
+            .header-title { display: none; }
+        }
+        /* Estilos del menu lateral */
+        .sidebar-nav { padding: 15px 10px; }
+        .sidebar-section { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
+        .sidebar-section:last-child { border-bottom: none; }
+        .sidebar .section-title { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin: 10px 15px; padding-bottom: 0; display: block; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 15px; color: var(--text-main); text-decoration: none; font-size: 14px; font-weight: 500; border-radius: 10px; margin-bottom: 2px; transition: all 0.2s; }
+        .nav-item:hover { background-color: var(--bg-color); }
+        .nav-item.active { background-color: #e8e8e8 !important; color: #000000 !important; font-weight: 700 !important; border-left: 4px solid #000000 !important; border-radius: 8px !important; }
+        .nav-item.active i { color: var(--primary-blue); }
 
+        .content {
+            flex: 1; padding: 30px; overflow-y: auto;
+        }
+        @media (max-width: 768px) { .content { padding: 20px; } }
+
+        .page-title {
+            display: flex; align-items: center; gap: 12px;
+            font-size: 22px; font-weight: 800; color: var(--primary-blue);
+            margin-bottom: 8px;
+        }
+        .page-title i { width: 28px; height: 28px; }
+        .page-subtitle {
+            color: var(--text-muted); font-size: 13px;
+            margin-bottom: 25px;
+        }
+
+        /* Tabs horizontales */
+        .tabs-bar {
+            display: flex; gap: 8px;
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 2px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            background: var(--bg-color);
+            border: 1.5px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        .tab-btn:hover { background: white; color: var(--text-main); border-color: var(--primary-blue); }
+        .tab-btn.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        }
+        .tab-btn i { width: 16px; height: 16px; }
+        .tab-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+        .tab-icon i { width: 16px; height: 16px; }
+        .tab-btn[data-tab="reporte"].active .tab-icon i { color: #606060; }
+        .tab-btn[data-tab="revision"].active .tab-icon i { color: #86efac; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.25s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            margin-bottom: 20px;
+        }
+        .card-title {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 15px; font-weight: 700; color: var(--text-main);
+            margin-bottom: 18px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--light-blue);
+        }
+        .card-title i { color: var(--primary-blue); width: 20px; height: 20px; }
+
+        /* Filtros */
+        .filters-bar {
+            display: flex; gap: 12px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+            padding: 16px;
+            background: var(--bg-color);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+        .filter-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 160px; }
+        .filter-label {
+            font-size: 10px; font-weight: 800; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: 0.4px;
+        }
+        .filter-input {
+            padding: 9px 12px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-main);
+            background: white;
+            transition: all 0.2s;
+            width: 100%;
+        }
+        .filter-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+        }
+        .btn-filter {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+            height: 40px;
+        }
+        .btn-filter:hover { background: #1a1a1a; }
+        .btn-filter i { width: 14px; height: 14px; }
+
+        /* Tabla */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+            background: white;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1100px;
+        }
+        .data-table th {
+            background: var(--primary-blue);
+            color: white;
+            text-transform: uppercase;
+            font-size: 10.5px;
+            font-weight: 800;
+            padding: 12px 10px;
+            text-align: left;
+            border-right: 1px solid rgba(255,255,255,0.15);
+            letter-spacing: 0.4px;
+            white-space: nowrap;
+        }
+        .data-table th:last-child { border-right: none; }
+        .data-table th.center { text-align: center; }
+        .data-table th.right { text-align: right; }
+        .data-table td {
+            padding: 11px 10px;
+            border-bottom: 1px solid var(--bg-color);
+            color: var(--text-main);
+            font-size: 12.5px;
+            font-weight: 500;
+            vertical-align: middle;
+        }
+        .data-table tbody tr:last-child td { border-bottom: none; }
+        .data-table tbody tr:hover { background: var(--bg-color); }
+        .folio-cell {
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            color: var(--primary-blue);
+            font-size: 11px;
+        }
+        .amount-cell {
+            font-weight: 800;
+            text-align: right;
+            color: var(--primary-blue);
+        }
+        .num-cell { text-align: right; font-weight: 700; }
+        .empty-row {
+            text-align: center;
+            color: var(--text-muted);
+            font-style: italic;
+            padding: 24px !important;
+        }
+        .map-link {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+        }
+        .map-link:hover { text-decoration: underline; }
+        .map-link i { width: 12px; height: 12px; }
+        .map-link.disabled {
+            color: var(--text-muted);
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        /* Badges de status */
+        .status-badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 4px 10px; border-radius: 20px;
+            font-size: 10px; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .status-badge.pendiente { background: #fef3c7; color: #92400e; }
+        .status-badge.aprobado { background: #dcfce7; color: #166534; }
+        .status-badge.rechazado { background: #fee2e2; color: #991b1b; }
+
+        /* Botones */
+        .btn-action {
+            padding: 7px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 11px;
+            cursor: pointer;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .btn-action i { width: 12px; height: 12px; }
+        .btn-approve {
+            background: var(--success);
+            color: white;
+        }
+        .btn-approve:hover { background: #059669; transform: translateY(-1px); }
+        .btn-reject {
+            background: var(--danger);
+            color: white;
+        }
+        .btn-reject:hover { background: #b91c1c; transform: translateY(-1px); }
+        .btn-view {
+            background: white;
+            color: var(--primary-blue);
+            border: 1.5px solid var(--primary-blue);
+        }
+        .btn-view:hover { background: var(--light-blue); }
+        .action-buttons-cell {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* KPIs para reporte */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .kpi-card {
+            background: white;
+            border-radius: 16px;
+            padding: 18px 20px;
+            border: 1px solid var(--border-color);
+            border-left: 5px solid var(--primary-blue);
+            display: flex; align-items: center; gap: 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+        .kpi-card.success { border-left-color: var(--success); }
+        .kpi-card.warning { border-left-color: var(--warning); }
+        .kpi-card.danger { border-left-color: var(--danger); }
+        .kpi-card.info { border-left-color: var(--info); }
+        .kpi-icon {
+            width: 44px; height: 44px; border-radius: 12px;
+            background: var(--light-blue); color: var(--primary-blue);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .kpi-card.success .kpi-icon { background: #dcfce7; color: var(--success); }
+        .kpi-card.warning .kpi-icon { background: #fef3c7; color: var(--warning); }
+        .kpi-card.danger .kpi-icon { background: #fee2e2; color: var(--danger); }
+        .kpi-card.info .kpi-icon { background: #e0e0e0; color: var(--info); }
+        .kpi-icon i { width: 22px; height: 22px; }
+        .kpi-info { display: flex; flex-direction: column; }
+        .kpi-value {
+            font-size: 20px; font-weight: 800; color: var(--text-main);
+            line-height: 1.1;
+            white-space: nowrap;
+        }
+        .kpi-label {
+            font-size: 11px; color: var(--text-muted);
+            font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-top: 2px;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 20px; right: 20px;
+            background: var(--text-main);
+            color: white;
+            padding: 14px 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 9999;
+            display: flex; align-items: center; gap: 10px;
+            font-size: 13px; font-weight: 600;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.success { background: var(--success); }
+        .toast.error { background: var(--danger); }
+        .toast.info { background: var(--info); }
+        .toast i { width: 18px; height: 18px; }
+
+        /* Modal (rechazo + detalle) */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.82);
+            backdrop-filter: blur(6px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-box {
+            background: white;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 480px;
+            padding: 24px;
+            box-shadow: 0 30px 70px rgba(0,0,0,0.4);
+            animation: slideIn 0.3s cubic-bezier(.2,.8,.3,1);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-box.modal-box-lg { max-width: 720px; }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .modal-header {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 14px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--bg-color);
+        }
+        .modal-icon {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            background: #fee2e2;
+            color: var(--danger);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .modal-icon.primary { background: var(--light-blue); color: var(--primary-blue); }
+        .modal-icon i { width: 24px; height: 24px; }
+        .modal-title {
+            font-size: 16px; font-weight: 800; color: var(--text-main);
+        }
+        .modal-subtitle {
+            font-size: 12px; color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .modal-body { margin-bottom: 18px; }
+        .modal-label {
+            display: block;
+            font-size: 11px; font-weight: 700; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: 0.4px;
+            margin-bottom: 6px;
+        }
+        .modal-textarea {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-main);
+            background: white;
+            transition: all 0.2s;
+            min-height: 100px;
+            resize: vertical;
+        }
+        .modal-textarea:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+        }
+        .modal-actions {
+            display: flex; gap: 10px; justify-content: flex-end;
+        }
+        .btn-modal {
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-modal-cancel {
+            background: white;
+            color: var(--text-main);
+            border: 1.5px solid var(--border-color);
+        }
+        .btn-modal-cancel:hover { background: var(--bg-color); }
+        .btn-modal-confirm {
+            background: var(--danger);
+            color: white;
+        }
+        .btn-modal-confirm:hover { background: #b91c1c; }
+        .btn-modal-confirm:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+        }
+
+        /* Detalle grid */
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px 18px;
+            margin-bottom: 14px;
+        }
+        @media (max-width: 600px) { .detail-grid { grid-template-columns: 1fr; } }
+        .detail-item {
+            display: flex; flex-direction: column;
+            background: var(--bg-color);
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+        .detail-item.full { grid-column: 1 / -1; }
+        .detail-item-label {
+            font-size: 10px; font-weight: 800; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: 0.4px;
+            margin-bottom: 4px;
+        }
+        .detail-item-value {
+            font-size: 13px; font-weight: 700; color: var(--text-main);
+            word-break: break-word;
+        }
+        .detail-photos {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 8px;
+        }
+        @media (max-width: 600px) { .detail-photos { grid-template-columns: 1fr; } }
+        .photo-block {
+            background: var(--bg-color);
+            border-radius: 12px;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+        }
+        .photo-block-title {
+            font-size: 11px; font-weight: 800; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: 0.4px;
+            margin-bottom: 8px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .photo-block-title i { width: 14px; height: 14px; }
+        .photo-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 8px;
+            background: var(--border-color);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .photo-img:hover { transform: scale(1.02); }
+        .photo-empty {
+            width: 100%;
+            height: 120px;
+            border-radius: 8px;
+            background: var(--border-color);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-muted);
+            font-size: 11px; font-style: italic;
+        }
+        .photo-empty i { width: 24px; height: 24px; margin-bottom: 4px; }
+        .rechazo-box {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-top: 10px;
+        }
+        .rechazo-box-title {
+            font-size: 11px; font-weight: 800; color: var(--danger);
+            text-transform: uppercase; letter-spacing: 0.4px;
+            margin-bottom: 6px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .rechazo-box-title i { width: 14px; height: 14px; }
+        .rechazo-box-text {
+            font-size: 13px; color: #7f1d1d; font-weight: 600;
+        }
+        .loading-row {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 32px !important;
+        }
+        .loading-row i {
+            width: 28px; height: 28px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    </style>
+
+    <!-- Firebase SDK + FYTTSA shared data helper -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script>
+// =====================================================
+// FYTTSA Shared Data Helper
+// Centralizes Firebase Firestore sync for cross-device data sharing.
+// All user-specific data is stored under: usuarios/{userId}/app_data/{key}
+// Falls back to localStorage if Firebase is unavailable or no user.
+// =====================================================
+
+const FYTTSA_FIREBASE_CONFIG = {
+    apiKey: "AIzaSyD9Ihkh0NaP5vVbKntobmVTb53T0yDAZjU",
+    authDomain: "fyttsa-ae508.firebaseapp.com",
+    projectId: "fyttsa-ae508",
+    storageBucket: "fyttsa-ae508.firebasestorage.app",
+    messagingSenderId: "860564632264",
+    appId: "1:860564632264:web:30edf5a8f837e284ab2bfd",
+    measurementId: "G-7PQ1R77YJ3"
+};
+
+// Initialize Firebase once
+let _fyttsaDb = null;
+let _fyttsaFirebaseReady = false;
+
+function _fyttsaInitFirebase() {
+    if (typeof firebase === 'undefined') return false;
+    if (!firebase.apps.length) {
+        firebase.initializeApp(FYTTSA_FIREBASE_CONFIG);
+    }
+    if (firebase.firestore) {
+        _fyttsaDb = firebase.firestore();
+        _fyttsaFirebaseReady = true;
+        return true;
+    }
+    return false;
+}
+
+// Try to init immediately if firebase is already loaded
+if (typeof firebase !== 'undefined') {
+    _fyttsaInitFirebase();
+}
+
+// Also try after window load (in case scripts load async)
+window.addEventListener('load', function() {
+    if (!_fyttsaFirebaseReady && typeof firebase !== 'undefined') {
+        _fyttsaInitFirebase();
+    }
+});
+
+/**
+ * Get the current user ID from localStorage.
+ */
+function fyttsa_getUserId() {
+    return localStorage.getItem('usuario') || null;
+}
+
+/**
+ * Load data for the current user from Firestore.
+ * Falls back to localStorage if Firestore is unavailable.
+ */
+async function fyttsa_loadData(key) {
+    const userId = fyttsa_getUserId();
+
+    if (userId) {
+        if (!_fyttsaFirebaseReady && typeof firebase !== 'undefined') {
+            _fyttsaInitFirebase();
+        }
+        if (_fyttsaFirebaseReady) {
+            try {
+                const doc = await _fyttsaDb.collection('usuarios')
+                    .doc(userId)
+                    .collection('app_data')
+                    .doc(key)
+                    .get();
+                if (doc.exists && doc.data().value !== undefined) {
+                    return doc.data().value;
+                }
+            } catch (e) {
+                console.warn('[FYTTSA] Firestore load failed, falling back to localStorage:', e);
+            }
+        }
+    }
+
+    // Fallback to localStorage
+    try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+        return null;
+    }
+}
+
+/**
+ * Save data for the current user to Firestore.
+ * Also saves to localStorage as a cache/fallback.
+ */
+async function fyttsa_saveData(key, value) {
+    const userId = fyttsa_getUserId();
+
+    try {
+        localStorage.setItem(key, JSON.stringify(value));
+    } catch (e) {
+        console.warn('[FYTTSA] localStorage save failed:', e);
+    }
+
+    if (userId) {
+        if (!_fyttsaFirebaseReady && typeof firebase !== 'undefined') {
+            _fyttsaInitFirebase();
+        }
+        if (_fyttsaFirebaseReady) {
+            try {
+                await _fyttsaDb.collection('usuarios')
+                    .doc(userId)
+                    .collection('app_data')
+                    .doc(key)
+                    .set({
+                        value: value,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+            } catch (e) {
+                console.warn('[FYTTSA] Firestore save failed:', e);
+            }
+        }
+    }
+}
+
+/**
+ * Save data synchronously to localStorage and fire async Firestore save.
+ */
+function fyttsa_saveDataSync(key, value) {
+    try {
+        localStorage.setItem(key, JSON.stringify(value));
+    } catch (e) {
+        console.warn('[FYTTSA] localStorage save failed:', e);
+    }
+    fyttsa_saveData(key, value);
+}
+
+// =====================================================
+// PRIVILEGE-BASED MENU VISIBILITY + ACTIVE MENU STYLING
+// =====================================================
+// Privilegio 1 = see ALL menu sections
+// Privilegio 2 = see ONLY Inicio + Trabajador section (hide Obra, Control, Almacén)
+// =====================================================
+
+function _fyttsa_applyMenuVisibility() {
+    var privilegio = String(localStorage.getItem('privilegio') || '1').trim();
+    var sidebar = document.getElementById('sidebar');
+    if (!sidebar) return;
+
+    // Allowed sections per role. Inicio link is always visible.
+    var allowedByRole = {
+        '1': ['Trabajador', 'Proveedor', 'Obra', 'Control', 'Almacén'],
+        '2': ['Trabajador'],
+        '3': ['Proveedor']
+    };
+    var allowed = allowedByRole[privilegio] || allowedByRole['1'];
+
+    var sections = sidebar.querySelectorAll('.sidebar-section');
+    sections.forEach(function(sec) {
+        var sectionName = (sec.getAttribute('data-section') || '').trim();
+        if (!sectionName) {
+            var t = sec.querySelector('.section-title');
+            if (t) sectionName = t.textContent.trim();
+        }
+        sec.style.display = (allowed.indexOf(sectionName) !== -1) ? '' : 'none';
+    });
+}
+
+function _fyttsa_applyActiveStyle() {
+    var activeItem = document.querySelector('.nav-item.active');
+    if (activeItem) {
+        activeItem.style.setProperty('background-color', '#e8e8e8', 'important');
+        activeItem.style.setProperty('color', '#000000', 'important');
+        activeItem.style.setProperty('font-weight', '700', 'important');
+        activeItem.style.setProperty('border-left', '4px solid #000000', 'important');
+        activeItem.style.setProperty('border-radius', '8px', 'important');
+        activeItem.style.setProperty('padding', '10px 15px', 'important');
+    }
+}
+
+// Public function that pages call after loading menu.html
+function fyttsa_applyPrivilegeMenu() {
+    _fyttsa_applyMenuVisibility();
+}
+
+// =====================================================
+// AUTO-SETUP: Runs automatically when the script loads.
+// Uses a MutationObserver to detect when the sidebar content
+// changes (i.e., when menu.html is loaded via fetch), then:
+//   1. Applies privilege-based menu visibility
+//   2. Starts an interval to apply active menu styling
+// =====================================================
+
+(function() {
+    var styleIntervalStarted = false;
+
+    function startActiveStyleInterval() {
+        if (styleIntervalStarted) return;
+        styleIntervalStarted = true;
+
+        _fyttsa_applyActiveStyle();
+
+        var intervalId = setInterval(function() {
+            _fyttsa_applyActiveStyle();
+        }, 200);
+
+        setTimeout(function() {
+            clearInterval(intervalId);
+        }, 20000);
+    }
+
+    function setupSidebarObserver() {
+        var sidebar = document.getElementById('sidebar');
+        if (!sidebar) {
+            setTimeout(setupSidebarObserver, 100);
+            return;
+        }
+
+        _fyttsa_applyMenuVisibility();
+        startActiveStyleInterval();
+
+        if (typeof MutationObserver !== 'undefined') {
+            var observer = new MutationObserver(function(mutations) {
+                _fyttsa_applyMenuVisibility();
+                _fyttsa_applyActiveStyle();
+            });
+            observer.observe(sidebar, {
+                childList: true,
+                subtree: true,
+                attributes: true,
+                attributeFilter: ['class']
+            });
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            setupSidebarObserver();
+            setTimeout(function() {
+                _fyttsa_applyMenuVisibility();
+                _fyttsa_applyActiveStyle();
+                startActiveStyleInterval();
+            }, 500);
+            setTimeout(function() {
+                _fyttsa_applyMenuVisibility();
+                _fyttsa_applyActiveStyle();
+            }, 1500);
+        });
+    } else {
+        setupSidebarObserver();
+        setTimeout(function() {
+            _fyttsa_applyMenuVisibility();
+            _fyttsa_applyActiveStyle();
+            startActiveStyleInterval();
+        }, 500);
+        setTimeout(function() {
+            _fyttsa_applyMenuVisibility();
+            _fyttsa_applyActiveStyle();
+        }, 1500);
+    }
+
+    window.addEventListener('load', function() {
+        _fyttsa_applyMenuVisibility();
+        _fyttsa_applyActiveStyle();
+        startActiveStyleInterval();
+    });
+})();
+
+    </script>
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <button class="menu-btn" id="toggle-menu"><i data-lucide="menu"></i></button>
+            <h1 class="header-title">FYTTSA</h1>
+            <img src="https://i.ibb.co/x8Bw8KR8/MARFIL-1.jpg" alt="Logo" height="35">
+        </div>
+        <div class="header-right">
+            <div class="user-initial" id="user-initial">U</div>
+            <img src="https://i.ibb.co/x8Bw8KR8/MARFIL-1.jpg" alt="Logo" height="35" style="border-radius: 8px;">
+        </div>
+    </header>
+    <script>try{lucide.createIcons()}catch(e){}</script>
+
+    <div class="main-layout">
+        <aside class="sidebar" id="sidebar"></aside>
+
+        <main class="content">
+            <h1 class="page-title">
+                <i data-lucide="fuel"></i>
+                Control de Gasolina
+            </h1>
+            <p class="page-subtitle">Reportes consolidados y revisión de cargas de combustible registradas por los colaboradores.</p>
+
+            <div class="tabs-bar">
+                <button class="tab-btn active" data-tab="reporte">
+                    <span class="tab-icon"><i data-lucide="bar-chart-3"></i></span> Reporte
+                </button>
+                <button class="tab-btn" data-tab="revision">
+                    <span class="tab-icon"><i data-lucide="search-check"></i></span> Revisión
+                </button>
+            </div>
+
+            <!-- TAB REPORTE -->
+            <div class="tab-content active" id="content-reporte">
+                <!-- KPIs -->
+                <div class="kpi-grid" id="kpi-grid">
+                    <!-- Se llena dinamicamente -->
+                </div>
+                <!-- E73/E74: alertas de mayor consumo (residente y vehículo vs km) -->
+                <div id="kpi-top-residente"></div>
+                <div id="kpi-top-vehiculo"></div>
+
+                <!-- Tabla por persona -->
+                <div class="card">
+                    <h3 class="card-title">
+                        <i data-lucide="users"></i>
+                        Concentrado por Colaborador
+                    </h3>
+                    <div class="table-responsive">
+                        <table class="data-table" id="table-reporte">
+                            <thead>
+                                <tr>
+                                    <th>Colaborador</th>
+                                    <th style="text-align:right;">Cargas</th>
+                                    <th style="text-align:right;">Litros</th>
+                                    <th style="text-align:right;">Importe</th>
+                                    <th style="text-align:right;">% Participación</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-reporte">
+                                <tr><td colspan="5" class="empty-row">No hay datos para mostrar.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB REVISION -->
+            <div class="tab-content" id="content-revision">
+                <div class="card">
+                    <h3 class="card-title">
+                        <i data-lucide="clipboard-check"></i>
+                        Revisión de Cargas de Combustible
+                    </h3>
+                    <p style="color:var(--text-muted); font-size:12px; margin-bottom:16px;">
+                        Aprueba o rechaza las cargas de gasolina registradas por los colaboradores. Si rechazas, deberás indicar el motivo.
+                    </p>
+
+                    <!-- Filtros -->
+                    <div class="filters-bar">
+                        <div class="filter-group">
+                            <label class="filter-label">Fecha Inicio</label>
+                            <input type="date" class="filter-input" id="filter-fecha-inicio">
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Fecha Fin</label>
+                            <input type="date" class="filter-input" id="filter-fecha-fin">
+                        </div>
+                        <div class="filter-group" style="flex: 2;">
+                            <label class="filter-label">Buscar Folio / Obra / Usuario</label>
+                            <input type="text" class="filter-input" id="filter-buscar" placeholder="Ej. nombre del trabajador o vehículo">
+                        </div>
+                        <div class="filter-group" style="flex: 0 0 auto;">
+                            <label class="filter-label">&nbsp;</label>
+                            <button class="btn-filter" id="btn-filtrar">
+                                <i data-lucide="filter"></i> Filtrar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="data-table" id="table-revision">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Folio</th>
+                                    <th>Vehículo</th>
+                                    <th>Colaborador</th>
+                                    <th class="right">Km</th>
+                                    <th class="right">Litros</th>
+                                    <th class="right">Importe</th>
+                                    <th class="center">Ubicación</th>
+                                    <th class="center">Estatus</th>
+                                    <th class="center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-revision">
+                                <tr><td colspan="10" class="loading-row"><i data-lucide="loader-circle"></i><div style="margin-top:8px;">Cargando cargas de gasolina...</div></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal de rechazo -->
+    <div class="modal-overlay" id="modal-rechazo">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div class="modal-icon"><i data-lucide="alert-triangle"></i></div>
+                <div>
+                    <div class="modal-title">Rechazar carga de gasolina</div>
+                    <div class="modal-subtitle" id="modal-rechazo-folio">Folio: —</div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <label class="modal-label">Motivo del rechazo <span style="color:var(--danger);">*</span></label>
+                <textarea class="modal-textarea" id="modal-rechazo-motivo" placeholder="Ej. El kilometraje no coincide con la fotografía del tacómetro. Favor de verificar y reenviar."></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-modal btn-modal-cancel" id="modal-rechazo-cancel">
+                    <i data-lucide="x"></i> Cancelar
+                </button>
+                <button class="btn-modal btn-modal-confirm" id="modal-rechazo-confirm" disabled>
+                    <i data-lucide="check"></i> Confirmar rechazo
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de detalle -->
+    <div class="modal-overlay" id="modal-detalle">
+        <div class="modal-box modal-box-lg">
+            <div class="modal-header">
+                <div class="modal-icon primary"><i data-lucide="fuel"></i></div>
+                <div style="flex:1;">
+                    <div class="modal-title">Detalle de Carga de Gasolina</div>
+                    <div class="modal-subtitle" id="detalle-folio">Folio: —</div>
+                </div>
+                <button class="btn-modal btn-modal-cancel" id="modal-detalle-cerrar" style="padding:6px 10px;">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modal-detalle-body">
+                <!-- Se llena dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <i data-lucide="check-circle"></i>
+        <span id="toast-msg">Mensaje</span>
+    </div>
+
+    <script>
+        // =====================================================
+        // 1. MENU DINAMICO
+        // =====================================================
+        fetch('menu.html?v=' + Date.now())
+            .then(r => r.text())
+            .then(html => {
+                document.getElementById('sidebar').innerHTML = html;
+                lucide.createIcons();
+                fyttsa_applyPrivilegeMenu();
+                const link = document.getElementById('link-control-gasolina');
+                if (link) link.classList.add('active');
+            })
+            .catch(err => console.error('Error cargando el menú:', err));
+
+        document.getElementById('toggle-menu').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('open');
+        });
+
+        // Usuario
+        function getUserName() {
+            return localStorage.getItem('nombre') || '';
+        }
+        function applyUserName() {
+            const nombre = getUserName();
+            if (nombre) {
+                document.getElementById('user-initial').textContent = nombre.charAt(0).toUpperCase();
+            } else {
+                setTimeout(applyUserName, 1500);
+            }
+        }
+        applyUserName();
+
+        // =====================================================
+        // 2. HELPERS
+        // =====================================================
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            return String(str).replace(/[&<>"']/g, c => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            })[c]);
+        }
+        function formatCurrency(num) {
+            return '$' + (Number(num || 0)).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+        function formatNumber(num, decimals = 2) {
+            return (Number(num || 0)).toLocaleString('es-MX', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+        }
+        function formatDate(fechaISO) {
+            if (!fechaISO) return '—';
+            let d;
+            // Firestore Timestamp support
+            if (typeof fechaISO === 'object' && fechaISO !== null && typeof fechaISO.toDate === 'function') {
+                d = fechaISO.toDate();
+            } else if (fechaISO.seconds !== undefined) {
+                d = new Date(fechaISO.seconds * 1000);
+            } else {
+                d = new Date(fechaISO);
+            }
+            if (isNaN(d)) return String(fechaISO);
+            return d.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' }) +
+                   ' ' + d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: true });
+        }
+        function formatDateOnly(fechaISO) {
+            if (!fechaISO) return '';
+            let d;
+            if (typeof fechaISO === 'object' && fechaISO !== null && typeof fechaISO.toDate === 'function') {
+                d = fechaISO.toDate();
+            } else if (fechaISO.seconds !== undefined) {
+                d = new Date(fechaISO.seconds * 1000);
+            } else {
+                d = new Date(fechaISO);
+            }
+            if (isNaN(d)) return '';
+            return d.toISOString().split('T')[0];
+        }
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('toast');
+            const iconName = type === 'success' ? 'check-circle' : (type === 'error' ? 'alert-circle' : 'info');
+            toast.innerHTML = `<i data-lucide="${iconName}"></i><span>${escapeHtml(msg)}</span>`;
+            toast.className = 'toast ' + type;
+            lucide.createIcons();
+            toast.classList.add('show');
+            clearTimeout(window._toastTimer);
+            window._toastTimer = setTimeout(() => toast.classList.remove('show'), 3500);
+        }
+
+        // =====================================================
+        // 3. FIRESTORE - Cargar todos los gasolina_logs
+        // =====================================================
+        let db = null;
+        let allLogs = []; // [{id, ...data}]
+
+        function initFirestore() {
+            if (db) return db;
+            if (typeof firebase === 'undefined') {
+                _fyttsaInitFirebase();
+            }
+            if (!_fyttsaFirebaseReady) {
+                _fyttsaInitFirebase();
+            }
+            if (_fyttsaFirebaseReady) {
+                db = _fyttsaDb;
+            } else if (typeof firebase !== 'undefined' && firebase.firestore) {
+                db = firebase.firestore();
+            }
+            return db;
+        }
+
+        async function loadLogs() {
+            const database = initFirestore();
+            if (!database) {
+                console.error('[Gasolina] Firebase no disponible');
+                showToast('No se pudo conectar con Firebase.', 'error');
+                return;
+            }
+            try {
+                const snapshot = await database.collection('gasolina_logs').get();
+                allLogs = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    allLogs.push({ id: doc.id, ...data });
+                });
+                // Ordenar por timestamp desc (más recientes primero)
+                allLogs.sort((a, b) => {
+                    const ta = getTimestampMillis(a.timestamp) || getTimestampMillis(a.fecha) || 0;
+                    const tb = getTimestampMillis(b.timestamp) || getTimestampMillis(b.fecha) || 0;
+                    return tb - ta;
+                });
+            } catch (err) {
+                console.error('[Gasolina] Error al cargar logs:', err);
+                showToast('Error al cargar cargas de gasolina: ' + err.message, 'error');
+                allLogs = [];
+            }
+        }
+
+        function getTimestampMillis(ts) {
+            if (!ts) return null;
+            if (typeof ts === 'object' && ts !== null && typeof ts.toDate === 'function') {
+                return ts.toDate().getTime();
+            }
+            if (ts.seconds !== undefined) {
+                return ts.seconds * 1000;
+            }
+            const d = new Date(ts);
+            return isNaN(d) ? null : d.getTime();
+        }
+
+        async function updateLogStatus(docId, nuevoEstado, observacionRechazo) {
+            const database = initFirestore();
+            if (!database) { showToast('Firebase no disponible.', 'error'); return false; }
+            try {
+                const update = {
+                    estado: nuevoEstado,
+                    fechaRevision: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                if (nuevoEstado === 'rechazado' && observacionRechazo) {
+                    update.observacionRechazo = observacionRechazo;
+                }
+                if (nuevoEstado === 'aprobado') {
+                    // Limpia una posible observación previa
+                    update.observacionRechazo = firebase.firestore.FieldValue.delete();
+                }
+                await database.collection('gasolina_logs').doc(docId).update(update);
+                // Actualizar en memoria
+                const idx = allLogs.findIndex(l => l.id === docId);
+                if (idx >= 0) {
+                    allLogs[idx].estado = nuevoEstado;
+                    if (nuevoEstado === 'rechazado') {
+                        allLogs[idx].observacionRechazo = observacionRechazo;
+                    } else if (nuevoEstado === 'aprobado') {
+                        delete allLogs[idx].observacionRechazo;
+                    }
+                }
+                return true;
+            } catch (err) {
+                console.error('[Gasolina] Error al actualizar estado:', err);
+                showToast('Error al actualizar: ' + err.message, 'error');
+                return false;
+            }
+        }
+
+        // =====================================================
+        // 4. TAB REPORTE
+        // =====================================================
+        function renderReporte() {
+            const totalLogs = allLogs.length;
+            const pendientes = allLogs.filter(l => (l.estado || 'pendiente') === 'pendiente').length;
+            const aprobados = allLogs.filter(l => l.estado === 'aprobado').length;
+            const rechazados = allLogs.filter(l => l.estado === 'rechazado').length;
+            const totalLitros = allLogs.reduce((acc, l) => acc + (Number(l.litros) || 0), 0);
+            const totalImporte = allLogs.reduce((acc, l) => acc + (Number(l.importe) || 0), 0);
+
+            const kpiGrid = document.getElementById('kpi-grid');
+            kpiGrid.innerHTML = `
+                <div class="kpi-card">
+                    <div class="kpi-icon"><i data-lucide="layers"></i></div>
+                    <div class="kpi-info">
+                        <span class="kpi-value">${totalLogs}</span>
+                        <span class="kpi-label">Total Cargas</span>
+                    </div>
+                </div>
+                <div class="kpi-card warning">
+                    <div class="kpi-icon"><i data-lucide="clock"></i></div>
+                    <div class="kpi-info">
+                        <span class="kpi-value">${pendientes}</span>
+                        <span class="kpi-label">Pendientes</span>
+                    </div>
+                </div>
+                <div class="kpi-card success">
+                    <div class="kpi-icon"><i data-lucide="check-circle"></i></div>
+                    <div class="kpi-info">
+                        <span class="kpi-value">${aprobados}</span>
+                        <span class="kpi-label">Aprobados</span>
+                    </div>
+                </div>
+                <div class="kpi-card danger">
+                    <div class="kpi-icon"><i data-lucide="x-circle"></i></div>
+                    <div class="kpi-info">
+                        <span class="kpi-value">${rechazados}</span>
+                        <span class="kpi-label">Rechazados</span>
+                    </div>
+                </div>
+                <div class="kpi-card info">
+                    <div class="kpi-icon"><i data-lucide="droplets"></i></div>
+                    <div class="kpi-info">
+                        <span class="kpi-value">${formatNumber(totalLitros, 2)} L</span>
+                        <span class="kpi-label">Total Litros</span>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon"><i data-lucide="dollar-sign"></i></div>
+                    <div class="kpi-info">
+                        <span class="kpi-value">${formatCurrency(totalImporte)}</span>
+                        <span class="kpi-label">Total Importe</span>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+
+            // E73: residente que más gasta combustible
+            const gastoPorPersona = {};
+            allLogs.forEach(l => {
+                const n = l.nombre_trabajador || 'Sin nombre';
+                gastoPorPersona[n] = (gastoPorPersona[n] || 0) + (Number(l.importe) || 0);
+            });
+            const topPersona = Object.entries(gastoPorPersona).sort((a, b) => b[1] - a[1])[0];
+            const elTopRes = document.getElementById('kpi-top-residente');
+            if (elTopRes) {
+                elTopRes.innerHTML = topPersona
+                    ? `<div class="kpi-card danger" style="margin-top:12px;">
+                         <div class="kpi-icon"><i data-lucide="user"></i></div>
+                         <div class="kpi-info">
+                           <span class="kpi-value" style="font-size:14px;">${escapeHtml(topPersona[0])}</span>
+                           <span class="kpi-label">Residente que más gasta (${formatCurrency(topPersona[1])})</span>
+                         </div>
+                       </div>`
+                    : '';
+                lucide.createIcons();
+            }
+
+            // E74: vehículo con mayor gasto vs km (alerta de posible falla mecánica)
+            const gastoPorVeh = {};
+            const kmPorVeh = {};
+            allLogs.forEach(l => {
+                const v = l.vehiculo_nombre || 'Sin vehículo';
+                gastoPorVeh[v] = (gastoPorVeh[v] || 0) + (Number(l.importe) || 0);
+                kmPorVeh[v] = Math.max(kmPorVeh[v] || 0, Number(l.km_actual) || 0);
+            });
+            const ratioVeh = Object.entries(gastoPorVeh).map(([v, gasto]) => {
+                const km = kmPorVeh[v] || 1;
+                return { v, gasto, km, ratio: gasto / km };
+            }).sort((a, b) => b.ratio - a.ratio);
+            const topVeh = ratioVeh[0];
+            const elTopVeh = document.getElementById('kpi-top-vehiculo');
+            if (elTopVeh) {
+                if (topVeh) {
+                    const alerta = topVeh.ratio > 1.5 ? '<span style="color:var(--danger);font-weight:700"> ⚠ Posible falla mecánica</span>' : '';
+                    elTopVeh.innerHTML = `<div class="kpi-card warning" style="margin-top:12px;">
+                         <div class="kpi-icon"><i data-lucide="car-front"></i></div>
+                         <div class="kpi-info">
+                           <span class="kpi-value" style="font-size:14px;">${escapeHtml(topVeh.v)}</span>
+                           <span class="kpi-label">${formatCurrency(topVeh.gasto)} / ${formatNumber(topVeh.km, 0)} km ${alerta}</span>
+                         </div>
+                       </div>`;
+                } else { elTopVeh.innerHTML = ''; }
+                lucide.createIcons();
+            }
+
+            // Tabla por colaborador
+            const porPersona = {};
+            allLogs.forEach(l => {
+                const nombre = l.nombre_trabajador || 'Sin nombre';
+                if (!porPersona[nombre]) {
+                    porPersona[nombre] = { litros: 0, importe: 0, count: 0 };
+                }
+                porPersona[nombre].litros += Number(l.litros) || 0;
+                porPersona[nombre].importe += Number(l.importe) || 0;
+                porPersona[nombre].count += 1;
+            });
+
+            const tbody = document.getElementById('tbody-reporte');
+            const personas = Object.keys(porPersona).sort((a, b) => porPersona[b].importe - porPersona[a].importe);
+            if (personas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-row">No hay datos para mostrar.</td></tr>';
+            } else {
+                tbody.innerHTML = personas.map((nombre) => {
+                    const p = porPersona[nombre];
+                    const porcentaje = totalImporte > 0 ? (p.importe / totalImporte * 100).toFixed(2) : '0.00';
+                    return `
+                        <tr>
+                            <td>
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <div style="width:30px; height:30px; border-radius:50%; background:var(--light-blue); color:var(--primary-blue); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px;">${escapeHtml(nombre.charAt(0).toUpperCase())}</div>
+                                    <span style="font-weight:700;">${escapeHtml(nombre)}</span>
+                                </div>
+                            </td>
+                            <td class="num-cell">${p.count}</td>
+                            <td class="num-cell">${formatNumber(p.litros, 2)}</td>
+                            <td class="amount-cell">${formatCurrency(p.importe)}</td>
+                            <td style="text-align:right; font-weight:800;">${porcentaje}%</td>
+                        </tr>
+                    `;
+                }).join('') + `
+                    <tr style="background:var(--light-blue); font-weight:800;">
+                        <td style="color:var(--primary-blue); padding:14px 10px;">TOTAL (${personas.length} colaboradores)</td>
+                        <td class="num-cell" style="color:var(--primary-blue);">${totalLogs}</td>
+                        <td class="num-cell" style="color:var(--primary-blue);">${formatNumber(totalLitros, 2)}</td>
+                        <td class="amount-cell" style="color:var(--primary-blue);">${formatCurrency(totalImporte)}</td>
+                        <td style="text-align:right; color:var(--primary-blue);">100.00%</td>
+                    </tr>
+                `;
+            }
+        }
+
+        // =====================================================
+        // 5. TAB REVISION
+        // =====================================================
+        function renderRevision(filtroFechaIni, filtroFechaFin, filtroBuscar) {
+            const tbody = document.getElementById('tbody-revision');
+            let registros = allLogs.slice();
+
+            // Filtro por texto
+            if (filtroBuscar) {
+                const q = filtroBuscar.toLowerCase().trim();
+                registros = registros.filter(l =>
+                    (l.id || '').toLowerCase().includes(q) ||
+                    (l.nombre_trabajador || '').toLowerCase().includes(q) ||
+                    (l.vehiculo_nombre || '').toLowerCase().includes(q) ||
+                    (l.uid_trabajador || '').toLowerCase().includes(q) ||
+                    (l.ticket || '').toLowerCase().includes(q)
+                );
+            }
+            // Filtro por fecha
+            if (filtroFechaIni) {
+                const ini = new Date(filtroFechaIni);
+                ini.setHours(0, 0, 0, 0);
+                registros = registros.filter(l => {
+                    const ts = getTimestampMillis(l.fecha) || getTimestampMillis(l.timestamp);
+                    return ts && ts >= ini.getTime();
+                });
+            }
+            if (filtroFechaFin) {
+                const fin = new Date(filtroFechaFin);
+                fin.setHours(23, 59, 59, 999);
+                registros = registros.filter(l => {
+                    const ts = getTimestampMillis(l.fecha) || getTimestampMillis(l.timestamp);
+                    return ts && ts <= fin.getTime();
+                });
+            }
+
+            if (registros.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" class="empty-row">No hay cargas de gasolina que coincidan con los filtros.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = registros.map(l => {
+                const estado = (l.estado || 'pendiente').toLowerCase();
+                let statusBadge = '';
+                if (estado === 'pendiente') {
+                    statusBadge = '<span class="status-badge pendiente">Pendiente</span>';
+                } else if (estado === 'aprobado') {
+                    statusBadge = '<span class="status-badge aprobado">Aprobado</span>';
+                } else if (estado === 'rechazado') {
+                    statusBadge = '<span class="status-badge rechazado">Rechazado</span>';
+                }
+
+                // Map link
+                const lat = l.latitud;
+                const lon = l.longitud;
+                let mapLink = '';
+                if (lat !== undefined && lon !== undefined && lat !== null && lon !== null && !isNaN(Number(lat)) && !isNaN(Number(lon))) {
+                    const mapUrl = `https://www.google.com/maps?q=${Number(lat)},${Number(lon)}`;
+                    mapLink = `<a href="${mapUrl}" target="_blank" class="map-link"><i data-lucide="map-pin"></i> Ver mapa</a>`;
+                } else {
+                    mapLink = '<span class="map-link disabled"><i data-lucide="map-pin-off"></i> Sin GPS</span>';
+                }
+
+                // Acciones
+                let actions = '';
+                if (estado === 'pendiente') {
+                    actions = `
+                        <button class="btn-action btn-approve" onclick="aprobarLog('${escapeHtml(l.id)}')">
+                            <i data-lucide="check"></i> Aprobar
+                        </button>
+                        <button class="btn-action btn-reject" onclick="abrirModalRechazo('${escapeHtml(l.id)}')">
+                            <i data-lucide="x"></i> Rechazar
+                        </button>
+                        <button class="btn-action btn-view" onclick="verDetalle('${escapeHtml(l.id)}')">
+                            <i data-lucide="eye"></i> Ver
+                        </button>
+                    `;
+                } else {
+                    actions = `
+                        <button class="btn-action btn-view" onclick="verDetalle('${escapeHtml(l.id)}')">
+                            <i data-lucide="eye"></i> Ver
+                        </button>
+                    `;
+                }
+
+                const fecha = l.fecha || l.timestamp;
+                const folioCorto = (l.id || '').substring(0, 10) + '…';
+                const folioCompleto = l.id || '—';
+
+                return `
+                    <tr>
+                        <td style="font-size:11px; white-space:nowrap;">${formatDate(fecha)}</td>
+                        <td class="folio-cell" title="${escapeHtml(folioCompleto)}">${escapeHtml(folioCorto)}</td>
+                        <td>${escapeHtml(l.vehiculo_nombre || '—')}</td>
+                        <td style="font-weight:600;">${escapeHtml(l.nombre_trabajador || '—')}</td>
+                        <td class="num-cell">${formatNumber(l.km_actual, 0)}</td>
+                        <td class="num-cell">${formatNumber(l.litros, 2)}</td>
+                        <td class="amount-cell">${formatCurrency(l.importe)}</td>
+                        <td style="text-align:center;">${mapLink}</td>
+                        <td style="text-align:center;">${statusBadge}</td>
+                        <td>
+                            <div class="action-buttons-cell">${actions}</div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        // =====================================================
+        // 6. ACCIONES DE REVISION
+        // =====================================================
+        async function aprobarLog(docId) {
+            if (!confirm('¿Confirmas que deseas APROBAR esta carga de gasolina?')) return;
+            const ok = await updateLogStatus(docId, 'aprobado', null);
+            if (ok) {
+                renderReporte();
+                renderRevision(
+                    document.getElementById('filter-fecha-inicio').value,
+                    document.getElementById('filter-fecha-fin').value,
+                    document.getElementById('filter-buscar').value
+                );
+                showToast('Carga de gasolina aprobada.', 'success');
+            }
+        }
+        // expose
+        window.aprobarLog = aprobarLog;
+
+        // Modal de rechazo
+        let folioPendienteRechazo = null;
+        function abrirModalRechazo(docId) {
+            folioPendienteRechazo = docId;
+            document.getElementById('modal-rechazo-folio').textContent = 'Folio: ' + docId;
+            document.getElementById('modal-rechazo-motivo').value = '';
+            document.getElementById('modal-rechazo-confirm').disabled = true;
+            document.getElementById('modal-rechazo').classList.add('show');
+            setTimeout(() => document.getElementById('modal-rechazo-motivo').focus(), 100);
+        }
+        window.abrirModalRechazo = abrirModalRechazo;
+
+        function cerrarModalRechazo() {
+            folioPendienteRechazo = null;
+            document.getElementById('modal-rechazo').classList.remove('show');
+        }
+        document.getElementById('modal-rechazo-cancel').addEventListener('click', cerrarModalRechazo);
+        document.getElementById('modal-rechazo-motivo').addEventListener('input', function() {
+            document.getElementById('modal-rechazo-confirm').disabled = this.value.trim().length < 5;
+        });
+        document.getElementById('modal-rechazo-confirm').addEventListener('click', async function() {
+            if (this.disabled) return;
+            const motivo = document.getElementById('modal-rechazo-motivo').value.trim();
+            if (motivo.length < 5) {
+                showToast('El motivo debe tener al menos 5 caracteres.', 'error');
+                return;
+            }
+            const docId = folioPendienteRechazo;
+            if (!docId) { showToast('No se encontró la carga.', 'error'); return; }
+            this.disabled = true;
+            const ok = await updateLogStatus(docId, 'rechazado', motivo);
+            if (ok) {
+                renderReporte();
+                renderRevision(
+                    document.getElementById('filter-fecha-inicio').value,
+                    document.getElementById('filter-fecha-fin').value,
+                    document.getElementById('filter-buscar').value
+                );
+                cerrarModalRechazo();
+                showToast('Carga de gasolina rechazada.', 'success');
+            } else {
+                this.disabled = false;
+            }
+        });
+
+        // Modal de detalle
+        function verDetalle(docId) {
+            const l = allLogs.find(x => x.id === docId);
+            if (!l) { showToast('No se encontró la carga.', 'error'); return; }
+            document.getElementById('detalle-folio').textContent = 'Folio: ' + docId;
+
+            const estado = (l.estado || 'pendiente').toLowerCase();
+            let estadoBadge = '';
+            if (estado === 'pendiente') estadoBadge = '<span class="status-badge pendiente">Pendiente</span>';
+            else if (estado === 'aprobado') estadoBadge = '<span class="status-badge aprobado">Aprobado</span>';
+            else if (estado === 'rechazado') estadoBadge = '<span class="status-badge rechazado">Rechazado</span>';
+
+            const lat = l.latitud, lon = l.longitud;
+            let mapBlock = '';
+            if (lat !== undefined && lon !== undefined && lat !== null && lon !== null && !isNaN(Number(lat)) && !isNaN(Number(lon))) {
+                const mapUrl = `https://www.google.com/maps?q=${Number(lat)},${Number(lon)}`;
+                mapBlock = `<a href="${mapUrl}" target="_blank" class="map-link"><i data-lucide="map-pin"></i> Ver ubicación en mapa</a>`;
+            } else {
+                mapBlock = '<span style="color:var(--text-muted); font-size:12px;">Sin coordenadas GPS</span>';
+            }
+
+            const fotoTac = l.foto_tacometro;
+            const fotoTicket = l.foto_ticket;
+
+            const photoTacHtml = fotoTac
+                ? `<img src="${escapeHtml(fotoTac)}" alt="Tacómetro" class="photo-img" onclick="window.open('${escapeHtml(fotoTac)}', '_blank')">`
+                : `<div class="photo-empty"><div style="text-align:center;"><i data-lucide="image-off"></i><div>Sin foto</div></div></div>`;
+            const photoTicketHtml = fotoTicket
+                ? `<img src="${escapeHtml(fotoTicket)}" alt="Ticket" class="photo-img" onclick="window.open('${escapeHtml(fotoTicket)}', '_blank')">`
+                : `<div class="photo-empty"><div style="text-align:center;"><i data-lucide="image-off"></i><div>Sin foto</div></div></div>`;
+
+            const rechazoBox = (estado === 'rechazado' && l.observacionRechazo)
+                ? `<div class="rechazo-box">
+                       <div class="rechazo-box-title"><i data-lucide="alert-triangle"></i> Motivo de rechazo</div>
+                       <div class="rechazo-box-text">${escapeHtml(l.observacionRechazo)}</div>
+                   </div>`
+                : '';
+
+            const observacion = l.observacion
+                ? `<div class="detail-item full">
+                       <span class="detail-item-label">Observación</span>
+                       <span class="detail-item-value">${escapeHtml(l.observacion)}</span>
+                   </div>`
+                : '';
+
+            const fecha = l.fecha || l.timestamp;
+
+            document.getElementById('modal-detalle-body').innerHTML = `
+                <div class="detail-grid">
+                    <div class="detail-item full">
+                        <span class="detail-item-label">Folio</span>
+                        <span class="detail-item-value" style="font-family:'Courier New', monospace; font-size:12px; word-break:break-all;">${escapeHtml(docId)}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-item-label">Fecha</span>
+                        <span class="detail-item-value">${formatDate(fecha)}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-item-label">Estado</span>
+                        <span class="detail-item-value">${estadoBadge}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-item-label">Colaborador</span>
+                        <span class="detail-item-value">${escapeHtml(l.nombre_trabajador || '—')}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-item-label">Vehículo</span>
+                        <span class="detail-item-value">${escapeHtml(l.vehiculo_nombre || '—')}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-item-label">Kilometraje</span>
+                        <span class="detail-item-value">${formatNumber(l.km_actual, 0)} km</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-item-label">Litros</span>
+                        <span class="detail-item-value">${formatNumber(l.litros, 2)} L</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-item-label">Importe</span>
+                        <span class="detail-item-value" style="color:var(--primary-blue);">${formatCurrency(l.importe)}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-item-label">Ticket / Folio Fiscal</span>
+                        <span class="detail-item-value">${escapeHtml(l.ticket || '—')}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-item-label">Ubicación GPS</span>
+                        <span class="detail-item-value">${mapBlock}</span>
+                    </div>
+                    ${observacion}
+                </div>
+
+                <div style="margin-top:10px;">
+                    <div class="photo-block-title" style="margin-bottom:8px;"><i data-lucide="camera"></i> Evidencias fotográficas</div>
+                    <div class="detail-photos">
+                        <div class="photo-block">
+                            <div class="photo-block-title"><i data-lucide="gauge"></i> Foto Tacómetro</div>
+                            ${photoTacHtml}
+                        </div>
+                        <div class="photo-block">
+                            <div class="photo-block-title"><i data-lucide="receipt"></i> Foto Ticket</div>
+                            ${photoTicketHtml}
+                        </div>
+                    </div>
+                </div>
+
+                ${rechazoBox}
+            `;
+            document.getElementById('modal-detalle').classList.add('show');
+            lucide.createIcons();
+        }
+        window.verDetalle = verDetalle;
+
+        document.getElementById('modal-detalle-cerrar').addEventListener('click', () => {
+            document.getElementById('modal-detalle').classList.remove('show');
+        });
+        document.getElementById('modal-detalle').addEventListener('click', (e) => {
+            if (e.target.id === 'modal-detalle') {
+                document.getElementById('modal-detalle').classList.remove('show');
+            }
+        });
+        document.getElementById('modal-rechazo').addEventListener('click', (e) => {
+            if (e.target.id === 'modal-rechazo') cerrarModalRechazo();
+        });
+
+        // =====================================================
+        // 7. TABS
+        // =====================================================
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            const btn = document.querySelector('.tab-btn[data-tab="' + tabName + '"]');
+            const content = document.getElementById('content-' + tabName);
+            if (btn) btn.classList.add('active');
+            if (content) content.classList.add('active');
+            if (tabName === 'reporte') renderReporte();
+            else if (tabName === 'revision') renderRevision(
+                document.getElementById('filter-fecha-inicio').value,
+                document.getElementById('filter-fecha-fin').value,
+                document.getElementById('filter-buscar').value
+            );
+        }
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+        });
+
+        // =====================================================
+        // 8. FILTROS
+        // =====================================================
+        document.getElementById('btn-filtrar').addEventListener('click', () => {
+            renderRevision(
+                document.getElementById('filter-fecha-inicio').value,
+                document.getElementById('filter-fecha-fin').value,
+                document.getElementById('filter-buscar').value
+            );
+        });
+        document.getElementById('filter-buscar').addEventListener('input', () => {
+            renderRevision(
+                document.getElementById('filter-fecha-inicio').value,
+                document.getElementById('filter-fecha-fin').value,
+                document.getElementById('filter-buscar').value
+            );
+        });
+        document.getElementById('filter-fecha-inicio').addEventListener('change', () => {
+            renderRevision(
+                document.getElementById('filter-fecha-inicio').value,
+                document.getElementById('filter-fecha-fin').value,
+                document.getElementById('filter-buscar').value
+            );
+        });
+        document.getElementById('filter-fecha-fin').addEventListener('change', () => {
+            renderRevision(
+                document.getElementById('filter-fecha-inicio').value,
+                document.getElementById('filter-fecha-fin').value,
+                document.getElementById('filter-buscar').value
+            );
+        });
+
+        // =====================================================
+        // INICIALIZAR
+        // =====================================================
+        (async function() {
+            lucide.createIcons();
+            // Mostrar estado de carga en ambos
+            document.getElementById('tbody-reporte').innerHTML =
+                '<tr><td colspan="5" class="loading-row"><i data-lucide="loader-circle"></i><div style="margin-top:8px;">Cargando cargas de gasolina...</div></td></tr>';
+            lucide.createIcons();
+
+            await loadLogs();
+            renderReporte();
+            renderRevision();
+            lucide.createIcons();
+        })();
+    </script>
+    <script src="fyttsa-backup.js"></script>
+</body>
+</html>
