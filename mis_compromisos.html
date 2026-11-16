@@ -1,0 +1,301 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Compromisos | FYTTSA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        :root {
+            --primary-blue: #000000;
+            --light-blue: #e8e8e8;
+            --bg-color: #f8fafc;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #404040;
+            --purple: #8b5cf6;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            display: flex; flex-direction: column;
+            height: 100vh; overflow: hidden;
+        }
+        .header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 20px; background: white;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 50; flex-shrink: 0;
+        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .menu-btn { background: none; border: none; cursor: pointer; color: var(--text-main); padding: 5px; }
+        .header-title { margin: 0; font-size: 15px; font-weight: 700; color: var(--primary-blue); display: none; }
+        @media (min-width: 768px) { .header-title { display: block; } }
+        .header-right { display: flex; align-items: center; gap: 12px; }
+        .user-initial {
+            width: 35px; height: 35px; border-radius: 50%;
+            background-color: var(--primary-blue); color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 16px;
+        }
+        .main-layout { display: flex; flex: 1; overflow: hidden; }
+        .sidebar {
+            width: 260px; background: white;
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto; transition: transform 0.3s ease;
+            display: flex; flex-direction: column; flex-shrink: 0;
+        }
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; height: calc(100vh - 60px); transform: translateX(-100%); z-index: 40; }
+            .sidebar.open { transform: translateX(0); }
+            .header-title { display: none; }
+        }
+        .sidebar-nav { padding: 15px 10px; }
+        .sidebar-section { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
+        .sidebar-section:last-child { border-bottom: none; }
+        .sidebar .section-title { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin: 10px 15px; padding-bottom: 0; display: block; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 15px; color: var(--text-main); text-decoration: none; font-size: 14px; font-weight: 500; border-radius: 10px; margin-bottom: 2px; transition: all 0.2s; }
+        .nav-item:hover { background-color: var(--bg-color); }
+        .nav-item.active { background-color: #e8e8e8 !important; color: #000000 !important; font-weight: 700 !important; border-left: 4px solid #000000 !important; border-radius: 8px !important; }
+        .nav-item.active i { color: var(--primary-blue); }
+        .content { flex: 1; padding: 30px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        @media (max-width: 768px) { .content { padding: 20px; } }
+        .page-title { display: flex; align-items: center; gap: 12px; font-size: 22px; font-weight: 800; color: var(--primary-blue); margin-bottom: 8px; }
+        .page-title i { width: 28px; height: 28px; }
+        .page-subtitle { color: var(--text-muted); font-size: 13px; margin-bottom: 25px; }
+        .card {
+            background: white; border-radius: 20px; padding: 24px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            margin-bottom: 20px;
+        }
+        .card-title { font-size: 16px; font-weight: 700; color: var(--text-main); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: var(--primary-blue); color: white;
+            border: none; padding: 10px 18px; border-radius: 10px;
+            font-weight: 600; cursor: pointer; font-size: 14px;
+            font-family: inherit; transition: opacity .15s;
+        }
+        .btn:hover { opacity: .88; }
+        .btn-secondary { background: white; color: var(--text-main); border: 1px solid var(--border-color); }
+        .btn-success { background: var(--success); }
+        .btn-warning { background: var(--warning); }
+        .btn-danger { background: var(--danger); }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        th { background: var(--bg-color); font-weight: 700; color: var(--text-muted); text-transform: uppercase; font-size: 11px; }
+        tr:hover td { background: #fafbfc; }
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; }
+        .badge-success { background: #dcfce7; color: #166534; }
+        .badge-warning { background: #fef3c7; color: #92400e; }
+        .badge-danger { background: #fee2e2; color: #991b1b; }
+        .badge-info { background: #e0e7ff; color: #3730a3; }
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
+        .empty-state i { width: 48px; height: 48px; margin-bottom: 12px; opacity: .4; }
+        .doc-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-color); }
+        .doc-row:last-child { border-bottom: none; }
+        .doc-name { display: flex; align-items: center; gap: 10px; font-weight: 600; color: var(--text-main); }
+        .doc-name i { color: var(--text-muted); }
+        .doc-actions { display: flex; gap: 8px; }
+        .upload-zone {
+            border: 2px dashed var(--border-color); border-radius: 14px;
+            padding: 28px; text-align: center; color: var(--text-muted);
+            cursor: pointer; transition: all .2s; margin-bottom: 16px;
+        }
+        .upload-zone:hover { border-color: var(--primary-blue); background: #fafafa; }
+        .upload-zone i { width: 32px; height: 32px; margin-bottom: 8px; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 20px; }
+        .kpi-card { background: white; border-radius: 16px; padding: 18px; border: 1px solid var(--border-color); border-left: 4px solid var(--primary-blue); }
+        .kpi-value { font-size: 26px; font-weight: 800; color: var(--text-main); }
+        .kpi-label { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+        .filter-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .filter-bar select, .filter-bar input {
+            padding: 8px 12px; border: 1px solid var(--border-color);
+            border-radius: 10px; font-size: 13px; font-family: inherit; background: white;
+        }
+        .toast {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: var(--text-main); color: white; padding: 12px 22px;
+            border-radius: 12px; font-size: 13px; font-weight: 600;
+            z-index: 1000; opacity: 0; transition: opacity .25s; pointer-events: none;
+        }
+        .toast.show { opacity: 1; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <button class="menu-btn" id="toggle-menu"><i data-lucide="menu"></i></button>
+            <h1 class="header-title">FYTTSA</h1>
+        </div>
+        <div class="header-right">
+            <div class="user-initial" id="user-initial">U</div>
+            <img src="https://i.ibb.co/x8Bw8KR8/MARFIL-1.jpg" alt="Logo" height="35" style="border-radius: 8px;">
+        </div>
+    </header>
+    <script>try{lucide.createIcons()}catch(e){}</script>
+
+    <div class="main-layout">
+        <aside class="sidebar" id="sidebar"></aside>
+        <main class="content">
+            <div class="page-title"><i data-lucide="list-checks"></i> Mis Compromisos</div>
+            <div class="page-subtitle">Tareas, entregables y compromisos pendientes asignados al colaborador.</div>
+
+            <div class="kpi-grid">
+                <div class="kpi-card"><div class="kpi-value" id="kpi-pend">0</div><div class="kpi-label">Pendientes</div></div>
+                <div class="kpi-card" style="border-left-color:var(--warning)"><div class="kpi-value" id="kpi-hoy">0</div><div class="kpi-label">Vencen hoy</div></div>
+                <div class="kpi-card" style="border-left-color:var(--danger)"><div class="kpi-value" id="kpi-venc">0</div><div class="kpi-label">Vencidos</div></div>
+                <div class="kpi-card" style="border-left-color:var(--success)"><div class="kpi-value" id="kpi-ok">0</div><div class="kpi-label">Completados</div></div>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><i data-lucide="clipboard-list"></i> Compromisos</div>
+                <table>
+                    <thead><tr><th>Compromiso</th><th>Obra</th><th>Vence</th><th>Estatus</th><th>Acción</th></tr></thead>
+                    <tbody id="comp-tbody"></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <script>
+        // Privilegios: 1=Directivo (todo), 2=Trabajador (solo Trabajador), 3=Proveedor (solo Proveedor)
+        function _fyttsa_applyMenuVisibility() {
+            var privilegio = String(localStorage.getItem('privilegio') || '1').trim();
+            var sidebar = document.getElementById('sidebar');
+            if (!sidebar) return;
+            var allowedByRole = {
+                '1': ['Trabajador', 'Proveedor', 'Obra', 'Control', 'Almacén'],
+                '2': ['Trabajador'],
+                '3': ['Proveedor']
+            };
+            var allowed = allowedByRole[privilegio] || allowedByRole['1'];
+            var sections = sidebar.querySelectorAll('.sidebar-section');
+            sections.forEach(function(sec) {
+                var sectionName = (sec.getAttribute('data-section') || '').trim();
+                if (!sectionName) {
+                    var t = sec.querySelector('.section-title');
+                    if (t) sectionName = t.textContent.trim();
+                }
+                sec.style.display = (allowed.indexOf(sectionName) !== -1) ? '' : 'none';
+            });
+        }
+        function _fyttsa_applyActiveStyle() {
+            var activeItem = document.querySelector('.nav-item.active');
+            if (activeItem) {
+                activeItem.style.setProperty('background-color', '#e8e8e8', 'important');
+                activeItem.style.setProperty('color', '#000000', 'important');
+                activeItem.style.setProperty('font-weight', '700', 'important');
+                activeItem.style.setProperty('border-left', '4px solid #000000', 'important');
+                activeItem.style.setProperty('border-radius', '8px', 'important');
+                activeItem.style.setProperty('padding', '10px 15px', 'important');
+            }
+        }
+        function fyttsa_applyPrivilegeMenu() { _fyttsa_applyMenuVisibility(); }
+        (function() {
+            var started = false;
+            function startStyle() {
+                if (started) return; started = true;
+                setInterval(_fyttsa_applyActiveStyle, 300);
+            }
+            document.addEventListener('DOMContentLoaded', startStyle);
+            var sidebar = document.getElementById('sidebar');
+            if (sidebar && window.MutationObserver) {
+                new MutationObserver(function() { _fyttsa_applyMenuVisibility(); startStyle(); })
+                    .observe(sidebar, { childList: true, subtree: true });
+            }
+        })();
+
+        function showToast(msg) {
+            var t = document.getElementById('toast');
+            if (!t) return;
+            t.textContent = msg; t.classList.add('show');
+            setTimeout(function(){ t.classList.remove('show'); }, 2200);
+        }
+
+        function cerrarSesion() {
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var name = localStorage.getItem('workerName') || localStorage.getItem('userName') || 'Usuario';
+            var ui = document.getElementById('user-initial');
+            if (ui) ui.innerText = (name.charAt(0) || 'U').toUpperCase();
+
+            fetch('menu.html?v=' + Date.now())
+                .then(function(r){ return r.text(); })
+                .then(function(html){
+                    document.getElementById('sidebar').innerHTML = html;
+                    lucide.createIcons();
+                    fyttsa_applyPrivilegeMenu();
+                    var link = document.getElementById('link-mis-compromisos');
+                    if (link) link.classList.add('active');
+                })
+                .catch(function(err){ console.error('Error cargando menú:', err); });
+
+            var toggle = document.getElementById('toggle-menu');
+            if (toggle) toggle.addEventListener('click', function() {
+                document.getElementById('sidebar').classList.toggle('open');
+            });
+
+            if (typeof pageInit === 'function') pageInit();
+        });
+    </script>
+    <script>
+        var STORE = 'fyttsa_mis_compromisos';
+        var SEED = [
+            { desc: 'Subir evidencia de instalación eléctrica', obra: 'Obra Casa Petra', vence: '2026-11-13', estatus: 'pendiente' },
+            { desc: 'Cerrar requisición de materiales pintura', obra: 'Edificio Atlas', vence: '2026-11-12', estatus: 'hoy' },
+            { desc: 'Entregar reporte fotográfico semanal', obra: 'Obra Casa Petra', vence: '2026-11-10', estatus: 'vencido' },
+            { desc: 'Validar presupuesto de herrería', obra: 'Local Comercial Sur', vence: '2026-11-15', estatus: 'pendiente' },
+            { desc: 'Firmar reglamento interno actualizado', obra: 'General', vence: '2026-11-08', estatus: 'completado' }
+        ];
+        function load() {
+            if (!localStorage.getItem(STORE)) localStorage.setItem(STORE, JSON.stringify(SEED));
+            return JSON.parse(localStorage.getItem(STORE));
+        }
+        function render() {
+            var data = load();
+            var counts = { pendiente: 0, hoy: 0, vencido: 0, completado: 0 };
+            data.forEach(function(c){ counts[c.estatus] = (counts[c.estatus]||0)+1; });
+            document.getElementById('kpi-pend').innerText = counts.pendiente;
+            document.getElementById('kpi-hoy').innerText = counts.hoy;
+            document.getElementById('kpi-venc').innerText = counts.vencido;
+            document.getElementById('kpi-ok').innerText = counts.completado;
+            var tb = document.getElementById('comp-tbody');
+            tb.innerHTML = data.map(function(c, i){
+                var badge = c.estatus === 'pendiente' ? '<span class="badge badge-info">Pendiente</span>'
+                    : c.estatus === 'hoy' ? '<span class="badge badge-warning">Vence hoy</span>'
+                    : c.estatus === 'vencido' ? '<span class="badge badge-danger">Vencido</span>'
+                    : '<span class="badge badge-success">Completado</span>';
+                var btn = c.estatus === 'completado' ? '' :
+                    '<button class="btn btn-success" onclick="completar(' + i + ')"><i data-lucide="check"></i></button>';
+                return '<tr><td>' + c.desc + '</td><td>' + c.obra + '</td><td>' + c.vence + '</td><td>' + badge + '</td><td>' + btn + '</td></tr>';
+            }).join('');
+            lucide.createIcons();
+        }
+        function completar(i) {
+            var data = load();
+            data[i].estatus = 'completado';
+            localStorage.setItem(STORE, JSON.stringify(data));
+            showToast('Compromiso completado');
+            render();
+        }
+        function pageInit() { render(); }
+    </script>
+</body>
+</html>
