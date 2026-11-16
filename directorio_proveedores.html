@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Directorio de Proveedores | FYTTSA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        :root {
+            --primary-blue: #000000;
+            --light-blue: #e8e8e8;
+            --bg-color: #f8fafc;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #404040;
+            --purple: #8b5cf6;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            display: flex; flex-direction: column;
+            height: 100vh; overflow: hidden;
+        }
+        .header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 20px; background: white;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 50; flex-shrink: 0;
+        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .menu-btn { background: none; border: none; cursor: pointer; color: var(--text-main); padding: 5px; }
+        .header-title { margin: 0; font-size: 15px; font-weight: 700; color: var(--primary-blue); display: none; }
+        @media (min-width: 768px) { .header-title { display: block; } }
+        .header-right { display: flex; align-items: center; gap: 12px; }
+        .user-initial {
+            width: 35px; height: 35px; border-radius: 50%;
+            background-color: var(--primary-blue); color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 16px;
+        }
+        .main-layout { display: flex; flex: 1; overflow: hidden; }
+        .sidebar {
+            width: 260px; background: white;
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto; transition: transform 0.3s ease;
+            display: flex; flex-direction: column; flex-shrink: 0;
+        }
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; height: calc(100vh - 60px); transform: translateX(-100%); z-index: 40; }
+            .sidebar.open { transform: translateX(0); }
+            .header-title { display: none; }
+        }
+        .sidebar-nav { padding: 15px 10px; }
+        .sidebar-section { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
+        .sidebar-section:last-child { border-bottom: none; }
+        .sidebar .section-title { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin: 10px 15px; padding-bottom: 0; display: block; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 15px; color: var(--text-main); text-decoration: none; font-size: 14px; font-weight: 500; border-radius: 10px; margin-bottom: 2px; transition: all 0.2s; }
+        .nav-item:hover { background-color: var(--bg-color); }
+        .nav-item.active { background-color: #e8e8e8 !important; color: #000000 !important; font-weight: 700 !important; border-left: 4px solid #000000 !important; border-radius: 8px !important; }
+        .nav-item.active i { color: var(--primary-blue); }
+        .content { flex: 1; padding: 30px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        @media (max-width: 768px) { .content { padding: 20px; } }
+        .page-title { display: flex; align-items: center; gap: 12px; font-size: 22px; font-weight: 800; color: var(--primary-blue); margin-bottom: 8px; }
+        .page-title i { width: 28px; height: 28px; }
+        .page-subtitle { color: var(--text-muted); font-size: 13px; margin-bottom: 25px; }
+        .card {
+            background: white; border-radius: 20px; padding: 24px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            margin-bottom: 20px;
+        }
+        .card-title { font-size: 16px; font-weight: 700; color: var(--text-main); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: var(--primary-blue); color: white;
+            border: none; padding: 10px 18px; border-radius: 10px;
+            font-weight: 600; cursor: pointer; font-size: 14px;
+            font-family: inherit; transition: opacity .15s;
+        }
+        .btn:hover { opacity: .88; }
+        .btn-secondary { background: white; color: var(--text-main); border: 1px solid var(--border-color); }
+        .btn-success { background: var(--success); }
+        .btn-warning { background: var(--warning); }
+        .btn-danger { background: var(--danger); }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        th { background: var(--bg-color); font-weight: 700; color: var(--text-muted); text-transform: uppercase; font-size: 11px; }
+        tr:hover td { background: #fafbfc; }
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; }
+        .badge-success { background: #dcfce7; color: #166534; }
+        .badge-warning { background: #fef3c7; color: #92400e; }
+        .badge-danger { background: #fee2e2; color: #991b1b; }
+        .badge-info { background: #e0e7ff; color: #3730a3; }
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
+        .empty-state i { width: 48px; height: 48px; margin-bottom: 12px; opacity: .4; }
+        .doc-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-color); }
+        .doc-row:last-child { border-bottom: none; }
+        .doc-name { display: flex; align-items: center; gap: 10px; font-weight: 600; color: var(--text-main); }
+        .doc-name i { color: var(--text-muted); }
+        .doc-actions { display: flex; gap: 8px; }
+        .upload-zone {
+            border: 2px dashed var(--border-color); border-radius: 14px;
+            padding: 28px; text-align: center; color: var(--text-muted);
+            cursor: pointer; transition: all .2s; margin-bottom: 16px;
+        }
+        .upload-zone:hover { border-color: var(--primary-blue); background: #fafafa; }
+        .upload-zone i { width: 32px; height: 32px; margin-bottom: 8px; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 20px; }
+        .kpi-card { background: white; border-radius: 16px; padding: 18px; border: 1px solid var(--border-color); border-left: 4px solid var(--primary-blue); }
+        .kpi-value { font-size: 26px; font-weight: 800; color: var(--text-main); }
+        .kpi-label { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+        .filter-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .filter-bar select, .filter-bar input {
+            padding: 8px 12px; border: 1px solid var(--border-color);
+            border-radius: 10px; font-size: 13px; font-family: inherit; background: white;
+        }
+        .toast {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: var(--text-main); color: white; padding: 12px 22px;
+            border-radius: 12px; font-size: 13px; font-weight: 600;
+            z-index: 1000; opacity: 0; transition: opacity .25s; pointer-events: none;
+        }
+        .toast.show { opacity: 1; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <button class="menu-btn" id="toggle-menu"><i data-lucide="menu"></i></button>
+            <h1 class="header-title">FYTTSA</h1>
+        </div>
+        <div class="header-right">
+            <div class="user-initial" id="user-initial">U</div>
+            <img src="https://i.ibb.co/x8Bw8KR8/MARFIL-1.jpg" alt="Logo" height="35" style="border-radius: 8px;">
+        </div>
+    </header>
+    <script>try{lucide.createIcons()}catch(e){}</script>
+
+    <div class="main-layout">
+        <aside class="sidebar" id="sidebar"></aside>
+        <main class="content">
+            <div class="page-title"><i data-lucide="address-book"></i> Directorio de Proveedores</div>
+            <div class="page-subtitle">Listado de proveedores con clasificación por familias (nota E57: un proveedor puede tener más de una familia de servicio).</div>
+
+            <div class="filter-bar">
+                <select id="filter-family">
+                    <option value="">Todas las familias…</option>
+                    <option>Estructura</option><option>Acabados</option><option>Eléctrico</option>
+                    <option>Plomería</option><option>Herrería</option><option>Aluminio</option>
+                    <option>Carpintería</option><option>Pintura</option><option>Impermeabilización</option>
+                    <option>Obra Civil</option><option>Pisos y Azulejos</option><option>Canceles y Vidrios</option>
+                    <option>Jardinería</option><option>Limpeza</option><option>Transporte</option>
+                </select>
+                <input type="text" id="filter-search" placeholder="Buscar por nombre…">
+                <button class="btn" onclick="addProvider()"><i data-lucide="plus"></i> Nuevo Proveedor</button>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><i data-lucide="list"></i> Proveedores registrados</div>
+                <table>
+                    <thead><tr><th>Proveedor</th><th>Contacto</th><th>Familias</th><th>Semáforo</th><th>Acciones</th></tr></thead>
+                    <tbody id="prov-tbody"></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <script>
+        // Privilegios: 1=Directivo (todo), 2=Trabajador (solo Trabajador), 3=Proveedor (solo Proveedor)
+        function _fyttsa_applyMenuVisibility() {
+            var privilegio = String(localStorage.getItem('privilegio') || '1').trim();
+            var sidebar = document.getElementById('sidebar');
+            if (!sidebar) return;
+            var allowedByRole = {
+                '1': ['Trabajador', 'Proveedor', 'Obra', 'Control', 'Almacén'],
+                '2': ['Trabajador'],
+                '3': ['Proveedor']
+            };
+            var allowed = allowedByRole[privilegio] || allowedByRole['1'];
+            var sections = sidebar.querySelectorAll('.sidebar-section');
+            sections.forEach(function(sec) {
+                var sectionName = (sec.getAttribute('data-section') || '').trim();
+                if (!sectionName) {
+                    var t = sec.querySelector('.section-title');
+                    if (t) sectionName = t.textContent.trim();
+                }
+                sec.style.display = (allowed.indexOf(sectionName) !== -1) ? '' : 'none';
+            });
+        }
+        function _fyttsa_applyActiveStyle() {
+            var activeItem = document.querySelector('.nav-item.active');
+            if (activeItem) {
+                activeItem.style.setProperty('background-color', '#e8e8e8', 'important');
+                activeItem.style.setProperty('color', '#000000', 'important');
+                activeItem.style.setProperty('font-weight', '700', 'important');
+                activeItem.style.setProperty('border-left', '4px solid #000000', 'important');
+                activeItem.style.setProperty('border-radius', '8px', 'important');
+                activeItem.style.setProperty('padding', '10px 15px', 'important');
+            }
+        }
+        function fyttsa_applyPrivilegeMenu() { _fyttsa_applyMenuVisibility(); }
+        (function() {
+            var started = false;
+            function startStyle() {
+                if (started) return; started = true;
+                setInterval(_fyttsa_applyActiveStyle, 300);
+            }
+            document.addEventListener('DOMContentLoaded', startStyle);
+            var sidebar = document.getElementById('sidebar');
+            if (sidebar && window.MutationObserver) {
+                new MutationObserver(function() { _fyttsa_applyMenuVisibility(); startStyle(); })
+                    .observe(sidebar, { childList: true, subtree: true });
+            }
+        })();
+
+        function showToast(msg) {
+            var t = document.getElementById('toast');
+            if (!t) return;
+            t.textContent = msg; t.classList.add('show');
+            setTimeout(function(){ t.classList.remove('show'); }, 2200);
+        }
+
+        function cerrarSesion() {
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var name = localStorage.getItem('workerName') || localStorage.getItem('userName') || 'Usuario';
+            var ui = document.getElementById('user-initial');
+            if (ui) ui.innerText = (name.charAt(0) || 'U').toUpperCase();
+
+            fetch('menu.html?v=' + Date.now())
+                .then(function(r){ return r.text(); })
+                .then(function(html){
+                    document.getElementById('sidebar').innerHTML = html;
+                    lucide.createIcons();
+                    fyttsa_applyPrivilegeMenu();
+                    var link = document.getElementById('link-directorio-proveedores');
+                    if (link) link.classList.add('active');
+                })
+                .catch(function(err){ console.error('Error cargando menú:', err); });
+
+            var toggle = document.getElementById('toggle-menu');
+            if (toggle) toggle.addEventListener('click', function() {
+                document.getElementById('sidebar').classList.toggle('open');
+            });
+
+            if (typeof pageInit === 'function') pageInit();
+        });
+    </script>
+    <script>
+        var STORE = 'fyttsa_directorio_proveedores';
+        var SEED = [
+            { name: 'Constructora Hernández S.A. de C.V.', contact: 'info@hernandez.com · 55-1234-5678', families: ['Obra Civil','Estructura'], semaforo: 'verde' },
+            { name: 'Acabados Premium del Bajío', contact: 'ventas@premiumbajio.com · 477-987-6543', families: ['Acabados','Pisos y Azulejos'], semaforo: 'amarillo' },
+            { name: 'Eléctrica Industrial del Centro', contact: 'oportunidades@electricentro.mx · 55-5555-1212', families: ['Eléctrico'], semaforo: 'verde' },
+            { name: 'Plomería y Gas García', contact: 'garcia.plomeria@gmail.com · 33-2222-3333', families: ['Plomería'], semaforo: 'rojo' },
+            { name: 'Herrería Artística FyM', contact: 'fym.herreria@hotmail.com · 81-4444-5555', families: ['Herrería','Canceles y Vidrios'], semaforo: 'verde' }
+        ];
+        function load() {
+            if (!localStorage.getItem(STORE)) localStorage.setItem(STORE, JSON.stringify(SEED));
+            return JSON.parse(localStorage.getItem(STORE));
+        }
+        function render() {
+            var data = load();
+            var fam = document.getElementById('filter-family').value;
+            var q = document.getElementById('filter-search').value.toLowerCase();
+            var filtered = data.filter(function(p){
+                var okFam = !fam || (p.families && p.families.indexOf(fam) !== -1);
+                var okQ = !q || p.name.toLowerCase().indexOf(q) !== -1;
+                return okFam && okQ;
+            });
+            var tb = document.getElementById('prov-tbody');
+            if (!filtered.length) {
+                tb.innerHTML = '<tr><td colspan="5"><div class="empty-state"><i data-lucide="search-x"></i><div>Sin resultados.</div></div></td></tr>';
+                lucide.createIcons(); return;
+            }
+            tb.innerHTML = filtered.map(function(p, i){
+                var badge = p.semaforo === 'verde' ? '<span class="badge badge-success">Verde</span>'
+                    : p.semaforo === 'amarillo' ? '<span class="badge badge-warning">Amarillo</span>'
+                    : '<span class="badge badge-danger">Rojo</span>';
+                return '<tr><td><strong>' + p.name + '</strong></td><td>' + p.contact + '</td>' +
+                    '<td>' + (p.families || []).map(function(f){ return '<span class="badge badge-info">' + f + '</span>'; }).join(' ') + '</td>' +
+                    '<td>' + badge + '</td>' +
+                    '<td><button class="btn btn-secondary" onclick="verDetalle(' + i + ')"><i data-lucide="eye"></i></button></td></tr>';
+            }).join('');
+            lucide.createIcons();
+        }
+        function addProvider() { showToast('Abrir formulario de alta (requiere autorización de Dirección — nota E61)'); }
+        function verDetalle(i) { showToast('Cada proveedor solo ve su propio registro (nota E58)'); }
+        function pageInit() {
+            render();
+            document.getElementById('filter-family').addEventListener('change', render);
+            document.getElementById('filter-search').addEventListener('input', render);
+        }
+    </script>
+</body>
+</html>
