@@ -1,1 +1,2247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Caja Chica | FYTTSA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        :root {
+            --primary-blue: #000000;
+            --light-blue: #e8e8e8;
+            --bg-color: #f8fafc;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #404040;
+            --purple: #8b5cf6;
+            --green-soft: #d1fae5;
+            --green-dark: #065f46;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 50;
+            flex-shrink: 0;
+        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .menu-btn { background: none; border: none; cursor: pointer; color: var(--text-main); padding: 5px; }
+        .header-title { margin: 0; font-size: 15px; font-weight: 700; color: var(--primary-blue); display: none; }
+        @media (min-width: 768px) { .header-title { display: block; } }
+        .header-right { display: flex; align-items: center; gap: 12px; }
+        .user-initial {
+            width: 35px; height: 35px; border-radius: 50%;
+            background-color: var(--primary-blue); color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 16px;
+        }
+        .main-layout { display: flex; flex: 1; overflow: hidden; }
+        .sidebar {
+            width: 260px; background: white;
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto; transition: transform 0.3s ease;
+            display: flex; flex-direction: column;
+            flex-shrink: 0;
+        }
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; height: calc(100vh - 60px); transform: translateX(-100%); z-index: 40; }
+            .sidebar.open { transform: translateX(0); }
+            .header-title { display: none; }
+        }
+        /* Estilos del menu lateral (mismos que gasolina.html) */
+        .sidebar-nav { padding: 15px 10px; }
+        .sidebar-section { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
+        .sidebar-section:last-child { border-bottom: none; }
+        .sidebar .section-title { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin: 10px 15px; padding-bottom: 0; display: block; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 15px; color: var(--text-main); text-decoration: none; font-size: 14px; font-weight: 500; border-radius: 10px; margin-bottom: 2px; transition: all 0.2s; }
+        .nav-item:hover { background-color: var(--bg-color); }
+        .nav-item.active { background-color: #e8e8e8 !important; color: #000000 !important; font-weight: 700 !important; border-left: 4px solid #000000 !important; border-radius: 8px !important; }
+        .nav-item.active i { color: var(--primary-blue); }
+        .content {
+            flex: 1; padding: 30px; overflow-y: auto;
+        }
+        @media (max-width: 768px) { .content { padding: 20px; } }
 
+        /* Page Title */
+        .page-title {
+            display: flex; align-items: center; gap: 12px;
+            font-size: 22px; font-weight: 800; color: var(--primary-blue);
+            margin-bottom: 8px;
+        }
+        .page-title i { width: 28px; height: 28px; }
+        .page-subtitle {
+            color: var(--text-muted); font-size: 13px;
+            margin-bottom: 25px;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            margin-bottom: 20px;
+        }
+        .card-title {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 15px; font-weight: 700; color: var(--text-main);
+            margin-bottom: 18px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--light-blue);
+        }
+        .card-title i { color: var(--primary-blue); width: 20px; height: 20px; }
+        .card-title .badge-count {
+            margin-left: auto;
+            background: var(--light-blue);
+            color: var(--primary-blue);
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        /* Form */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+        }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group.full { grid-column: 1 / -1; }
+        .form-label {
+            font-size: 11px; font-weight: 700; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: 0.4px;
+            margin-bottom: 6px;
+        }
+        .form-label .req { color: var(--danger); }
+        .form-control {
+            padding: 10px 12px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 13.5px;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-main);
+            background: white;
+            transition: all 0.2s;
+            width: 100%;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+        }
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 32px;
+        }
+        .top-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 900px) {
+            .top-grid { grid-template-columns: 1fr; }
+        }
+
+        /* TABLE - el formato principal */
+        .table-wrap {
+            overflow-x: auto;
+            border: 1.5px solid var(--border-color);
+            border-radius: 14px;
+            margin-bottom: 14px;
+            background: white;
+        }
+        .expense-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12.5px;
+            min-width: 1100px;
+        }
+        .expense-table thead th {
+            background: var(--primary-blue);
+            color: white;
+            text-transform: uppercase;
+            font-size: 10.5px;
+            font-weight: 800;
+            padding: 12px 8px;
+            text-align: left;
+            border-right: 1px solid rgba(255,255,255,0.15);
+            letter-spacing: 0.4px;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+        .expense-table thead th:last-child { border-right: none; }
+        .expense-table thead th.center { text-align: center; }
+        .expense-table thead th.right { text-align: right; }
+        .expense-table tbody td {
+            padding: 6px 6px;
+            border-bottom: 1px solid var(--bg-color);
+            border-right: 1px solid var(--bg-color);
+            vertical-align: middle;
+        }
+        .expense-table tbody td:last-child { border-right: none; }
+        .expense-table tbody tr:last-child td { border-bottom: none; }
+        .expense-table tbody tr:hover { background: var(--bg-color); }
+        .row-num {
+            text-align: center;
+            font-weight: 700;
+            color: var(--text-muted);
+            width: 40px;
+            background: var(--bg-color);
+        }
+        .col-tipo { width: 110px; }
+        .col-folio { width: 140px; }
+        .col-fecha { width: 130px; }
+        .col-proveedor { min-width: 180px; }
+        .col-concepto { min-width: 220px; }
+        .col-importe { width: 120px; }
+        .col-observ { min-width: 160px; }
+        .col-adjuntos { width: 160px; }
+        .col-actions { width: 50px; text-align: center; }
+
+        /* Inputs dentro de la tabla */
+        .table-input, .table-select {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            font-size: 12px;
+            font-family: 'Inter', sans-serif;
+            background: transparent;
+            color: var(--text-main);
+            transition: all 0.15s;
+        }
+        .table-input:hover, .table-select:hover {
+            background: var(--bg-color);
+        }
+        .table-input:focus, .table-select:focus {
+            outline: none;
+            background: white;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+        }
+        .table-input.amount {
+            text-align: right;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+
+        /* Tipo toggle mini */
+        .tipo-toggle {
+            display: flex; gap: 0;
+            border: 1.5px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+        }
+        .tipo-btn {
+            flex: 1;
+            padding: 5px 4px;
+            text-align: center;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.15s;
+            border: none;
+            background: none;
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .tipo-btn.active.factura {
+            background: var(--success);
+            color: white;
+        }
+        .tipo-btn.active.nota {
+            background: var(--warning);
+            color: white;
+        }
+        .tipo-btn:hover:not(.active) {
+            background: var(--bg-color);
+        }
+
+        /* Adjuntos en la tabla */
+        .attach-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .attach-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            font-size: 10px;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 1px dashed var(--border-color);
+            background: var(--bg-color);
+            color: var(--text-muted);
+            transition: all 0.15s;
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            position: relative;
+            overflow: hidden;
+        }
+        .attach-btn:hover {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+            background: var(--light-blue);
+        }
+        .attach-btn.has-file {
+            border-style: solid;
+            background: var(--green-soft);
+            color: var(--green-dark);
+            border-color: var(--success);
+        }
+        .attach-btn input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+        .attach-btn i { width: 12px; height: 12px; }
+        .attach-btn .file-name {
+            max-width: 80px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .attach-btn .remove-attach {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0;
+            line-height: 1;
+            margin-left: 4px;
+            position: relative;
+            z-index: 3;
+        }
+
+        /* Subtotales en la tabla */
+        .subtotal-row td {
+            background: var(--light-blue) !important;
+            font-weight: 800;
+            color: var(--primary-blue);
+            font-size: 12px;
+            border-top: 2px solid var(--primary-blue);
+        }
+        .subtotal-row .subtotal-label {
+            text-align: right;
+            padding-right: 12px;
+        }
+        .subtotal-row .subtotal-amount {
+            text-align: right;
+            padding-right: 12px;
+            font-family: 'Courier New', monospace;
+        }
+        /* Subtotal de NO Facturado: franja gris clara */
+        .subtotal-row.subtotal-no-facturado td {
+            background: #f1f5f9 !important;
+            color: var(--text-main) !important;
+            border-top: 2px solid #cbd5e1 !important;
+        }
+        .subtotal-row.subtotal-no-facturado .subtotal-label,
+        .subtotal-row.subtotal-no-facturado .subtotal-amount {
+            color: var(--text-main) !important;
+        }
+        /* Fila TOTAL GASTADO: estilo azul fuerte como el header */
+        .subtotal-row.subtotal-total td {
+            background: var(--primary-blue) !important;
+            color: white !important;
+            border-top: 2px solid var(--primary-blue) !important;
+        }
+        .subtotal-row.subtotal-total .subtotal-label,
+        .subtotal-row.subtotal-total .subtotal-amount {
+            color: white !important;
+        }
+
+        /* Remove button */
+        .btn-remove-row {
+            background: #fee2e2;
+            color: var(--danger);
+            border: none;
+            cursor: pointer;
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+        .btn-remove-row:hover {
+            background: var(--danger);
+            color: white;
+        }
+        .btn-remove-row i { width: 13px; height: 13px; }
+
+        /* Buttons */
+        .btn {
+            padding: 11px 18px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            font-family: 'Inter', sans-serif;
+        }
+        .btn i { width: 16px; height: 16px; }
+        .btn-primary {
+            background: var(--primary-blue);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #1a1a1a;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+        }
+        .btn-secondary {
+            background: white;
+            color: var(--primary-blue);
+            border: 1.5px solid var(--border-color);
+        }
+        .btn-secondary:hover {
+            background: var(--light-blue);
+            border-color: var(--primary-blue);
+        }
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+        .btn-danger {
+            background: white;
+            color: var(--danger);
+            border: 1.5px solid #fecaca;
+        }
+        .btn-danger:hover { background: var(--danger); color: white; }
+        .actions-bar {
+            display: flex; gap: 10px;
+            justify-content: flex-end;
+            margin-top: 18px;
+            flex-wrap: wrap;
+        }
+        .actions-bar .left {
+            margin-right: auto;
+        }
+
+        /* === TABS HORIZONTALES === */
+        .tabs-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 2px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            background: var(--bg-color);
+            border: 1.5px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        .tab-btn:hover {
+            background: white;
+            color: var(--text-main);
+            border-color: var(--primary-blue);
+        }
+        .tab-btn.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        }
+        .tab-btn i { width: 16px; height: 16px; }
+        .tab-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 22px;
+            height: 22px;
+            padding: 0 6px;
+            border-radius: 11px;
+            font-size: 11px;
+            font-weight: 800;
+            background: white;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+        }
+        .tab-btn.active .tab-badge {
+            background: white;
+            color: var(--primary-blue);
+            border-color: white;
+        }
+        .tab-btn.tab-rechazados.active .tab-badge {
+            background: white;
+            color: var(--danger);
+        }
+        .tab-btn.tab-aprobados.active .tab-badge {
+            background: white;
+            color: var(--success);
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.25s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* === BOTONES DE ACCION ROJOS === */
+        .btn-action-red {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 11px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .btn-action-red:hover {
+            background: #b91c1c;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+        .btn-action-red i { width: 13px; height: 13px; }
+
+        /* Summary cards */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        .summary-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px 18px;
+            border: 1px solid var(--border-color);
+            border-left: 5px solid var(--primary-blue);
+            display: flex; align-items: center; gap: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+        .summary-card.facturado { border-left-color: var(--success); }
+        .summary-card.no-facturado { border-left-color: var(--warning); }
+        .summary-card.total { border-left-color: var(--primary-blue); }
+        .summary-card.devolucion { border-left-color: var(--purple); }
+        .summary-icon {
+            width: 40px; height: 40px; border-radius: 12px;
+            background: var(--light-blue); color: var(--primary-blue);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .summary-card.facturado .summary-icon { background: #dcfce7; color: var(--success); }
+        .summary-card.no-facturado .summary-icon { background: #fef3c7; color: var(--warning); }
+        .summary-card.devolucion .summary-icon { background: #ede9fe; color: var(--purple); }
+        .summary-icon i { width: 22px; height: 22px; }
+        .summary-info { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+        .summary-value {
+            font-size: 18px; font-weight: 800; color: var(--text-main);
+            line-height: 1.1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .summary-label {
+            font-size: 11px; color: var(--text-muted);
+            font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-top: 2px;
+        }
+
+        /* Recent table (últimas 5) */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12.5px;
+        }
+        .data-table thead th {
+            background: var(--bg-color);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 10.5px;
+            font-weight: 800;
+            padding: 11px 12px;
+            text-align: left;
+            border-bottom: 2px solid var(--border-color);
+            letter-spacing: 0.4px;
+        }
+        .data-table tbody td {
+            padding: 11px 12px;
+            border-bottom: 1px solid var(--bg-color);
+            color: var(--text-main);
+            font-weight: 500;
+        }
+        .data-table tbody tr:last-child td { border-bottom: none; }
+        .data-table tbody tr:hover { background: var(--bg-color); }
+        .folio-cell {
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+        .badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 3px 9px; border-radius: 20px;
+            font-size: 10px; font-weight: 700; text-transform: uppercase;
+        }
+        .badge.ok { background: #dcfce7; color: #166534; }
+        .amount-cell {
+            font-weight: 800;
+            text-align: right;
+            color: var(--primary-blue);
+        }
+        .empty-row {
+            text-align: center;
+            color: var(--text-muted);
+            font-style: italic;
+            padding: 24px !important;
+        }
+
+        /* Signature section */
+        .signature-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            align-items: center;
+            padding: 24px;
+            background: linear-gradient(135deg, #e8e8e8 0%, #f8fafc 100%);
+            border-radius: 16px;
+            border: 1px solid #cccccc;
+        }
+        @media (max-width: 768px) {
+            .signature-section { grid-template-columns: 1fr; }
+            /* Tabs en grid 2x2 */
+            .tabs-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; border-bottom: none; padding-bottom: 0; }
+            .tab-btn { width: 100%; justify-content: center; padding: 10px 8px; font-size: 12px; }
+            .tab-badge { min-width: 18px; height: 18px; font-size: 10px; }
+            /* Tabla vertical en movil - estilo formulario con etiqueta arriba y recuadro abajo */
+            .table-wrap { border: none; border-radius: 0; overflow: visible; }
+            .expense-table { min-width: 0 !important; width: 100%; }
+            .expense-table thead { display: none; }
+            .expense-table tbody tr {
+                display: block;
+                background: white;
+                border: 1px solid var(--border-color);
+                border-radius: 12px;
+                margin-bottom: 12px;
+                padding: 12px 14px;
+            }
+            .expense-table tbody tr:hover { background: white; }
+            .expense-table tbody tr:last-child td { border-bottom: none; }
+            .expense-table tbody td {
+                display: flex;
+                flex-direction: column;
+                border: none;
+                border-bottom: none;
+                padding: 6px 0;
+                text-align: left;
+                gap: 4px;
+            }
+            .expense-table tbody td:last-child { border-bottom: none; }
+            .expense-table tbody td::before {
+                content: attr(data-label);
+                font-size: 11px;
+                font-weight: 700;
+                color: var(--text-muted);
+                text-transform: uppercase;
+                letter-spacing: 0.3px;
+            }
+            .expense-table tbody td.col-actions::before { display: none; }
+            .expense-table tbody td.col-actions { flex-direction: row; justify-content: flex-end; padding: 8px 0 4px 0; }
+            .expense-table tbody td.col-actions .btn-remove-row { width: 36px; height: 36px; }
+            .expense-table tbody td.col-actions .btn-remove-row i { width: 16px; height: 16px; }
+            .row-num { width: auto; background: transparent; font-size: 13px; font-weight: 800; }
+            /* Override fixed column widths para que todos los inputs tengan el mismo ancho */
+            .col-tipo, .col-folio, .col-fecha, .col-proveedor, .col-concepto, .col-importe, .col-observ, .col-adjuntos, .col-actions { width: auto !important; min-width: 0 !important; }
+            /* Todos los inputs al mismo ancho */
+            .table-input, .table-select {
+                font-size: 14px;
+                padding: 10px 12px;
+                width: 100%;
+                border: 1.5px solid var(--border-color);
+                border-radius: 8px;
+                background: white;
+                box-sizing: border-box;
+            }
+            .table-input:focus, .table-select:focus {
+                border-color: var(--primary-blue);
+                box-shadow: 0 0 0 2px rgba(0,0,0,0.08);
+            }
+            .table-input.right { font-size: 14px; text-align: left; }
+            /* Tipo toggle: mismo ancho que los inputs */
+            .col-tipo .tipo-toggle { width: 100%; display: flex; gap: 0; }
+            .tipo-btn { font-size: 13px; padding: 10px 12px; flex: 1; border-radius: 8px 0 0 8px; }
+            .tipo-btn:last-child { border-radius: 0 8px 8px 0; }
+            /* Adjuntos: botones PDF y XML estilo gastos.html (negro, blanco, con icono) */
+            .attach-cell { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+            .attach-btn {
+                display: inline-flex; align-items: center; gap: 8px;
+                padding: 10px 18px;
+                background: #000000; color: #ffffff;
+                border: none; border-radius: 10px;
+                font-size: 13px; font-weight: 700;
+                font-family: 'Inter', sans-serif;
+                cursor: pointer; transition: all 0.2s;
+                width: 100%; justify-content: center; box-sizing: border-box;
+            }
+            .attach-btn:hover { background: #1a1a1a; }
+            .attach-btn i { width: 16px; height: 16px; flex-shrink: 0; }
+            .attach-btn .file-name { flex: 1; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+            .attach-btn.has-file { background: #dcfce7; color: #166534; border: 2px solid var(--success); }
+            .attach-btn .remove-attach { font-size: 14px; padding: 0 4px; background: none; border: none; color: var(--danger); cursor: pointer; }
+            .col-observ, .col-adjuntos { display: flex; }
+            .expense-table thead th.col-observ, .expense-table thead th.col-adjuntos { display: none; }
+            .subtotal-row td { display: none; }
+            .subtotal-row td.subtotal-label, .subtotal-row td.subtotal-amount {
+                display: flex; padding: 8px 0; font-size: 16px; font-weight: 800;
+            }
+            .form-grid { grid-template-columns: 1fr !important; }
+            .top-grid { grid-template-columns: 1fr !important; }
+            .summary-grid { grid-template-columns: 1fr 1fr !important; }
+            .summary-value { font-size: 14px; }
+            .card { padding: 16px; }
+            .card-title { font-size: 13px; }
+            .actions-bar { flex-direction: column; gap: 8px; }
+            .actions-bar .btn, .actions-bar .left { width: 100%; justify-content: center; margin-right: 0; }
+            .actions-bar .btn-secondary { background: #000000; color: #ffffff; border: none; }
+            .actions-bar .btn-secondary:hover { background: #1a1a1a; }
+            .btn { font-size: 14px; padding: 12px 14px; width: 100%; justify-content: center; box-sizing: border-box; }
+        }
+        .signature-user-info {
+            display: flex; align-items: center; gap: 14px;
+        }
+        .signature-avatar {
+            width: 56px; height: 56px;
+            border-radius: 50%;
+            background: var(--primary-blue);
+            color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; font-weight: 800;
+            flex-shrink: 0;
+        }
+        .signature-user-detail {
+            display: flex; flex-direction: column;
+        }
+        .signature-user-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .signature-user-name {
+            font-size: 16px;
+            color: var(--primary-blue);
+            font-weight: 800;
+            margin-top: 2px;
+        }
+        .signature-user-role {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .signature-box {
+            position: relative;
+            background: white;
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 12px;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .signature-box.signed { border-color: var(--primary-blue); border-style: solid; }
+        #signature-canvas {
+            display: block;
+            width: 100%;
+            height: 100px;
+            cursor: crosshair;
+            touch-action: none;
+        }
+        .signature-hint {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            color: #cbd5e1;
+            font-size: 13px;
+            font-style: italic;
+            pointer-events: none;
+            text-align: center;
+        }
+        .signature-hint i { width: 16px; height: 16px; vertical-align: -3px; margin-right: 4px; }
+        .signature-actions {
+            display: flex; gap: 8px; justify-content: flex-end;
+            margin-top: 8px;
+        }
+        .btn-mini {
+            padding: 6px 12px;
+            font-size: 11px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-mini i { width: 12px; height: 12px; }
+        .btn-mini-clear {
+            background: #fee2e2; color: var(--danger);
+        }
+        .btn-mini-clear:hover { background: var(--danger); color: white; }
+        .btn-mini-clear:disabled {
+            background: #f1f5f9; color: #cbd5e1;
+            cursor: not-allowed;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 20px; right: 20px;
+            background: var(--text-main);
+            color: white;
+            padding: 14px 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 9999;
+            display: flex; align-items: center; gap: 10px;
+            font-size: 13px; font-weight: 600;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.success { background: var(--success); }
+        .toast.error { background: var(--danger); }
+        .toast i { width: 18px; height: 18px; }
+    </style>
+
+    <!-- Firebase SDK + FYTTSA shared data helper -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script>
+// =====================================================
+// FYTTSA Shared Data Helper
+// Centralizes Firebase Firestore sync for cross-device data sharing.
+// All user-specific data is stored under: usuarios/{userId}/app_data/{key}
+// Falls back to localStorage if Firebase is unavailable or no user.
+// =====================================================
+
+const FYTTSA_FIREBASE_CONFIG = {
+    apiKey: "AIzaSyD9Ihkh0NaP5vVbKntobmVTb53T0yDAZjU",
+    authDomain: "fyttsa-ae508.firebaseapp.com",
+    projectId: "fyttsa-ae508",
+    storageBucket: "fyttsa-ae508.firebasestorage.app",
+    messagingSenderId: "860564632264",
+    appId: "1:860564632264:web:30edf5a8f837e284ab2bfd",
+    measurementId: "G-7PQ1R77YJ3"
+};
+
+// Initialize Firebase once
+let _fyttsaDb = null;
+let _fyttsaFirebaseReady = false;
+
+function _fyttsaInitFirebase() {
+    if (typeof firebase === 'undefined') return false;
+    if (!firebase.apps.length) {
+        firebase.initializeApp(FYTTSA_FIREBASE_CONFIG);
+    }
+    if (firebase.firestore) {
+        _fyttsaDb = firebase.firestore();
+        _fyttsaFirebaseReady = true;
+        return true;
+    }
+    return false;
+}
+
+// Try to init immediately if firebase is already loaded
+if (typeof firebase !== 'undefined') {
+    _fyttsaInitFirebase();
+}
+
+// Also try after window load (in case scripts load async)
+window.addEventListener('load', function() {
+    if (!_fyttsaFirebaseReady && typeof firebase !== 'undefined') {
+        _fyttsaInitFirebase();
+    }
+});
+
+/**
+ * Get the current user ID from localStorage.
+ */
+function fyttsa_getUserId() {
+    return localStorage.getItem('usuario') || null;
+}
+
+/**
+ * Load data for the current user from Firestore.
+ * Falls back to localStorage if Firestore is unavailable.
+ */
+async function fyttsa_loadData(key) {
+    const userId = fyttsa_getUserId();
+
+    if (userId) {
+        if (!_fyttsaFirebaseReady && typeof firebase !== 'undefined') {
+            _fyttsaInitFirebase();
+        }
+        if (_fyttsaFirebaseReady) {
+            try {
+                const doc = await _fyttsaDb.collection('usuarios')
+                    .doc(userId)
+                    .collection('app_data')
+                    .doc(key)
+                    .get();
+                if (doc.exists && doc.data().value !== undefined) {
+                    return doc.data().value;
+                }
+            } catch (e) {
+                console.warn('[FYTTSA] Firestore load failed, falling back to localStorage:', e);
+            }
+        }
+    }
+
+    // Fallback to localStorage
+    try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+        return null;
+    }
+}
+
+/**
+ * Save data for the current user to Firestore.
+ * Also saves to localStorage as a cache/fallback.
+ */
+async function fyttsa_saveData(key, value) {
+    const userId = fyttsa_getUserId();
+
+    try {
+        localStorage.setItem(key, JSON.stringify(value));
+    } catch (e) {
+        console.warn('[FYTTSA] localStorage save failed:', e);
+    }
+
+    if (userId) {
+        if (!_fyttsaFirebaseReady && typeof firebase !== 'undefined') {
+            _fyttsaInitFirebase();
+        }
+        if (_fyttsaFirebaseReady) {
+            try {
+                await _fyttsaDb.collection('usuarios')
+                    .doc(userId)
+                    .collection('app_data')
+                    .doc(key)
+                    .set({
+                        value: value,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+            } catch (e) {
+                console.warn('[FYTTSA] Firestore save failed:', e);
+            }
+        }
+    }
+}
+
+/**
+ * Save data synchronously to localStorage and fire async Firestore save.
+ */
+function fyttsa_saveDataSync(key, value) {
+    try {
+        localStorage.setItem(key, JSON.stringify(value));
+    } catch (e) {
+        console.warn('[FYTTSA] localStorage save failed:', e);
+    }
+    fyttsa_saveData(key, value);
+}
+
+// =====================================================
+// PRIVILEGE-BASED MENU VISIBILITY + ACTIVE MENU STYLING
+// =====================================================
+// Privilegio 1 = see ALL menu sections
+// Privilegio 2 = see ONLY Inicio + Trabajador section (hide Obra, Control, Almacén)
+// =====================================================
+
+function _fyttsa_applyMenuVisibility() {
+    var privilegio = String(localStorage.getItem('privilegio') || '1').trim();
+    var sidebar = document.getElementById('sidebar');
+    if (!sidebar) return;
+
+    // Allowed sections per role. Inicio link is always visible.
+    var allowedByRole = {
+        '1': ['Trabajador', 'Proveedor', 'Obra', 'Control', 'Almacén'],
+        '2': ['Trabajador'],
+        '3': ['Proveedor']
+    };
+    var allowed = allowedByRole[privilegio] || allowedByRole['1'];
+
+    var sections = sidebar.querySelectorAll('.sidebar-section');
+    sections.forEach(function(sec) {
+        var sectionName = (sec.getAttribute('data-section') || '').trim();
+        if (!sectionName) {
+            var t = sec.querySelector('.section-title');
+            if (t) sectionName = t.textContent.trim();
+        }
+        sec.style.display = (allowed.indexOf(sectionName) !== -1) ? '' : 'none';
+    });
+}
+
+function _fyttsa_applyActiveStyle() {
+    var activeItem = document.querySelector('.nav-item.active');
+    if (activeItem) {
+        activeItem.style.setProperty('background-color', '#e8e8e8', 'important');
+        activeItem.style.setProperty('color', '#000000', 'important');
+        activeItem.style.setProperty('font-weight', '700', 'important');
+        activeItem.style.setProperty('border-left', '4px solid #000000', 'important');
+        activeItem.style.setProperty('border-radius', '8px', 'important');
+        activeItem.style.setProperty('padding', '10px 15px', 'important');
+    }
+}
+
+// Public function that pages call after loading menu.html
+function fyttsa_applyPrivilegeMenu() {
+    _fyttsa_applyMenuVisibility();
+}
+
+// =====================================================
+// AUTO-SETUP: Runs automatically when the script loads.
+// Uses a MutationObserver to detect when the sidebar content
+// changes (i.e., when menu.html is loaded via fetch), then:
+//   1. Applies privilege-based menu visibility
+//   2. Starts an interval to apply active menu styling
+// This ensures the menu is always correct regardless of
+// when fyttsa_applyPrivilegeMenu() is called.
+// =====================================================
+
+(function() {
+    var styleIntervalStarted = false;
+
+    function startActiveStyleInterval() {
+        if (styleIntervalStarted) return;
+        styleIntervalStarted = true;
+
+        // Apply immediately
+        _fyttsa_applyActiveStyle();
+
+        // Then check every 200ms for 20 seconds
+        var intervalId = setInterval(function() {
+            _fyttsa_applyActiveStyle();
+        }, 200);
+
+        setTimeout(function() {
+            clearInterval(intervalId);
+        }, 20000);
+    }
+
+    function setupSidebarObserver() {
+        var sidebar = document.getElementById('sidebar');
+        if (!sidebar) {
+            // Sidebar not yet in DOM, retry shortly
+            setTimeout(setupSidebarObserver, 100);
+            return;
+        }
+
+        // Apply immediately in case menu is already loaded
+        _fyttsa_applyMenuVisibility();
+        startActiveStyleInterval();
+
+        // Watch for changes to sidebar content (when menu.html is loaded via fetch)
+        if (typeof MutationObserver !== 'undefined') {
+            var observer = new MutationObserver(function(mutations) {
+                _fyttsa_applyMenuVisibility();
+                _fyttsa_applyActiveStyle();
+            });
+            observer.observe(sidebar, {
+                childList: true,
+                subtree: true,
+                attributes: true,
+                attributeFilter: ['class']
+            });
+        }
+    }
+
+    // Start when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            setupSidebarObserver();
+            // Also retry after a delay in case DOMContentLoaded already fired
+            setTimeout(function() {
+                _fyttsa_applyMenuVisibility();
+                _fyttsa_applyActiveStyle();
+                startActiveStyleInterval();
+            }, 500);
+            setTimeout(function() {
+                _fyttsa_applyMenuVisibility();
+                _fyttsa_applyActiveStyle();
+            }, 1500);
+        });
+    } else {
+        // DOM already ready
+        setupSidebarObserver();
+        setTimeout(function() {
+            _fyttsa_applyMenuVisibility();
+            _fyttsa_applyActiveStyle();
+            startActiveStyleInterval();
+        }, 500);
+        setTimeout(function() {
+            _fyttsa_applyMenuVisibility();
+            _fyttsa_applyActiveStyle();
+        }, 1500);
+    }
+
+    // Also run on window load (final safety net)
+    window.addEventListener('load', function() {
+        _fyttsa_applyMenuVisibility();
+        _fyttsa_applyActiveStyle();
+        startActiveStyleInterval();
+    });
+})();
+
+    </script>
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <button class="menu-btn" id="toggle-menu"><i data-lucide="menu"></i></button>
+            <h1 class="header-title">FYTTSA</h1>
+        </div>
+        <div class="header-right">
+            <div class="user-initial" id="user-initial">U</div>
+            <img src="https://i.ibb.co/x8Bw8KR8/MARFIL-1.jpg" alt="Logo" height="35" style="border-radius: 8px;">
+        </div>
+    </header>
+    <script>try{lucide.createIcons()}catch(e){}</script>
+
+    <div class="main-layout">
+        <aside class="sidebar" id="sidebar"></aside>
+
+        <main class="content">
+            <h1 class="page-title">
+                <i data-lucide="wallet"></i>
+                Comprobación de Gastos
+            </h1>
+            <p class="page-subtitle">Captura de facturas y notas de caja chica por obra y periodo.</p>
+
+            <!-- TABS HORIZONTALES -->
+            <div class="tabs-bar">
+                <button class="tab-btn tab-nuevo active" data-tab="nuevo">
+                    <i data-lucide="plus-circle"></i> Nuevo
+                </button>
+                <button class="tab-btn tab-guardados" data-tab="guardados">
+                    <i data-lucide="save"></i> Guardados
+                    <span class="tab-badge" id="badge-guardados">0</span>
+                </button>
+                <button class="tab-btn tab-rechazados" data-tab="rechazados">
+                    <i data-lucide="x-circle"></i> Rechazados
+                    <span class="tab-badge" id="badge-rechazados">0</span>
+                </button>
+                <button class="tab-btn tab-aprobados" data-tab="aprobados">
+                    <i data-lucide="check-circle"></i> Aprobados
+                    <span class="tab-badge" id="badge-aprobados">0</span>
+                </button>
+            </div>
+
+            <!-- CONTENIDO TAB NUEVO (el formulario actual) -->
+            <div class="tab-content active" id="content-nuevo">
+                <!-- 1. OBRA Y PERIODO -->
+                <div class="top-grid">
+                <div class="card">
+                    <h3 class="card-title">
+                        <i data-lucide="building-2"></i>
+                        Obra
+                    </h3>
+                    <div class="form-grid">
+                        <div class="form-group full">
+                            <label class="form-label">Nombre de la obra <span class="req">*</span></label>
+                            <input type="text" class="form-control" id="input-obra" placeholder="Ej. 3B Mexiquense - Coacalco" list="obras-list">
+                            <datalist id="obras-list">
+                                <option value="3B Zarzaparrillas">
+                                <option value="3B Santa Cecilia">
+                                <option value="3B Ixmiquilpan">
+                                <option value="3B Mexiquense - Coacalco">
+                                <option value="3B San Miguel Otlica">
+                                <option value="3B La Escondida">
+                                <option value="3B Los Pinos Ixtapaluca">
+                                <option value="3B Paseo las Américas">
+                                <option value="3B Mexico Neza">
+                                <option value="3B San Buenaventura">
+                                <option value="3B T Bara Tulancingo">
+                                <option value="3B EKT Peñon">
+                                <option value="3B Industria">
+                                <option value="Guarniciones y Banquetas">
+                                <option value="Bajo Puentes">
+                                <option value="Construcción">
+                                <option value="Adecuaciones/Construccion">
+                                <option value="Banamex">
+                                <option value="Black Sheep">
+                                <option value="Imper C100">
+                            </datalist>
+                        </div>
+                        <div class="form-group full">
+                            <label class="form-label">Folio</label>
+                            <input type="text" class="form-control" id="input-folio" readonly style="background:#e2e8f0; color:var(--text-muted); font-weight:bold; cursor:not-allowed;">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">
+                        <i data-lucide="calendar-range"></i>
+                        Periodo
+                    </h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Fecha de inicio <span class="req">*</span></label>
+                            <input type="date" class="form-control" id="input-fecha-inicio">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Fecha final <span class="req">*</span></label>
+                            <input type="date" class="form-control" id="input-fecha-fin">
+                        </div>
+                        <div class="form-group full">
+                            <label class="form-label">Periodo (descripción)</label>
+                            <input type="text" class="form-control" id="input-periodo" placeholder="Se calcula automáticamente" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. TABLA DE COMPROBANTES (Facturas y Notas juntas) -->
+            <div class="card">
+                <h3 class="card-title">
+                    <i data-lucide="receipt"></i>
+                    Comprobantes
+                    <span class="badge-count" id="items-count">0 items</span>
+                </h3>
+                <div class="table-wrap">
+                    <table class="expense-table" id="expense-table">
+                        <thead>
+                            <tr>
+                                <th class="center col-num">No.</th>
+                                <th class="center col-tipo">Tipo</th>
+                                <th class="col-folio">No. Fact. / Nota</th>
+                                <th class="col-fecha">Fecha</th>
+                                <th class="col-proveedor">Proveedor</th>
+                                <th class="col-concepto">Concepto</th>
+                                <th class="right col-importe">Importe</th>
+                                <th class="col-observ">Tipo de Pago</th>
+                                <th class="col-adjuntos">Adjuntos (PDF/XML/Foto)</th>
+                                <th class="col-actions"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="expense-tbody">
+                            <!-- Filas dinamicas -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="actions-bar">
+                    <button class="btn btn-secondary left" id="btn-add-item">
+                        <i data-lucide="plus"></i> Agregar comprobante
+                    </button>
+                </div>
+            </div>
+
+            <!-- 3. LIQUIDACIÓN DE CAJA -->
+            <div class="card">
+                <h3 class="card-title">
+                    <i data-lucide="coins"></i>
+                    Liquidación de Caja
+                </h3>
+                <p style="color:var(--text-muted); font-size:12px; margin-bottom:14px;">
+                    Función: registra el monto de efectivo que se te entregó al inicio del periodo y el método principal con el que vas a comprobar. El sistema calcula automáticamente cuánto debes devolver en efectivo al cerrar la comprobación (= efectivo recibido − gastos pagados en efectivo).
+                </p>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Monto recibido en efectivo</label>
+                        <input type="number" class="form-control" id="input-monto-recibido" placeholder="0.00" step="0.01" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Método de pago principal</label>
+                        <select class="form-control" id="input-metodo">
+                            <option value="Efectivo">Efectivo</option>
+                            <option value="TC">Tarjeta de Crédito (TC)</option>
+                            <option value="TCC">Tarjeta de Crédito Corporativa (TCC)</option>
+                            <option value="TD">Tarjeta de Débito (TD)</option>
+                            <option value="Transferencia">Transferencia</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. SUMATORIAS -->
+            <div class="summary-grid">
+                <div class="summary-card facturado">
+                    <div class="summary-icon"><i data-lucide="file-text"></i></div>
+                    <div class="summary-info">
+                        <span class="summary-value" id="sum-facturado">$0.00</span>
+                        <span class="summary-label">Total Facturado</span>
+                    </div>
+                </div>
+                <div class="summary-card no-facturado">
+                    <div class="summary-icon"><i data-lucide="file-question"></i></div>
+                    <div class="summary-info">
+                        <span class="summary-value" id="sum-no-facturado">$0.00</span>
+                        <span class="summary-label">Total No Facturado</span>
+                    </div>
+                </div>
+                <div class="summary-card total">
+                    <div class="summary-icon"><i data-lucide="calculator"></i></div>
+                    <div class="summary-info">
+                        <span class="summary-value" id="sum-total">$0.00</span>
+                        <span class="summary-label">Importe Total de Gastos</span>
+                    </div>
+                </div>
+                <div class="summary-card devolucion">
+                    <div class="summary-icon"><i data-lucide="banknote"></i></div>
+                    <div class="summary-info">
+                        <span class="summary-value" id="sum-devolucion">$0.00</span>
+                        <span class="summary-label">Total en Efectivo</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. ACCIONES -->
+            <div class="card">
+                <h3 class="card-title">
+                    <i data-lucide="check-circle-2"></i>
+                    Acciones
+                </h3>
+                <p style="color:var(--text-muted); font-size:12px; margin-bottom:10px;">
+                    <strong>Guardar comprobación</strong>: deja la comprobación como borrador editable (no la envía a revisión). <strong>Enviar a revisión</strong>: cierra la comprobación y la manda al flujo de autorización; ya no podrás editarla hasta que sea devuelta.
+                </p>
+                <div class="actions-bar" style="margin-top: 10px;">
+                    <button class="btn btn-danger" id="btn-cancel">
+                        <i data-lucide="x"></i> Cancelar
+                    </button>
+                    <button class="btn btn-primary" id="btn-save">
+                        <i data-lucide="save"></i> Guardar comprobación
+                    </button>
+                    <button class="btn btn-success" id="btn-submit">
+                        <i data-lucide="send"></i> Enviar a revisión
+                    </button>
+                </div>
+            </div>
+            </div><!-- /tab-content-nuevo -->
+
+            <!-- TAB GUARDADOS -->
+            <div class="tab-content" id="content-guardados">
+                <div class="card">
+                    <h3 class="card-title">
+                        <i data-lucide="save"></i>
+                        Comprobaciones Guardadas
+                        <span class="badge-count" id="count-guardados">0</span>
+                    </h3>
+                    <p style="color:var(--text-muted); font-size:12px; margin-bottom:16px;">
+                        Comprobaciones en borrador que aún puedes editar y enviar a revisión.
+                    </p>
+                    <div style="overflow-x: auto;">
+                        <table class="data-table" id="table-guardados">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Folio</th>
+                                    <th>Obra</th>
+                                    <th style="text-align:right;">Importe</th>
+                                    <th style="text-align:center;">No. Conceptos</th>
+                                    <th style="text-align:center;">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-guardados">
+                                <tr><td colspan="6" class="empty-row">No hay comprobaciones guardadas.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB RECHAZADOS -->
+            <div class="tab-content" id="content-rechazados">
+                <div class="card">
+                    <h3 class="card-title">
+                        <i data-lucide="x-circle"></i>
+                        Comprobaciones Rechazadas
+                        <span class="badge-count" id="count-rechazados">0</span>
+                    </h3>
+                    <p style="color:var(--text-muted); font-size:12px; margin-bottom:16px;">
+                        Comprobaciones rechazadas por el revisor. Edita los datos y vuelve a enviar.
+                    </p>
+                    <div style="overflow-x: auto;">
+                        <table class="data-table" id="table-rechazados">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Folio</th>
+                                    <th>Obra</th>
+                                    <th style="text-align:right;">Importe</th>
+                                    <th style="text-align:center;">No. Conceptos</th>
+                                    <th style="text-align:center;">Observación</th>
+                                    <th style="text-align:center;">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-rechazados">
+                                <tr><td colspan="7" class="empty-row">No hay comprobaciones rechazadas.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB APROBADOS -->
+            <div class="tab-content" id="content-aprobados">
+                <div class="card">
+                    <h3 class="card-title">
+                        <i data-lucide="check-circle"></i>
+                        Comprobaciones Aprobadas
+                        <span class="badge-count" id="count-aprobados">0</span>
+                    </h3>
+                    <p style="color:var(--text-muted); font-size:12px; margin-bottom:16px;">
+                        Comprobaciones revisadas y aprobadas. Solo consulta (no editables).
+                    </p>
+                    <div style="overflow-x: auto;">
+                        <table class="data-table" id="table-aprobados">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Folio</th>
+                                    <th>Obra</th>
+                                    <th style="text-align:right;">Importe</th>
+                                    <th style="text-align:center;">No. Conceptos</th>
+                                    <th style="text-align:center;">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-aprobados">
+                                <tr><td colspan="6" class="empty-row">No hay comprobaciones aprobadas.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="toast" id="toast">
+        <i data-lucide="check-circle"></i>
+        <span id="toast-msg">Mensaje</span>
+    </div>
+
+    <script>
+        // =====================================================
+        // 1. MENU DINAMICO
+        // =====================================================
+        fetch('menu.html?v=' + Date.now())
+            .then(r => r.text())
+            .then(html => {
+                document.getElementById('sidebar').innerHTML = html;
+                lucide.createIcons();
+                fyttsa_applyPrivilegeMenu();
+                const link = document.getElementById('link-cajachica') || document.getElementById('link-caja-chica');
+                if (link) link.classList.add('active');
+            })
+            .catch(err => console.error('Error cargando el menú:', err));
+
+        document.getElementById('toggle-menu').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('open');
+        });
+
+        // =====================================================
+        // 2. USUARIO LOGUEADO
+        // =====================================================
+        function getUserName() {
+            return localStorage.getItem('nombre') || '';
+        }
+        function applyUserName() {
+            const nombre = getUserName();
+            if (nombre) {
+                document.getElementById('user-initial').textContent = nombre.charAt(0).toUpperCase();
+            } else {
+                setTimeout(applyUserName, 1500);
+            }
+        }
+        applyUserName();
+
+        // =====================================================
+        // 3. PERIODO AUTOMATICO
+        // =====================================================
+        // Parsea 'YYYY-MM-DD' como fecha LOCAL (no UTC) para evitar
+        // el bug de zona horaria que mostraba 4-nov como 3-nov (nota E21).
+        function parseLocalDate(str) {
+            const parts = str.split('-');
+            if (parts.length !== 3) return new Date(NaN);
+            return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+        }
+        function updatePeriodo() {
+            const ini = document.getElementById('input-fecha-inicio').value;
+            const fin = document.getElementById('input-fecha-fin').value;
+            if (ini && fin) {
+                const dIni = parseLocalDate(ini);
+                const dFin = parseLocalDate(fin);
+                const diffDays = Math.round((dFin - dIni) / (1000 * 60 * 60 * 24)) + 1;
+                const opts = { day: '2-digit', month: 'short', year: 'numeric' };
+                const txt = `Del ${dIni.toLocaleDateString('es-MX', opts)} al ${dFin.toLocaleDateString('es-MX', opts)}` +
+                            (diffDays > 0 ? ` (${diffDays} días)` : '');
+                document.getElementById('input-periodo').value = txt;
+            } else {
+                document.getElementById('input-periodo').value = '';
+            }
+        }
+        document.getElementById('input-fecha-inicio').addEventListener('change', updatePeriodo);
+        document.getElementById('input-fecha-fin').addEventListener('change', updatePeriodo);
+
+        // =====================================================
+        // 4. ITEMS (Comprobantes en tabla)
+        // =====================================================
+        let items = []; // {id, tipo, folio, fecha, proveedor, concepto, importe, observacion, pdfFactura, xmlFactura, fotoNota}
+
+        function newItemId() {
+            return 'item-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>"']/g, c => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            })[c]);
+        }
+
+        function renderItems() {
+            const tbody = document.getElementById('expense-tbody');
+            tbody.innerHTML = '';
+
+            if (items.length === 0) {
+                tbody.innerHTML = `
+                    <tr><td colspan="10" class="empty-row">
+                        No hay comprobantes. Presiona "Agregar comprobante" para comenzar.
+                    </td></tr>
+                `;
+            } else {
+                items.forEach((item, idx) => {
+                    const tr = document.createElement('tr');
+                    tr.dataset.id = item.id;
+                    const folioPlaceholder = item.tipo === 'Factura' ? 'Ej. HMA-2683' : 'Ej. S/N o EDIF 490';
+                    tr.innerHTML = `
+                        <td class="row-num" data-label="No.">${idx + 1}</td>
+                        <td class="col-tipo" data-label="Tipo">
+                            <div class="tipo-toggle">
+                                <button type="button" class="tipo-btn factura ${item.tipo === 'Factura' ? 'active' : ''}" data-value="Factura">Factura</button>
+                                <button type="button" class="tipo-btn nota ${item.tipo === 'Nota' ? 'active' : ''}" data-value="Nota">Nota</button>
+                            </div>
+                        </td>
+                        <td class="col-folio" data-label="Folio/Nota">
+                            <input type="text" class="table-input" data-field="folio"
+                                placeholder="${folioPlaceholder}"
+                                value="${escapeHtml(item.folio)}">
+                        </td>
+                        <td class="col-fecha" data-label="Fecha">
+                            <input type="date" class="table-input" data-field="fecha" value="${item.fecha || ''}">
+                        </td>
+                        <td class="col-proveedor" data-label="Proveedor">
+                            <input type="text" class="table-input" data-field="proveedor"
+                                placeholder="Nombre del proveedor"
+                                value="${escapeHtml(item.proveedor)}">
+                        </td>
+                        <td class="col-concepto" data-label="Concepto">
+                            <input type="text" class="table-input" data-field="concepto"
+                                placeholder="Descripción del gasto"
+                                value="${escapeHtml(item.concepto)}">
+                        </td>
+                        <td class="col-importe" data-label="Importe">
+                            <input type="number" class="table-input amount" data-field="importe"
+                                placeholder="0.00" step="0.01" min="0"
+                                value="${item.importe || ''}">
+                        </td>
+                        <td class="col-observ" data-label="Pago">
+                            <select class="table-input" data-field="observacion">
+                                <option value="">Tipo de pago…</option>
+                                <option value="Efectivo" ${item.observacion === 'Efectivo' ? 'selected' : ''}>Efectivo</option>
+                                <option value="Tarjeta Débito" ${item.observacion === 'Tarjeta Débito' ? 'selected' : ''}>Tarjeta Débito</option>
+                                <option value="Tarjeta Crédito" ${item.observacion === 'Tarjeta Crédito' ? 'selected' : ''}>Tarjeta Crédito</option>
+                                <option value="Tarjeta Crédito Corporativa" ${item.observacion === 'Tarjeta Crédito Corporativa' ? 'selected' : ''}>Tarjeta Crédito Corporativa</option>
+                                <option value="Transferencia" ${item.observacion === 'Transferencia' ? 'selected' : ''}>Transferencia</option>
+                            </select>
+                        </td>
+                        <td class="col-adjuntos" data-label="Adjuntos">
+                            <div class="attach-cell"></div>
+                        </td>
+                        <td class="col-actions" data-label="">
+                            <button type="button" class="btn-remove-row" data-action="remove" title="Eliminar">
+                                <i data-lucide="trash-2"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                    bindRowEvents(tr, item);
+                    renderAttachments(tr, item);
+                });
+
+                // Filas de subtotal
+                const facturado = items.filter(i => i.tipo === 'Factura').reduce((a, i) => a + (parseFloat(i.importe) || 0), 0);
+                const noFacturado = items.filter(i => i.tipo === 'Nota').reduce((a, i) => a + (parseFloat(i.importe) || 0), 0);
+                const total = facturado + noFacturado;
+
+                if (items.length > 0) {
+                    const subTotalFact = document.createElement('tr');
+                    subTotalFact.className = 'subtotal-row';
+                    subTotalFact.innerHTML = `
+                        <td colspan="6" class="subtotal-label">SUBTOTAL FACTURADO (${items.filter(i => i.tipo === 'Factura').length})</td>
+                        <td class="subtotal-amount">${formatCurrency(facturado)}</td>
+                        <td colspan="3"></td>
+                    `;
+                    tbody.appendChild(subTotalFact);
+
+                    const subTotalNota = document.createElement('tr');
+                    subTotalNota.className = 'subtotal-row subtotal-no-facturado';
+                    subTotalNota.innerHTML = `
+                        <td colspan="6" class="subtotal-label">SUBTOTAL NO FACTURADO (${items.filter(i => i.tipo === 'Nota').length})</td>
+                        <td class="subtotal-amount">${formatCurrency(noFacturado)}</td>
+                        <td colspan="3"></td>
+                    `;
+                    tbody.appendChild(subTotalNota);
+
+                    const totalRow = document.createElement('tr');
+                    totalRow.className = 'subtotal-row subtotal-total';
+                    totalRow.innerHTML = `
+                        <td colspan="6" class="subtotal-label" style="color: white;">IMPORTE TOTAL GASTADO</td>
+                        <td class="subtotal-amount" style="color: white;">${formatCurrency(total)}</td>
+                        <td colspan="3"></td>
+                    `;
+                    tbody.appendChild(totalRow);
+                }
+            }
+
+            document.getElementById('items-count').textContent = items.length + (items.length === 1 ? ' item' : ' items');
+            lucide.createIcons();
+            updateSummary();
+        }
+
+        function renderAttachments(tr, item) {
+            const cell = tr.querySelector('.attach-cell');
+            if (!cell) return;
+            cell.innerHTML = '';
+
+            if (item.tipo === 'Factura') {
+                // PDF + XML
+                cell.appendChild(makeAttachBtn('Seleccionar PDF', 'pdfFactura', item, 'file-text'));
+                cell.appendChild(makeAttachBtn('Seleccionar XML', 'xmlFactura', item, 'file-code'));
+            } else {
+                // Nota sin factura: foto del ticket/nota + hasta 4 fotos de evidencia de materiales (nota E22)
+                cell.appendChild(makeAttachBtn('Foto ticket/nota', 'fotoNota', item, 'image'));
+                ['fotoMat1', 'fotoMat2', 'fotoMat3', 'fotoMat4'].forEach((f) => {
+                    cell.appendChild(makeAttachBtn('Evidencia materiales', f, item, 'camera'));
+                });
+            }
+            lucide.createIcons();
+        }
+
+        function makeAttachBtn(label, field, item, iconName) {
+            const hasFile = !!(item[field] && item[field + 'Name']);
+            const btn = document.createElement('label');
+            btn.className = 'attach-btn' + (hasFile ? ' has-file' : '');
+            btn.innerHTML = `
+                <i data-lucide="${iconName}"></i>
+                <span class="file-name">${hasFile ? escapeHtml(item[field + 'Name']) : label}</span>
+                ${hasFile ? '<button type="button" class="remove-attach" data-field="' + field + '">&times;</button>' : ''}
+                <input type="file" accept="${field === 'fotoNota' ? 'image/*,.pdf' : (field.startsWith('fotoMat') ? 'image/*' : (field === 'xmlFactura' ? '.xml,text/xml' : '.pdf,application/pdf'))}" data-field="${field}">
+            `;
+            const fileInput = btn.querySelector('input[type="file"]');
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    item[field] = file;
+                    item[field + 'Name'] = file.name;
+                    renderAttachments(tr, item);
+                }
+            });
+            if (hasFile) {
+                const rmBtn = btn.querySelector('.remove-attach');
+                if (rmBtn) {
+                    rmBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        item[field] = null;
+                        item[field + 'Name'] = null;
+                        renderAttachments(tr, item);
+                    });
+                }
+            }
+            return btn;
+        }
+
+        function bindRowEvents(tr, item) {
+            // Tipo toggle
+            tr.querySelectorAll('.tipo-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const newValue = btn.dataset.value;
+                    item.tipo = newValue;
+                    tr.querySelectorAll('.tipo-btn').forEach(b => {
+                        b.classList.toggle('active', b.dataset.value === newValue);
+                    });
+                    // Limpiar adjuntos al cambiar tipo (porque cambian los campos)
+                    item.pdfFactura = null; item.pdfFacturaName = null;
+                    item.xmlFactura = null; item.xmlFacturaName = null;
+                    item.fotoNota = null; item.fotoNotaName = null;
+                    item.fotoMat1 = null; item.fotoMat1Name = null;
+                    item.fotoMat2 = null; item.fotoMat2Name = null;
+                    item.fotoMat3 = null; item.fotoMat3Name = null;
+                    item.fotoMat4 = null; item.fotoMat4Name = null;
+                    // Actualizar placeholder del folio
+                    const folioInput = tr.querySelector('[data-field="folio"]');
+                    if (folioInput) {
+                        folioInput.placeholder = (newValue === 'Factura' ? 'Ej. HMA-2683' : 'Ej. S/N o EDIF 490');
+                    }
+                    renderAttachments(tr, item);
+                });
+            });
+            // Inputs
+            tr.querySelectorAll('input[data-field]').forEach(input => {
+                if (input.type === 'file') return; // handled separately
+                input.addEventListener('input', () => {
+                    const field = input.dataset.field;
+                    if (field === 'importe') {
+                        item[field] = parseFloat(input.value) || 0;
+                        updateSummary();
+                        updateSubtotals();
+                    } else {
+                        item[field] = input.value;
+                    }
+                });
+            });
+            // Selects (ej. tipo de pago — nota E16)
+            tr.querySelectorAll('select[data-field]').forEach(sel => {
+                sel.addEventListener('change', () => {
+                    const field = sel.dataset.field;
+                    item[field] = sel.value;
+                });
+            });
+            // Remove
+            const removeBtn = tr.querySelector('[data-action="remove"]');
+            if (removeBtn) {
+                removeBtn.addEventListener('click', () => {
+                    items = items.filter(i => i.id !== item.id);
+                    renderItems();
+                });
+            }
+        }
+
+        function updateSubtotals() {
+            // Actualiza SOLO las filas de subtotal (sin re-render completo)
+            const tbody = document.getElementById('expense-tbody');
+            const facturado = items.filter(i => i.tipo === 'Factura').reduce((a, i) => a + (parseFloat(i.importe) || 0), 0);
+            const noFacturado = items.filter(i => i.tipo === 'Nota').reduce((a, i) => a + (parseFloat(i.importe) || 0), 0);
+            const total = facturado + noFacturado;
+            const subRows = tbody.querySelectorAll('.subtotal-row');
+            if (subRows.length >= 3) {
+                const fCount = items.filter(i => i.tipo === 'Factura').length;
+                const nCount = items.filter(i => i.tipo === 'Nota').length;
+                subRows[0].children[0].textContent = `SUBTOTAL FACTURADO (${fCount})`;
+                subRows[0].children[1].textContent = formatCurrency(facturado);
+                subRows[1].children[0].textContent = `SUBTOTAL NO FACTURADO (${nCount})`;
+                subRows[1].children[1].textContent = formatCurrency(noFacturado);
+                subRows[2].children[1].textContent = formatCurrency(total);
+            }
+        }
+
+        function addItem(scroll) {
+            const newItem = {
+                id: newItemId(),
+                tipo: 'Factura',
+                folio: '',
+                fecha: '',
+                proveedor: '',
+                concepto: '',
+                importe: 0,
+                observacion: '',
+                pdfFactura: null, pdfFacturaName: null,
+                xmlFactura: null, xmlFacturaName: null,
+                fotoNota: null, fotoNotaName: null,
+                fotoMat1: null, fotoMat1Name: null,
+                fotoMat2: null, fotoMat2Name: null,
+                fotoMat3: null, fotoMat3Name: null,
+                fotoMat4: null, fotoMat4Name: null
+            };
+            items.push(newItem);
+            renderItems();
+            if (scroll) setTimeout(() => {
+                const last = document.querySelector('#expense-tbody tr:last-child');
+                if (last) last.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 50);
+        }
+
+        document.getElementById('btn-add-item').addEventListener('click', () => addItem(true));
+        addItem(false);
+
+        // =====================================================
+        // 5. SUMATORIAS
+        // =====================================================
+        function formatCurrency(num) {
+            return '$' + (num || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function updateSummary() {
+            const facturado = items
+                .filter(i => i.tipo === 'Factura')
+                .reduce((acc, i) => acc + (parseFloat(i.importe) || 0), 0);
+            const noFacturado = items
+                .filter(i => i.tipo === 'Nota')
+                .reduce((acc, i) => acc + (parseFloat(i.importe) || 0), 0);
+            const total = facturado + noFacturado;
+            const recibido = parseFloat(document.getElementById('input-monto-recibido').value) || 0;
+            const devolucion = recibido - total;
+
+            document.getElementById('sum-facturado').textContent = formatCurrency(facturado);
+            document.getElementById('sum-no-facturado').textContent = formatCurrency(noFacturado);
+            document.getElementById('sum-total').textContent = formatCurrency(total);
+            document.getElementById('sum-devolucion').textContent = formatCurrency(devolucion);
+
+            const devCard = document.getElementById('sum-devolucion').parentElement.parentElement;
+            if (devolucion < 0) {
+                devCard.style.borderLeftColor = 'var(--danger)';
+                document.getElementById('sum-devolucion').style.color = 'var(--danger)';
+            } else {
+                devCard.style.borderLeftColor = 'var(--purple)';
+                document.getElementById('sum-devolucion').style.color = 'var(--text-main)';
+            }
+        }
+
+        document.getElementById('input-monto-recibido').addEventListener('input', updateSummary);
+
+        // =====================================================
+        // 6. HISTORIAL CON STATUS (guardado / rechazado / aprobado)
+        // =====================================================
+        let historial = [];
+        let editingFolio = null; // folio que se está editando actualmente
+
+        const CAJACHICA_KEY = 'fyttsa_cajachica_historial';
+        async function loadHistorial() {
+            try {
+                const data = await fyttsa_loadData(CAJACHICA_KEY);
+                historial = data || [];
+                // Migracion: si algun registro no tiene status, asignar 'guardado'
+                historial.forEach(h => {
+                    if (!h.status) h.status = 'guardado';
+                });
+            } catch (e) { historial = []; }
+        }
+        function saveHistorial() {
+            fyttsa_saveDataSync(CAJACHICA_KEY, historial);
+        }
+        function generateFolio() {
+            const year = new Date().getFullYear();
+            // Buscar el maximo numero de folio del año actual
+            let maxNum = 0;
+            historial.forEach(h => {
+                if (h.folio && h.folio.startsWith('CC-' + year + '-')) {
+                    const n = parseInt(h.folio.split('-')[2], 10);
+                    if (!isNaN(n) && n > maxNum) maxNum = n;
+                }
+            });
+            const nextNum = maxNum + 1;
+            return 'CC-' + year + '-' + String(nextNum).padStart(4, '0');
+        }
+        function updateFolioInput() {
+            const folioInput = document.getElementById('input-folio');
+            if (folioInput && !editingFolio) {
+                folioInput.value = generateFolio();
+            }
+        }
+
+        function formatDate(fechaISO) {
+            if (!fechaISO) return '—';
+            const d = new Date(fechaISO);
+            if (isNaN(d)) return fechaISO;
+            return d.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' }) +
+                   ' ' + d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: true });
+        }
+
+        // Renderea las tablas de cada tab
+        function renderTabsTables() {
+            const guardados = historial.filter(h => h.status === 'guardado').reverse();
+            const rechazados = historial.filter(h => h.status === 'rechazado').reverse();
+            const aprobados = historial.filter(h => h.status === 'aprobado').reverse();
+
+            // Badges en los botones de tabs
+            document.getElementById('badge-guardados').textContent = guardados.length;
+            document.getElementById('badge-rechazados').textContent = rechazados.length;
+            document.getElementById('badge-aprobados').textContent = aprobados.length;
+            document.getElementById('count-guardados').textContent = guardados.length;
+            document.getElementById('count-rechazados').textContent = rechazados.length;
+            document.getElementById('count-aprobados').textContent = aprobados.length;
+
+            // Tabla Guardados (accion: Editar)
+            const tbodyG = document.getElementById('tbody-guardados');
+            if (guardados.length === 0) {
+                tbodyG.innerHTML = '<tr><td colspan="6" class="empty-row">No hay comprobaciones guardadas.</td></tr>';
+            } else {
+                tbodyG.innerHTML = guardados.map(h => `
+                    <tr>
+                        <td style="font-size:11px;">${formatDate(h.fechaRegistro)}</td>
+                        <td class="folio-cell">${escapeHtml(h.folio)}</td>
+                        <td>${escapeHtml(h.obra)}</td>
+                        <td class="amount-cell">${formatCurrency(h.total)}</td>
+                        <td style="text-align:center;">${h.items ? h.items.length : 0}</td>
+                        <td style="text-align:center;">
+                            <button class="btn-action-red" onclick="loadComprobacionForEdit('${escapeHtml(h.folio)}')">
+                                <i data-lucide="edit-3"></i> Editar
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            // Tabla Rechazados (accion: Editar + observacion)
+            const tbodyR = document.getElementById('tbody-rechazados');
+            if (rechazados.length === 0) {
+                tbodyR.innerHTML = '<tr><td colspan="7" class="empty-row">No hay comprobaciones rechazadas.</td></tr>';
+            } else {
+                tbodyR.innerHTML = rechazados.map(h => `
+                    <tr>
+                        <td style="font-size:11px;">${formatDate(h.fechaRegistro)}</td>
+                        <td class="folio-cell">${escapeHtml(h.folio)}</td>
+                        <td>${escapeHtml(h.obra)}</td>
+                        <td class="amount-cell">${formatCurrency(h.total)}</td>
+                        <td style="text-align:center;">${h.items ? h.items.length : 0}</td>
+                        <td style="font-size:11px; color:var(--danger); font-weight:600;">${escapeHtml(h.observacionRechazo || 'Sin observación')}</td>
+                        <td style="text-align:center;">
+                            <button class="btn-action-red" onclick="loadComprobacionForEdit('${escapeHtml(h.folio)}')">
+                                <i data-lucide="edit-3"></i> Editar
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            // Tabla Aprobados (accion: Ver - solo lectura)
+            const tbodyA = document.getElementById('tbody-aprobados');
+            if (aprobados.length === 0) {
+                tbodyA.innerHTML = '<tr><td colspan="6" class="empty-row">No hay comprobaciones aprobadas.</td></tr>';
+            } else {
+                tbodyA.innerHTML = aprobados.map(h => `
+                    <tr>
+                        <td style="font-size:11px;">${formatDate(h.fechaRegistro)}</td>
+                        <td class="folio-cell">${escapeHtml(h.folio)}</td>
+                        <td>${escapeHtml(h.obra)}</td>
+                        <td class="amount-cell">${formatCurrency(h.total)}</td>
+                        <td style="text-align:center;">${h.items ? h.items.length : 0}</td>
+                        <td style="text-align:center;">
+                            <button class="btn-action-red" onclick="loadComprobacionView('${escapeHtml(h.folio)}')">
+                                <i data-lucide="eye"></i> Ver
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+            lucide.createIcons();
+        }
+
+        // Cargar comprobacion en el tab Nuevo para editar
+        function loadComprobacionForEdit(folio) {
+            const h = historial.find(x => x.folio === folio);
+            if (!h) { showToast('No se encontró la comprobación.', 'error'); return; }
+            // Cambiar a tab Nuevo
+            switchTab('nuevo');
+            // Llenar campos
+            editingFolio = folio;
+            document.getElementById('input-folio').value = h.folio;
+            document.getElementById('input-obra').value = h.obra || '';
+            document.getElementById('input-fecha-inicio').value = h.fechaInicio || '';
+            document.getElementById('input-fecha-fin').value = h.fechaFin || '';
+            updatePeriodo();
+            document.getElementById('input-monto-recibido').value = h.recibido || 0;
+            document.getElementById('input-metodo').value = h.metodo || 'Efectivo';
+            // Cargar items
+            items = (h.items || []).map(i => ({
+                id: newItemId(),
+                tipo: i.tipo || 'Factura',
+                folio: i.folio || '',
+                fecha: i.fecha || '',
+                proveedor: i.proveedor || '',
+                concepto: i.concepto || '',
+                importe: parseFloat(i.importe) || 0,
+                observacion: i.observacion || '',
+                pdfFactura: null, pdfFacturaName: null,
+                xmlFactura: null, xmlFacturaName: null,
+                fotoNota: null, fotoNotaName: null
+            }));
+            renderItems();
+            updateSummary();
+            // Limpiar firma (no podemos restaurar la firma del historial)
+            // Scroll arriba
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            showToast('Comprobación ' + folio + ' cargada para edición.', 'success');
+        }
+
+        // Cargar comprobacion en modo solo lectura
+        let viewMode = false;
+        function loadComprobacionView(folio) {
+            const h = historial.find(x => x.folio === folio);
+            if (!h) { showToast('No se encontró la comprobación.', 'error'); return; }
+            switchTab('nuevo');
+            viewMode = true;
+            editingFolio = folio;
+            document.getElementById('input-folio').value = h.folio;
+            document.getElementById('input-obra').value = h.obra || '';
+            document.getElementById('input-fecha-inicio').value = h.fechaInicio || '';
+            document.getElementById('input-fecha-fin').value = h.fechaFin || '';
+            updatePeriodo();
+            document.getElementById('input-monto-recibido').value = h.recibido || 0;
+            document.getElementById('input-metodo').value = h.metodo || 'Efectivo';
+            items = (h.items || []).map(i => ({
+                id: newItemId(),
+                tipo: i.tipo || 'Factura',
+                folio: i.folio || '',
+                fecha: i.fecha || '',
+                proveedor: i.proveedor || '',
+                concepto: i.concepto || '',
+                importe: parseFloat(i.importe) || 0,
+                observacion: i.observacion || '',
+                pdfFactura: null, pdfFacturaName: null,
+                xmlFactura: null, xmlFacturaName: null,
+                fotoNota: null, fotoNotaName: null
+            }));
+            renderItems();
+            updateSummary();
+            // Deshabilitar todos los inputs y botones
+            document.querySelectorAll('#content-nuevo input, #content-nuevo select, #content-nuevo button').forEach(el => {
+                if (el.id !== 'btn-cancel') {
+                    el.disabled = true;
+                    el.dataset.wasDisabled = 'true';
+                }
+            });
+            // Mostrar aviso
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            showToast('Comprobación ' + folio + ' cargada en modo solo lectura.', 'info');
+        }
+
+        // Salir del modo vista/edicion y volver a nuevo
+        function exitEditMode() {
+            editingFolio = null;
+            viewMode = false;
+            // Rehabilitar inputs
+            document.querySelectorAll('#content-nuevo [data-was-disabled]').forEach(el => {
+                el.disabled = false;
+                delete el.dataset.wasDisabled;
+            });
+        }
+
+        // Cambiar de tab
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            const btn = document.querySelector('.tab-btn[data-tab="' + tabName + '"]');
+            const content = document.getElementById('content-' + tabName);
+            if (btn) btn.classList.add('active');
+            if (content) content.classList.add('active');
+            if (tabName !== 'nuevo' && (editingFolio || viewMode)) {
+                exitEditMode();
+                resetForm();
+            }
+            if (tabName !== 'nuevo') {
+                renderTabsTables();
+            }
+        }
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+        });
+
+        (async function() {
+            await loadHistorial();
+            renderTabsTables();
+            updateFolioInput();
+        })();
+
+        // =====================================================
+        // 7. VALIDAR Y GUARDAR
+        // =====================================================
+        function validateForm() {
+            const errors = [];
+            const obra = document.getElementById('input-obra').value.trim();
+            const fechaIni = document.getElementById('input-fecha-inicio').value;
+            const fechaFin = document.getElementById('input-fecha-fin').value;
+            if (!obra) errors.push('El nombre de la obra es obligatorio.');
+            if (!fechaIni) errors.push('La fecha de inicio es obligatoria.');
+            if (!fechaFin) errors.push('La fecha final es obligatoria.');
+            if (fechaIni && fechaFin && new Date(fechaIni) > new Date(fechaFin)) {
+                errors.push('La fecha de inicio no puede ser mayor a la fecha final.');
+            }
+            if (items.length === 0) errors.push('Debe agregar al menos un comprobante.');
+            items.forEach((item, idx) => {
+                if (!item.folio) errors.push(`Comprobante ${idx + 1}: falta el folio.`);
+                if (!item.fecha) errors.push(`Comprobante ${idx + 1}: falta la fecha.`);
+                if (!item.proveedor) errors.push(`Comprobante ${idx + 1}: falta el proveedor.`);
+                if (!item.concepto) errors.push(`Comprobante ${idx + 1}: falta el concepto.`);
+                if (!item.importe || item.importe <= 0) errors.push(`Comprobante ${idx + 1}: importe inválido.`);
+            });
+            return errors;
+        }
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('toast');
+            const msgEl = document.getElementById('toast-msg');
+            // Limpiar contenido y crear icono nuevo
+            const iconName = type === 'success' ? 'check-circle' : (type === 'error' ? 'alert-circle' : 'info');
+            toast.innerHTML = `<i data-lucide="${iconName}"></i><span id="toast-msg">${escapeHtml(msg)}</span>`;
+            toast.className = 'toast ' + type;
+            lucide.createIcons();
+            toast.classList.add('show');
+            clearTimeout(window._toastTimer);
+            window._toastTimer = setTimeout(() => toast.classList.remove('show'), 3500);
+        }
+        document.getElementById('btn-save').addEventListener('click', () => {
+            const errors = validateForm();
+            if (errors.length > 0) {
+                showToast('Faltan datos: ' + errors[0], 'error');
+                return;
+            }
+            const folio = document.getElementById('input-folio').value || generateFolio();
+            const total = items.reduce((acc, i) => acc + (parseFloat(i.importe) || 0), 0);
+            const recibido = parseFloat(document.getElementById('input-monto-recibido').value) || 0;
+            const registro = {
+                folio,
+                obra: document.getElementById('input-obra').value.trim(),
+                fechaInicio: document.getElementById('input-fecha-inicio').value,
+                fechaFin: document.getElementById('input-fecha-fin').value,
+                periodo: document.getElementById('input-periodo').value,
+                items: items.map(i => ({
+                    tipo: i.tipo,
+                    folio: i.folio,
+                    fecha: i.fecha,
+                    proveedor: i.proveedor,
+                    concepto: i.concepto,
+                    importe: i.importe,
+                    observacion: i.observacion,
+                    tienePdfFactura: !!i.pdfFactura,
+                    tieneXmlFactura: !!i.xmlFactura,
+                    tieneFotoNota: !!i.fotoNota
+                })),
+                total,
+                facturado: items.filter(i => i.tipo === 'Factura').reduce((a, i) => a + (parseFloat(i.importe) || 0), 0),
+                noFacturado: items.filter(i => i.tipo === 'Nota').reduce((a, i) => a + (parseFloat(i.importe) || 0), 0),
+                recibido,
+                devolucion: recibido - total,
+                metodo: document.getElementById('input-metodo').value,
+                usuario: getUserName(),
+                fechaRegistro: new Date().toISOString(),
+                status: 'guardado'
+            };
+            // Si estamos editando, reemplazar; si no, agregar
+            const idx = historial.findIndex(h => h.folio === folio);
+            if (idx >= 0) {
+                // Conservar observacionRechazo si tenia y status no era aprobado
+                const oldObs = historial[idx].observacionRechazo;
+                registro.observacionRechazo = oldObs;
+                historial[idx] = registro;
+            } else {
+                historial.push(registro);
+            }
+            saveHistorial();
+            renderTabsTables();
+            showToast('Comprobación ' + folio + ' guardada correctamente.', 'success');
+        });
+        document.getElementById('btn-submit').addEventListener('click', () => {
+            const errors = validateForm();
+            if (errors.length > 0) {
+                showToast('Faltan datos: ' + errors[0], 'error');
+                return;
+            }
+            showToast('Comprobación firmada y enviada a contabilidad.', 'success');
+            setTimeout(() => {
+                if (confirm('¿Deseas limpiar el formulario para una nueva comprobación?')) {
+                    resetForm();
+                }
+            }, 1500);
+        });
+        document.getElementById('btn-cancel').addEventListener('click', () => {
+            if (viewMode) {
+                // Salir del modo solo lectura
+                exitEditMode();
+                resetForm();
+                showToast('Saliendo del modo solo lectura.', 'info');
+                return;
+            }
+            if (editingFolio) {
+                if (confirm('¿Cancelar la edición? Los cambios no guardados se perderán.')) {
+                    exitEditMode();
+                    resetForm();
+                }
+            } else {
+                if (confirm('¿Cancelar la comprobación actual? Se perderán los datos no guardados.')) {
+                    resetForm();
+                }
+            }
+        });
+        function resetForm() {
+            editingFolio = null;
+            viewMode = false;
+            items = [];
+            document.getElementById('input-obra').value = '';
+            document.getElementById('input-fecha-inicio').value = '';
+            document.getElementById('input-fecha-fin').value = '';
+            document.getElementById('input-periodo').value = '';
+            document.getElementById('input-monto-recibido').value = '0';
+            document.getElementById('input-metodo').value = 'Efectivo';
+            // Rehabilitar inputs (en caso de haber salido del modo vista)
+            document.querySelectorAll('#content-nuevo [data-was-disabled]').forEach(el => {
+                el.disabled = false;
+                delete el.dataset.wasDisabled;
+            });
+            addItem(false);
+            updateSummary();
+            updateFolioInput();
+        }
+
+        lucide.createIcons();
+    </script>
+</body>
+</html>
